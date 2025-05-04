@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any, Mapping, List
+from doc_embedder.embedding_interface.embedding_interfaces import EmbeddingInterface
 
 class Document(ABC):
     """Represents a recoverable document."""
@@ -18,7 +19,7 @@ class Document(ABC):
 
     @property
     @abstractmethod
-    def embedding(self) -> List[float]:
+    def embedding(self) -> EmbeddingInterface:
         """Vector embedding of the document."""
         ...
 

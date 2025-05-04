@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any
+from doc_embedder.embedding_interface.embedding_interfaces import EmbeddingInterface
 
 class LLM(ABC):
     """Abstract base class for LLM implementations."""
@@ -14,7 +15,7 @@ class LLM(ABC):
         pass
 
     @abstractmethod
-    def generate_embedding(self, query: str) -> List[float]:
+    def generate_embedding(self, query: str) -> EmbeddingInterface:
         """
         Send a query to the LLM and get back an embedding vector.
         :param query: The input prompt or text to embed.

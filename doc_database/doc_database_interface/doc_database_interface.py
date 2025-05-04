@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional
-from interfaces.initial_topics_generator_interface.initial_topics_generator_interface import InitialTopicsGeneratorInterface
-from interfaces.doc_interface.doc_interface import Document
+from typing import List, Optional
+from doc_database.initial_topics_generator_interface.initial_topics_generator_interface import InitialTopicsGeneratorInterface
+from doc_database.doc_interface.doc_interface import Document
 class DocDatabaseInterface(ABC):
     """
     Abstract interface for a document‐oriented, vector‐enabled database.
