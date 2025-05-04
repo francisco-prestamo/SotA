@@ -1,16 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import Set
-from doc_database.doc_interface import Document
-from doc_embedder.doc_embedder_interface.doc_embedder_interface import DocEmbedderInterface
+from entities.document import Document
 
 class DocRecoverer(ABC):
     """Interface for recovering documents based on a text query."""
-
-    def __init__(self,embedder: DocEmbedderInterface):
-        """
-        Initializes the DocRecoverer with a document embedder.
-        """
-        self.embedder = embedder
 
     @abstractmethod
     def recover(self, query: str) -> Set[Document]:

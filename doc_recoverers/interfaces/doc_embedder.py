@@ -1,14 +1,13 @@
 from abc import ABC, abstractmethod
-from typing import List
-from doc_embedder.embedding_interface.embedding_interfaces import EmbeddingInterface
+from entities.embedding import Embedding
 
-class DocEmbedderInterface(ABC):
+class DocEmbedder(ABC):
     """
     Interface for generating vector embeddings from documents.
     """
 
     @abstractmethod
-    def embed(self, document_text: str) -> EmbeddingInterface:
+    def embed(self, document_text: str) -> Embedding:
         """
         Generate an embedding for the given document content.
 
@@ -19,3 +18,4 @@ class DocEmbedderInterface(ABC):
             Sequence[float]: The vector embedding of the document.
         """
         ...
+
