@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class TextTextLLMQuerier(ABC):
+class TextGenerator(ABC):
 
     @abstractmethod
     def generate_text(self, query: str) -> str:
