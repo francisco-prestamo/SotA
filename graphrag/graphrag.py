@@ -52,9 +52,8 @@ class GraphRAGBuilder:
     def extract_entities_and_relationships_from_text(self, text: str) -> Tuple[List[str], List[Tuple[str, str, str]]]:
         try:
             data = self.llm.generate_json(extract_graph_prompt(text), EntityRelationshipSchema)
-            validated = EntityRelationshipSchema.model_validate(data)
-            entities = validated.entities
-            relationships = validated.relationships
+            entities = data.entities
+            relationships = data.relationships
             return entities, relationships
         except (ValidationError, Exception):
             print("error in graph extraction")

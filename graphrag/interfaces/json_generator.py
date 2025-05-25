@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import Any, Type
+from typing import Type, TypeVar
 from pydantic import BaseModel
+
+T = TypeVar("T", bound=BaseModel)
 
 class JsonGenerator(ABC):
     @abstractmethod
-    def generate_json(self, query: str, schema: Type[BaseModel]) -> Any:
+    def generate_json(self, query: str, schema: Type[T]) -> T:
         """
         Send a query to the LLM and get back a JSON response.
         :param query: The input prompt or question.
