@@ -73,16 +73,15 @@ class GraphRAGBuilder:
         Returns a tuple: (entities, relationships)
         relationships: List of (entity1, relation, entity2)
         """
-        schema_str = EntityRelationshipSchema.schema_json(indent=2)
         prompt = (
             "Extract all named entities (people, places, concepts) and relationships between them "
             "from the following text.\n"
             "Return a JSON object matching this JSON schema:\n"
-            f"{schema_str}\n"
+            f"{EntityRelationshipSchema.schema_json(indent=2)}\n"
             f"Text: {doc.content}"
         )
         try:
-            data = self.llm.generate_json(prompt)
+            data = self.llm.generate_json(prompt, EntityRelationshipSchema)
             validated = EntityRelationshipSchema.parse_obj(data)
             entities = validated.entities
             relationships = validated.relationships
