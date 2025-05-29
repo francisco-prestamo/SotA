@@ -28,6 +28,7 @@ class TaskType(str, Enum):
     COMMUNICATION = "communication"
 
 class Task(BaseModel):
+    id: str
     title: str
     description: str
     type: TaskType
@@ -41,33 +42,34 @@ class Board:
         self,
         json_generator: JsonGenerator,
     ):
-
         self.json_generator: JsonGenerator = json_generator
         self.graphrag_builder: GraphRAGBuilder = GraphRAGBuilder(json_generator)
         self.knowledge_graph: KnowledgeGraph = self.graphrag_builder.build_knowledge_graph([])
         self.sota_table: SotaTable = None
         self.thesis_knowledge: ThesisKnowledgeModel = ThesisKnowledgeModel(thoughts=[], description="")
-        self.k: List[str] = []
         self.kanban: Dict[str, list[Task]] = {
             ItemStatus.TODO: [],
             ItemStatus.IN_PROGRESS: [],
             ItemStatus.DONE: []
         }
 
-    def add_(self, item: Task):
-        self.kanban[ItemStatus.TODO].append(item)
-        
+    def add_task(self, task: Task):
+        self.kanban[ItemStatus.TODO].append(task)
 
-    async def add_item_async(self, item: Task):
-        if(item.is_async):
-            item.status = ItemStatus.IN_PROGRESS
-            self.kanban[ItemStatus.TODO].append(item)
+    async def add_task_async(self, task: Task):
+        if task.is_async:
+            self.kanban[ItemStatus.TODO].append(task)
 
-            while item.status != ItemStatus.DONE:
-                await asyncio.sleep(0.5)
+            timeout = 600
+            elapsed = 0
+            while task.id not in [t.id for t in self.kanban[ItemStatus.DONE]]:
+                await asyncio.sleep(3)
+                elapsed += 3
+                if elapsed >= timeout:
+                    raise TimeoutError(f"Task '{task.title}' did not complete within {timeout} seconds.")
 
-            return item.response
+            return task.response
         else:
-            raise ValueError("Item is not async")
+            raise ValueError("Task is not async")
 
 
