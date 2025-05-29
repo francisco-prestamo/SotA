@@ -18,7 +18,7 @@ class Agent:
         self.json_generator = json_generator
         self.task_in_progress: Optional[Task] = None
 
-    def run(self, board: Board, skill: Any):
+    def run(self, board: Board, skill: TaskSkill):
         """
         Continuously process tasks: if a task is in progress, work on it; otherwise, get a new task by skill from the board.
         """
@@ -29,6 +29,7 @@ class Agent:
                 board.move_task_between_statuses(self.task_in_progress.id, ItemStatus.IN_PROGRESS, ItemStatus.DONE)
                 self.task_in_progress = None
             else:
+                print(f"Looking for tasks with skill: {skill}")
                 task = board.get_task_by_skill(skill)
                 if task:
                     board.move_task_between_statuses(task.id, ItemStatus.TODO, ItemStatus.IN_PROGRESS)
@@ -42,6 +43,7 @@ class Agent:
         """
         Returns the current task in progress.
         """
+        
 
 
         return self.task_in_progress
