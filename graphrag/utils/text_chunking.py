@@ -1,8 +1,13 @@
 import spacy
+from typing import List, Optional
+from entities.document import Document
+from graphrag.models.text_unit import TextUnit
+from pydantic import ValidationError
+from graphrag.interfaces.text_embedder import TextEmbedder
 
 nlp = spacy.load("en_core_web_sm")
 
-def chunk_text(text: str, max_tokens=300, overlap_tokens=50) -> list[str]:
+def chunk_text(text: str, max_tokens=30000, overlap_tokens=50) -> list[str]:
     """
     Chunk text into semantically meaningful chunks using spaCy, with overlap.
 
@@ -56,3 +61,37 @@ def chunk_text(text: str, max_tokens=300, overlap_tokens=50) -> list[str]:
         chunks.append(chunk_text)
 
     return chunks
+
+def chunk_document(text_embedder: TextEmbedder,document: Document, max_tokens=30000, overlap_tokens=50) -> List[TextUnit]:
+    """
+    Chunk document's content into semantically meaningful chunks using spaCy, with overlap,
+    and convert them to TextUnit objects.
+
+    Args:
+        document (Document): Input document to be chunked.
+        max_tokens (int): Maximum number of tokens per chunk.
+        overlap_tokens (int): Number of tokens to overlap between chunks.
+
+    Returns:
+        List[TextUnit]: list of TextUnit objects created from the chunks.
+    """
+    if not document.content:
+        raise ValidationError("Document content is empty")
+    
+    # Get raw text chunks using the chunking function
+    text_chunks = chunk_text(document.content, max_tokens=max_tokens, overlap_tokens=overlap_tokens)
+    
+    # Convert chunks to TextUnit objects
+    text_units = []
+    for i, chunk in enumerate(text_chunks):
+        text_unit = TextUnit(
+            document_id=document.id,
+            text=chunk,
+            unit_id=f"{document.id}_chunk_{i}",
+            position=i,
+            number_tokens=len(nlp(chunk)),
+            embedding=text_embedder.embed(chunk)
+        )
+        text_units.append(text_unit)
+    
+    return text_units
