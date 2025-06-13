@@ -9,6 +9,7 @@ from networkx.algorithms.community import louvain_communities
 
 import re
 from collections import defaultdict
+import concurrent.futures
 
 from entities.document import Document
 from graphrag.interfaces.json_generator import JsonGenerator
@@ -107,12 +108,17 @@ class GraphRAGBuilder:
                     textunit_entities[tu_union.unit_id] = entities
                     tu_union = None
         else:
-            for idx, tu in enumerate(tqdm(kg.text_units, desc="Extracting entities/relationships"), 1):
-                entities, relationships = self.extract_entities_and_relationships_from_textunit(tu)
-                all_entities.extend(entities)
-                all_relationships.extend(relationships)
-                # Save entities for this textunit_id (if tu has id)
-                textunit_entities[tu.unit_id] = entities
+            with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+                future_to_tu = {
+                    executor.submit(self.extract_entities_and_relationships_from_textunit, tu): tu
+                    for tu in kg.text_units
+                }
+                for idx, future in enumerate(tqdm(concurrent.futures.as_completed(future_to_tu), total=len(kg.text_units), desc="Extracting entities/relationships (multi-threaded)"), 1):
+                    tu = future_to_tu[future]
+                    entities, relationships = future.result()
+                    all_entities.extend(entities)
+                    all_relationships.extend(relationships)
+                    textunit_entities[tu.unit_id] = entities
         print("Finished extracting entities/relationships.")
         merged_entities: Dict[str, Tuple[EntityType,List[str]]] = {}
         entity_type_map: Dict[EntityType, List[str]] = {}
@@ -169,17 +175,115 @@ class GraphRAGBuilder:
             kg.add_community(comm)
         #==============================================================================================================================
         # # Phase 4: Community Summarization
-        for comm in tqdm(kg.communities, desc="Summarizing communities"):
-            report = self.summarize_community(comm, kg)
-            comm.report = report
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            future_to_comm = {
+                executor.submit(self.summarize_community, comm, kg): comm
+                for comm in kg.communities
+            }
+            for future in concurrent.futures.as_completed(future_to_comm):
+                comm = future_to_comm[future]
+                report = future.result()
+                comm.report = report
+                kg.add_community_report(report)
         #==============================================================================================================================
 
         return kg
 
-    def add_papers(self, kg: KnowledgeGraph, docs: List[Document]):
-        # todo
-        pass
+    def update_knowledge_graph(self, kg: KnowledgeGraph, docs: List[Document]):
+        """
+        Incrementally update the knowledge graph with new documents.
+        """
+        # 1. Chunk new documents and add text units
+        new_text_units = []
+        for doc in docs:
+            tus = self._chunk_document(doc, max_tokens=self.max_tokens, overlap_tokens=self.overlap_tokens)
+            for tu in tus:
+                kg.add_text_unit(tu)
+                new_text_units.append(tu)
 
+        # 2. Extract entities and relationships from new text units
+        all_entities = []
+        all_relationships = []
+        textunit_entities = {}
+        if self.low_consume:
+            tu_union = None
+            for idx, tu in enumerate(new_text_units, 1):
+                if tu_union is None:
+                    tu_union = tu
+                if tu_union.number_tokens + tu.number_tokens < self.max_tokens-100 and idx != len(new_text_units):
+                    tu_union.text += "\n"*3 + "#"*30 + "\n"*3 + tu.text
+                    tu_union.number_tokens += tu.number_tokens+50
+                else:
+                    entities, relationships = self.extract_entities_and_relationships_from_textunit(tu_union)
+                    all_entities.extend(entities)
+                    all_relationships.extend(relationships)
+                    textunit_entities[tu_union.unit_id] = entities
+                    tu_union = None
+        else:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+                future_to_tu = {
+                    executor.submit(self.extract_entities_and_relationships_from_textunit, tu): tu
+                    for tu in new_text_units
+                }
+                for idx, future in enumerate(tqdm(concurrent.futures.as_completed(future_to_tu), total=len(new_text_units), desc="Extracting entities/relationships (multi-threaded)"), 1):
+                    tu = future_to_tu[future]
+                    entities, relationships = future.result()
+                    all_entities.extend(entities)
+                    all_relationships.extend(relationships)
+                    textunit_entities[tu.unit_id] = entities
+
+        # 3. Merge new entities and relationships
+        merged_entities = {e.name: e for e in kg.entities}
+        for ent in all_entities:
+            if ent.name in merged_entities:
+                # Optionally update description (e.g., merge summaries)
+                merged_entities[ent.name].description += f"; {ent.description}"
+            else:
+                merged_entities[ent.name] = ent
+        # Summarize entity descriptions
+        for name, ent in merged_entities.items():
+            descs = ent.description.split(';')
+            ent.description = self.summary_descriptions(descs)
+        kg.entities = list(merged_entities.values())
+
+        # Update textunit-entity mapping
+        for textunit_id, entities in textunit_entities.items():
+            kg.add_textunits_entities(textunit_id, entities)
+
+        # Merge relationships
+        rel_key = lambda r: (r.source, r.target)
+        merged_relationships = {(r.source, r.target): r for r in kg.relationships}
+        for rel in all_relationships:
+            key = rel_key(rel)
+            if key in merged_relationships:
+                merged_relationships[key].description += f"; {rel.description}"
+            else:
+                merged_relationships[key] = rel
+        # Summarize relationship descriptions
+        for rel in merged_relationships.values():
+            descs = rel.description.split(';')
+            rel.description = self.summary_descriptions(descs)
+        kg.relationships = list(merged_relationships.values())
+
+        # 4. Re-run community detection and summarization
+        kg.communities = []
+        kg.community_reports = []
+        communities = self.detect_communities(kg)
+        for comm in communities:
+            kg.add_community(comm)
+            
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            future_to_comm = {
+                executor.submit(self.summarize_community, comm, kg): comm
+                for comm in kg.communities
+            }
+            for future in concurrent.futures.as_completed(future_to_comm):
+                comm = future_to_comm[future]
+                report = future.result()
+                comm.report = report
+                kg.add_community_report(report)
+
+        # Optionally, update covariates if needed (not shown here)
 
     def _chunk_document(self, doc: Document, max_tokens=100000, overlap_tokens=50) -> List[TextUnit]:
         """
@@ -326,7 +430,7 @@ class GraphRAGBuilder:
         Uses cosine similarity between the response embedding and each text unit embedding,
         then aggregates per document and sorts by average similarity.
         """
-        response = self.respond(query, kg, c=3)
+        response = query
         response_embedding = self.text_embedder.embed(response)
 
         # Map: doc_id -> [similarities]
@@ -335,9 +439,9 @@ class GraphRAGBuilder:
         for tu in kg.text_units:
             tu_embedding = self.text_embedder.embed(tu.text)
             # Cosine similarity
-            dot = sum(a * b for a, b in zip(response_embedding, tu_embedding))
-            norm1 = sum(a * a for a in response_embedding) ** 0.5
-            norm2 = sum(b * b for b in tu_embedding) ** 0.5
+            dot = sum(a * b for a, b in zip(response_embedding.vector, tu_embedding.vector))
+            norm1 = sum(a * a for a in response_embedding.vector) ** 0.5
+            norm2 = sum(b * b for b in tu_embedding.vector) ** 0.5
             similarity = dot / (norm1 * norm2 + 1e-8)
             doc_similarities[tu.document_id].append(similarity)
         for doc in kg.documents:
