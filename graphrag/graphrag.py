@@ -57,7 +57,7 @@ class FinalResponseModel(BaseModel):
     recommendations: List[str] = Field(description="Recommendations for further exploration")
 
 
-class GraphRAGBuilder:
+class GraphRag:
     """
     Builds a Graph-RAG from a collection of documents, following the GraphRAG Knowledge Model workflow.
     """
