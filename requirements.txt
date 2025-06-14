@@ -1,2 +1,5 @@
-
 networkx
+PyPDF2
+requests
+pydantic
+pdfminer
