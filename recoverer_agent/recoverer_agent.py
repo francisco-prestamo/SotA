@@ -60,6 +60,20 @@ class RecovererAgent:
         response = self.graphrag.respond(query, kg, k)
         return self.graphrag.find_documents(response, kg, k)
 
+    def get_survey_docs(self, query: str, k=3) -> List[Document]:
+        """
+        Get documents related to a survey based on the query
+        
+        Args:
+            query: The query to search for survey-related documents
+            k: The number of documents to retrieve
+            
+        Returns:
+            A list of retrieved documents from the first scrapper (Semantic Scholar Scrapper)
+        """
+        return self.scrappers[0].recover(query)[:k]
+
+
 
 
 
