@@ -1,0 +1,3 @@
+from receptionist_agent.prompts.thesis_assessment_prompt import thesis_assessment_prompt
+from receptionist_agent.prompts.experts_list_prompt import experts_list_prompt
+from receptionist_agent.prompts.update_thesis_knowledge_prompt import update_thesis_knowledge_prompt

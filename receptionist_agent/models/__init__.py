@@ -1,0 +1,3 @@
+from receptionist_agent.models.thesis_assessment_model import ThesisAssessmentModel
+from receptionist_agent.models.expert_model import ExpertModel
+from receptionist_agent.models.experts_list_model import ExpertsListModel
