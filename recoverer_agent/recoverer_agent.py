@@ -1,7 +1,5 @@
 from typing import List
 from pydantic import  create_model
-
-
 from concurrent.futures import ThreadPoolExecutor
 
 from entities.document import Document
@@ -15,8 +13,8 @@ from recoverer_agent.prompts.is_necessary_search_prompt import is_necessary_sear
 
 
 class RecovererAgent:
-    def __init__(self, json_ganerator: JsonGenerator, graphrag: GraphRag, scrappers: List[DocRecoverer]):
-        self.json_generator: JsonGenerator = json_ganerator
+    def __init__(self, json_generator: JsonGenerator, graphrag: GraphRag, scrappers: List[DocRecoverer]):
+        self.json_generator: JsonGenerator = json_generator
         self.graphrag: GraphRag = graphrag
         self.scrappers: List[DocRecoverer] = scrappers
 
