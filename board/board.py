@@ -1,7 +1,7 @@
 from board.interfaces.json_generator import JsonGenerator
 from entities.sota_table import SotaTable
 from graphrag.knowledge_graph import KnowledgeGraph
-from graphrag.graphrag import GraphRAGBuilder
+from graphrag.graphrag import GraphRag
 from typing import List, Dict, Optional, Any
 from pydantic import BaseModel
 from enum import Enum
@@ -44,7 +44,7 @@ class Board:
         json_generator: JsonGenerator,
     ):
         self.json_generator: JsonGenerator = json_generator
-        self.graphrag_builder: GraphRAGBuilder = GraphRAGBuilder(json_generator)
+        self.graphrag_builder: GraphRag = GraphRag(json_generator)
         self.knowledge_graph: KnowledgeGraph = self.graphrag_builder.build_knowledge_graph([])
         self.sota_table: SotaTable = None
         self.thesis_knowledge: ThesisKnowledgeModel = ThesisKnowledgeModel(thoughts=[], description="")
