@@ -2,7 +2,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Callable, TypeVar, Generic, List
 
-T = TypeVar('T')
+
+T = TypeVar("T")
+
 
 class KnowledgeRepository(ABC, Generic[T]):
     @abstractmethod
