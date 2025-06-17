@@ -2,7 +2,6 @@ import json
 from typing import Dict, Optional, Type
 
 from pydantic import BaseModel, create_model
-
 from ..models import ExpertDescription
 
 
@@ -13,6 +12,7 @@ class ExpertAnswerModel(BaseModel):
 
 
 def create_answers_model(experts: Dict[str, ExpertDescription]) -> Type[BaseModel]:
+
     """
     Dynamically create a Pydantic model with one field per expert.
     Each field is named after the expert key and has type ExpertAnswerModel.
@@ -47,6 +47,7 @@ This is a conversation of a team of domain experts to update a State of the Art 
 Current State of the Art Table (in Markdown):
 {sota_markdown}
 
+
 Thesis Context:
 Description:
 {thesis_desc}
@@ -71,3 +72,4 @@ Expected output schema:
 {answer_model_str}
 """
     return prompt
+

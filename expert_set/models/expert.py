@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 from ..models import DocumentChunk
 from ..interfaces import KnowledgeRepository
 
