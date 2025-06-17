@@ -1,10 +1,10 @@
 from typing import Callable, Generic, List, TypeVar
-from expert_set.interfaces import KnowledgeRepository
+from expert_set.interfaces import KnowledgeRepository, KnowledgeRepositoryFactory
+from rag_repo.interfaces.vectorial_db import VectorialDBFactory
 from .interfaces import RagRepoTextEmbedder, VectorialDB
 
 
 T = TypeVar("T")
-
 
 class RagRepo(Generic[T], KnowledgeRepository[T]):
     def __init__(self, text_embedder: RagRepoTextEmbedder, vector_repo: VectorialDB):
@@ -23,3 +23,13 @@ class RagRepo(Generic[T], KnowledgeRepository[T]):
         ids = self.vector_db.get_closest(vector, k)
 
         return [self.docs[id] for id in ids]
+
+
+class RagRepoFactory(KnowledgeRepositoryFactory):
+    def __init__(self, text_embedder: RagRepoTextEmbedder, vector_repo_factory: VectorialDBFactory):
+        self.embedder = text_embedder
+        self.vec_repo_factory = vector_repo_factory
+
+
+    def create_knowledge_repository(self) -> KnowledgeRepository:
+        return RagRepo(self.embedder, self.vec_repo_factory.create_vectorial_db())
