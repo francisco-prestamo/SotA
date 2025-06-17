@@ -1,9 +1,9 @@
+from typing import List
 from board.board import Board, ThesisKnowledgeModel
+from expert_set.models.build_expert_model import BuildExpertCommand
 from recoverer_agent.recoverer_agent import RecovererAgent
 from receptionist_agent.interfaces.json_generator import JsonGenerator
-from receptionist_agent.models.thesis_assessment_model import ThesisAssessmentModel
-from receptionist_agent.models.expert_model import ExpertModel
-from receptionist_agent.models.experts_list_model import ExpertsListModel
+from receptionist_agent.models import ThesisAssessmentModel, BuildExpertCommandList
 from receptionist_agent.prompts.thesis_assessment_prompt import thesis_assessment_prompt
 from receptionist_agent.prompts.experts_list_prompt import experts_list_prompt
 from receptionist_agent.prompts.update_thesis_knowledge_prompt import update_thesis_knowledge_prompt
@@ -64,18 +64,18 @@ class ReceptionistAgent:
         assessment = self.json_generator.generate_json(prompt, ThesisAssessmentModel)
         return assessment
     
-    def _generate_experts_list(self) -> ExpertsListModel:
+    def _generate_experts_list(self) -> BuildExpertCommandList:
         """
         Generate a list of experts based on the thesis knowledge.
         
         Returns:
             Model containing a list of experts
         """
-        prompt = experts_list_prompt(self.board.thesis_knowledge, ExpertsListModel)
-        experts_list = self.json_generator.generate_json(prompt, ExpertsListModel)
+        prompt = experts_list_prompt(self.board.thesis_knowledge, BuildExpertCommandList)
+        experts_list = self.json_generator.generate_json(prompt, BuildExpertCommandList)
         return experts_list
     
-    def interact(self):
+    def interact(self) -> List[BuildExpertCommand]:
         """
         Main interaction loop with the user to gather thesis knowledge.
         """

@@ -1,5 +1,5 @@
-from abc import ABC, abstractmethod
-from typing import List, Optional, Self
+from abc import abstractmethod
+from typing import Optional, Self
 import numpy as np
 
 class Embedding:

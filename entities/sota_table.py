@@ -1,7 +1,7 @@
 from entities.document import Document
-from typing import List, Dict, Any
-from pydantic import BaseModel
-
+from typing import List, Dict, Any, Tuple
+from pydantic import BaseModel, Field
+import pandas as pd
 
 class PaperFeaturesModel(BaseModel):
     authors: List[str]
@@ -10,21 +10,31 @@ class PaperFeaturesModel(BaseModel):
     domain: str
     features: Dict[str, Dict[str, Any]]
 
-class SotaTable:
-    def __init__(self):
-        """
-        Initializes the SotaTable with columns, rows, documents, features, and paper_features.
-        :param columns: List of column names.
-        :param rows: List of rows, each row is a list of strings.
-        :param documents: List of Document objects associated with the table.
-        :param features: List of feature names (str).
-        :param paper_features: List of PaperFeaturesModel, one for each document.
-        """
-        self.features: list[str] = []
-        self.documents_features : list[tuple[Document, PaperFeaturesModel]] = []
+class SotaTable(BaseModel):
+    features: List[str] = Field(default=[])
+    document_features: List[Tuple[Document, PaperFeaturesModel]] = Field(default=[])
 
-    def __str__(self) -> str:
-        """
-        Returns a string representation of the SOTA table (columns, rows, and features).
-        """
-        return ""
+def sota_table_to_dataframe(sota_table: SotaTable) -> pd.DataFrame:
+    rows = []
+
+    for _, paper in sota_table.document_features:
+        base_data = {
+            "authors": ", ".join(paper.authors),
+            "title": paper.title,
+            "year": paper.year,
+            "domain": paper.domain
+        }
+
+        for feature_name in sota_table.features:
+            base_data[feature_name] = paper.features.get(feature_name, {}).get("value", None)
+
+        rows.append(base_data)
+
+    df = pd.DataFrame(rows)
+    return df
+
+
+def sota_table_to_markdown(sota_table: SotaTable) -> str:
+    df = sota_table_to_dataframe(sota_table)
+    return df.to_markdown(index=False)
+

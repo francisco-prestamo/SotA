@@ -1,4 +1,8 @@
-def experts_list_prompt(thesis_knowledge, experts_list_model):
+from board.board import ThesisKnowledgeModel
+from ..models import BuildExpertCommandList
+
+
+def experts_list_prompt(thesis_knowledge: ThesisKnowledgeModel):
     """
     Prompt for generating a list of experts based on thesis knowledge.
     
@@ -22,7 +26,7 @@ Collected Knowledge Points:
     for thought in thesis_knowledge.thoughts:
         prompt += f"- {thought}\n"
     
-    prompt += """
+    prompt += f"""
 Based on the above information, generate a list of 3-5 experts who would be ideal to provide surveys about the state-of-the-art in the thesis topic.
 
 For each expert, provide:
@@ -30,22 +34,9 @@ For each expert, provide:
 2. A brief description of their expertise and background
 3. A specific query that would be used to search for surveys they might have authored or would be knowledgeable about
 
-Example Output:
+Expected Output:
 ```
-{
-  "experts": [
-    {
-      "name": "Dr. Alex Martinez",
-      "description": "Expert in computer vision with focus on image segmentation techniques",
-      "query": "image segmentation deep learning survey recent advances"
-    },
-    {
-      "name": "Prof. Sarah Johnson",
-      "description": "Specialist in reinforcement learning applications for robotic control",
-      "query": "reinforcement learning robotics survey state-of-the-art"
-    }
-  ]
-}
+{BuildExpertCommandList.model_json_schema()}
 ```
 
 Generate a diverse list of experts covering different aspects of the thesis topic. The experts should be complementary, not redundant.
