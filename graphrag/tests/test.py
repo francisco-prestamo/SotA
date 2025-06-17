@@ -500,7 +500,7 @@ def main():
     graph_rag = GraphRag(
         text_embedder=NomicAIEmbedder(dimensions=128),
         json_generator=GeminiJsonGenerator(),
-        max_tokens=2000,
+        max_tokens=1000,
         low_consume=False,
     )
 
@@ -510,10 +510,10 @@ def main():
     # Run test suite
     results = tester.run_test_suite(
         max_queries=1,  # Test with 3 queries
-        k=5,  # Retrieve top 10 documents
+        k=3,  # Retrieve top 10 documents
         rebuild_kg=True,
-        top_scored_per_query=5,  # Top 25 scored docs per query
-        random_docs_per_query=20,  # Plus 25 random docs per query
+        top_scored_per_query=3,  # Top 25 scored docs per query
+        random_docs_per_query=7,  # Plus 25 random docs per query
     )
 
     # Save results
