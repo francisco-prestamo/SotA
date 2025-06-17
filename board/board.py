@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 from graphrag.graphrag import GraphRag
 
 
-class ThesisKnowledge(BaseModel):
+class ThesisKnowledgeModel(BaseModel):
     description: str = Field(default="")
     thoughts: List[str] = Field(default_factory=list)
     history: List[str] = Field(default_factory=list)
@@ -28,7 +28,7 @@ class Board:
         self.graph_rag = graph_rag
         self.knowledge_graph = graph_rag.build_knowledge_graph([])
         self.sota_table: SotaTable = SotaTable()
-        self.thesis_knowledge = ThesisKnowledge(
+        self.thesis_knowledge = ThesisKnowledgeModel(
             description=initial_thesis_description,
             history=[initial_thesis_description] if initial_thesis_description else []
         )
