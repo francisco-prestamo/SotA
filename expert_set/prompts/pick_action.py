@@ -100,3 +100,47 @@ as when they were described, their answers will be of the following form, consid
 Output only an answer in the following schema, no extra text
 {answer_model_str}
 """
+
+class SummaryAnswerModel(BaseModel):
+    summary: str
+
+def pick_action_summary_prompt(pick_action_prompt: str, answer: BaseModel, chosen_action: RoundAction) -> str:
+    return f"""
+
+As the moderator in a discussion between experts in order to build a state of the art table for a research paper, your role at the moment
+is to summarize the process the experts went through to make a decision on what to do next, you are expected to provide a concise summary
+of the interaction, the chosen action and the general rationale as to why it was chosen, based on the proceedings, output
+a json object containing a summary with the following schema:
+
+{json.dumps(SummaryAnswerModel.model_json_schema(), indent=2)}
+
+The process of decision making is as follows
+
+--- Role: System ---
+
+{pick_action_prompt}
+
+--- Role: Experts ---
+
+{json.dumps(answer.model_dump(), indent=2)}
+
+--- Role: System ---
+
+After a count of the votes, the following action was chosen: {chosen_action}
+
+    """
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

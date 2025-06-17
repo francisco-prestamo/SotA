@@ -15,9 +15,20 @@ from .prompts.pick_action import (
     pick_action_prompt,
     ExpertPresentation,
     create_answers_model as create_pick_action_prompt_answer_model,
+    pick_action_summary_prompt,
+    SummaryAnswerModel,
 )
 from .models import Expert, DocumentChunk, ExpertDescription, RoundAction
 from .interfaces import JsonGenerator
+
+
+EXTRA_CONTEXT_AMOUNT_OF_PAPERS = 2
+
+
+class PickActionResult(BaseModel):
+    action: RoundAction
+    summary: str
+    expert_presentations: Dict[str, ExpertPresentation]
 
 
 class ActionPicker:
@@ -33,7 +44,7 @@ class ActionPicker:
         self.thesis_description = board.thesis_knowledge.description
         self.document_recoverer = recoverer_agent
 
-    def pick_action(self, experts: List[Expert]) -> RoundAction:
+    def pick_action(self, experts: List[Expert]) -> PickActionResult:
         id_to_expert = self._generate_expert_id_dict(experts)
         expert_descriptions = self._extract_descriptions_from_id_dict(id_to_expert)
 
@@ -52,7 +63,28 @@ class ActionPicker:
 
         id_to_intervention = self.json_generator.generate_json(prompt, answer_model)
 
-        return self._parse_answer_and_count_votes(id_to_intervention)
+        chosen_action = self._parse_answer_and_count_votes(id_to_intervention)
+
+        summary = self._summarize_action_picking_process(
+            prompt, id_to_intervention, chosen_action
+        )
+
+        return PickActionResult(summary=summary, action=chosen_action, expert_presentations=id_to_presentation)
+
+    def _summarize_action_picking_process(
+        self,
+        pick_action_prompt: str,
+        pick_action_answer: BaseModel,
+        chosen_action: RoundAction,
+    ) -> str:
+
+        summary_prompt = pick_action_summary_prompt(
+            pick_action_prompt, pick_action_answer, chosen_action
+        )
+
+        summary = self.json_generator.generate_json(summary_prompt, SummaryAnswerModel)
+
+        return summary.summary
 
     def _parse_answer_and_count_votes(
         self, id_to_intervention: BaseModel
@@ -130,7 +162,9 @@ class ActionPicker:
             if not query:
                 continue
 
-            chunks = expert.knowledge.query_knowledge(query, 2)
+            chunks = expert.knowledge.query_knowledge(
+                query, EXTRA_CONTEXT_AMOUNT_OF_PAPERS
+            )
             answ[expert_id] = chunks
 
         return answ
