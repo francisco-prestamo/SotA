@@ -16,6 +16,8 @@ from .prompts.build_expert_search_reasoning_prompt import build_expert_search_re
 from .models.paper_addition_result_model import PaperAdditionResult
 from .models.expert_chunk_new_features_model import ExpertChunkNewFeatures
 from .models.paper_feature_extraction_model import PaperFeatureExtraction
+from .models.string_response_model import StringResponseModel
+from .models.dict_response_model import DictResponseModel
 
 # Import the moved prompts
 from .prompts.feature_extraction_prompt import build_feature_extraction_prompt
@@ -72,7 +74,8 @@ class PaperAdder:
         # Synthesize search queries
         all_queries = [getattr(expert_searches, name).what_to_search for name in expert_names]
         synthesis_prompt = build_search_query_synthesis_prompt(all_queries)
-        summary_query = self.json_generator.generate_json(synthesis_prompt, str)
+        summary_query_model = self.json_generator.generate_json(synthesis_prompt, StringResponseModel)
+        summary_query = summary_query_model.response
         
         # Recover new documents
         new_docs = self.recoverer_agent.recover_docs(summary_query, self.board.knowledge_graph, self.k)
@@ -96,7 +99,8 @@ class PaperAdder:
         summary_prompt = build_addition_summary_prompt(
             added_titles, expert_names, new_features
         )
-        summary = self.json_generator.generate_json(summary_prompt, str)
+        summary_model = self.json_generator.generate_json(summary_prompt, StringResponseModel)
+        summary = summary_model.response
         
         return PaperAdditionResult(papers_added=added_titles, summary=summary)
 
@@ -224,7 +228,8 @@ class PaperAdder:
         )
         
         try:
-            response = self.json_generator.generate_json(prompt, dict)
+            response_model = self.json_generator.generate_json(prompt, DictResponseModel)
+            response = response_model.data
             new_features = response.get("new_features", [])
             feature_values = response.get("feature_values", {})
         except Exception as e:
@@ -260,7 +265,8 @@ class PaperAdder:
                 prompt = build_feature_consolidation_prompt(
                     feature_name, paper_title, values
                 )
-                consolidated_value = self.json_generator.generate_json(prompt, str)
+                consolidated_model = self.json_generator.generate_json(prompt, StringResponseModel)
+                consolidated_value = consolidated_model.response
             else:
                 consolidated_value = "Not Available"
             
@@ -293,7 +299,8 @@ class PaperAdder:
                 prompt = build_feature_consolidation_prompt(
                     feature_name, paper_title, values
                 )
-                consolidated_value = self.json_generator.generate_json(prompt, str)
+                consolidated_model = self.json_generator.generate_json(prompt, StringResponseModel)
+                consolidated_value = consolidated_model.response
             else:
                 consolidated_value = "Not Available"
             
@@ -319,8 +326,8 @@ class PaperAdder:
         )
         
         try:
-            domain = self.json_generator.generate_json(prompt, str)
-            return domain
+            domain_model = self.json_generator.generate_json(prompt, StringResponseModel)
+            return domain_model.response
         except Exception as e:
             logging.error(f"Failed to extract domain: {e}")
             return ""
