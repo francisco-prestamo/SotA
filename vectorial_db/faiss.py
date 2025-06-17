@@ -1,3 +1,4 @@
+from typing import List
 import faiss
 import numpy as np
 
@@ -28,5 +29,3 @@ class FaissVectorialDB(VectorialDB):
         vec = np.expand_dims(vector.astype(np.float32), axis=0)
         _, indices = self.id_map.search(vec, k)
         return indices[0].tolist()
-
-

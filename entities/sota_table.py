@@ -14,7 +14,7 @@ class SotaTable(BaseModel):
     features: List[str] = Field(default=[])
     document_features: List[Tuple[Document, PaperFeaturesModel]] = Field(default=[])
 
-def sota_table_to_dataframe(sota_table: SotaTable) -> pd.DataFrame:
+def sota_table_to_dataframe(sota_table: SotaTable, include_id: bool = False) -> pd.DataFrame:
     rows = []
 
     for _, paper in sota_table.document_features:
@@ -24,6 +24,9 @@ def sota_table_to_dataframe(sota_table: SotaTable) -> pd.DataFrame:
             "year": paper.year,
             "domain": paper.domain
         }
+
+        if include_id:
+            base_data["id"] = paper.id
 
         for feature_name in sota_table.features:
             base_data[feature_name] = paper.features.get(feature_name, {}).get("value", None)
