@@ -27,34 +27,11 @@ from graphrag.utils.text_chunking import chunk_document
 from graphrag.models.graph_types import Entity, Relationship, Claim, EntityType, Community, CommunityReport
 from graphrag.models.summary_description import SummaryDescriptionModel
 
-
-class InitialAnswerModel(BaseModel):
-    """Model for structured initial answer generation"""
-    answer: str = Field(description="Comprehensive initial answer based on community insights")
-    key_insights: List[str] = Field(description="List of key insights extracted from communities")
-    confidence_score: float = Field(description="Confidence score between 0.0 and 1.0")
-    reasoning: str = Field(description="Explanation of how the answer was derived")
-
-class FollowUpQuestionsModel(BaseModel):
-    """Model for generating structured follow-up questions"""
-    questions: List[str] = Field(description="List of relevant follow-up questions to explore")
-    question_types: List[str] = Field(description="Types of each question (entity, relationship, temporal, causal)")
-    priority_scores: List[float] = Field(description="Priority scores for each question (0.0-1.0)")
-
-class LocalSearchModel(BaseModel):
-    """Model for local search results"""
-    answer: str = Field(description="Detailed answer from local search")
-    evidence: List[str] = Field(description="List of evidence sources supporting the answer")
-    confidence_score: float = Field(description="Confidence score for this local search result")
-    entity_mentions: List[str] = Field(description="Key entities mentioned in the search results")
-
-class FinalResponseModel(BaseModel):
-    """Model for the final structured response"""
-    executive_summary: str = Field(description="High-level executive summary of findings")
-    global_insights: str = Field(description="Key insights from global community analysis")
-    local_findings: List[str] = Field(description="Important findings from local searches")
-    confidence_assessment: str = Field(description="Overall confidence assessment and limitations")
-    recommendations: List[str] = Field(description="Recommendations for further exploration")
+# Import the moved models
+from graphrag.models.initial_answer_model import InitialAnswerModel
+from graphrag.models.follow_up_questions_model import FollowUpQuestionsModel
+from graphrag.models.local_search_model import LocalSearchModel
+from graphrag.models.final_response_model import FinalResponseModel
 
 
 class GraphRag:
@@ -77,13 +54,21 @@ class GraphRag:
         kg = KnowledgeGraph(documents=documents)
 
         #==============================================================================================================================
-        # Phase 1: Compose TextUnits
-        for doc in documents:
+        # Phase 1: Compose TextUnits using threads
+        def process_document(doc):
             text_units: List[TextUnit] = self._chunk_document(doc, max_tokens=self.max_tokens, overlap_tokens=self.overlap_tokens)
-            for tu in text_units:
-                kg.add_text_unit(tu)
-                print(f"Processed TextUnit: {tu.unit_id} from Document: {doc.id} with {tu.number_tokens} tokens.")
-                print(f"TextUnit Embedding: {tu.embedding.vector}")
+            return text_units
+            
+        all_text_units = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            future_to_doc = {executor.submit(process_document, doc): doc for doc in documents}
+            for future in tqdm(concurrent.futures.as_completed(future_to_doc), total=len(documents), desc="Processing documents"):
+                text_units = future.result()
+                all_text_units.extend(text_units)
+                
+        # Add all text units to the knowledge graph
+        for tu in all_text_units:
+            kg.add_text_unit(tu)
         #==============================================================================================================================      
         # Phase 2: Graph Extraction (Entities, Relationships, Covariates)
         all_entities: List[Entity] = []
@@ -193,13 +178,18 @@ class GraphRag:
         """
         Incrementally update the knowledge graph with new documents.
         """
-        # 1. Chunk new documents and add text units
+        # 1. Chunk new documents and add text units using threads
+        def process_document(doc):
+            return self._chunk_document(doc, max_tokens=self.max_tokens, overlap_tokens=self.overlap_tokens)
+            
         new_text_units = []
-        for doc in docs:
-            tus = self._chunk_document(doc, max_tokens=self.max_tokens, overlap_tokens=self.overlap_tokens)
-            for tu in tus:
-                kg.add_text_unit(tu)
-                new_text_units.append(tu)
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future_to_doc = {executor.submit(process_document, doc): doc for doc in docs}
+            for future in tqdm(concurrent.futures.as_completed(future_to_doc), total=len(docs), desc="Processing new documents"):
+                tus = future.result()
+                for tu in tus:
+                    kg.add_text_unit(tu)
+                    new_text_units.append(tu)
 
         # 2. Extract entities and relationships from new text units
         all_entities = []
@@ -437,7 +427,7 @@ class GraphRag:
         doc_similarities = defaultdict(list)
         doc_id_to_doc = {}
         for tu in kg.text_units:
-            tu_embedding = self.text_embedder.embed(tu.text)
+            tu_embedding = tu.embedding
             # Cosine similarity
             dot = sum(a * b for a, b in zip(response_embedding.vector, tu_embedding.vector))
             norm1 = sum(a * a for a in response_embedding.vector) ** 0.5
@@ -446,10 +436,10 @@ class GraphRag:
             doc_similarities[tu.document_id].append(similarity)
         for doc in kg.documents:
             doc_id_to_doc[doc.id] = doc
-        # Compute average similarity per document
+        
         doc_avg_sim = []
         for doc_id, sims in doc_similarities.items():
-            avg_sim = sum(sims) / len(sims)
+            avg_sim = sum((sim)**3 for sim in sims) / len(sims)
             doc_avg_sim.append((doc_id, avg_sim))
         # Sort by similarity descending
         doc_avg_sim.sort(key=lambda x: x[1], reverse=True)
