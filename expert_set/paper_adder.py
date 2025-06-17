@@ -12,14 +12,12 @@ from entities.document import Document
 from .models.expert_search_reasoning_model import build_expert_search_reasoning_model
 from .prompts.build_expert_search_reasoning_prompt import build_expert_search_reasoning_prompt
 
-# Import the moved models
 from .models.paper_addition_result_model import PaperAdditionResult
 from .models.expert_chunk_new_features_model import ExpertChunkNewFeatures
 from .models.paper_feature_extraction_model import PaperFeatureExtraction
 from .models.string_response_model import StringResponseModel
 from .models.dict_response_model import DictResponseModel
 
-# Import the moved prompts
 from .prompts.feature_extraction_prompt import build_feature_extraction_prompt
 from .prompts.new_feature_identification_prompt import build_new_feature_identification_prompt
 from .prompts.feature_consolidation_prompt import build_feature_consolidation_prompt
@@ -108,15 +106,56 @@ class PaperAdder:
         """Add a single paper to the SOTA table by extracting features"""
         # Extract features from the document
         extraction_result = self._extract_paper_features(doc, experts)
-        
-        # Update SOTA table features if new ones were found
+         # Update SOTA table features if new ones were found
+        new_features_added = []
         for new_feature in extraction_result.consolidated_new_features:
             if new_feature not in self.board.sota_table.features:
                 self.board.sota_table.features.append(new_feature)
-                # Add empty values for existing papers
-                for existing_doc, existing_features in self.board.sota_table.document_features:
+                new_features_added.append(new_feature)
+        
+        # If we added new features, process all existing documents to check for these features
+        if new_features_added:
+            from expert_set.utils.document_chunking import chunk_document
+            
+            for existing_doc, existing_features in self.board.sota_table.document_features:
+                # First initialize with "Not Available"
+                for new_feature in new_features_added:
                     if new_feature not in existing_features.features:
                         existing_features.features[new_feature] = {"value": "Not Available"}
+                
+                # Now process document chunks to find values for the new features
+                chunks = chunk_document(existing_doc)
+                chunk_new_feature_values = []
+                
+                # Process each chunk to find new features
+                for chunk_idx, chunk in enumerate(chunks):
+                    # Extract values for the new features from this chunk
+                    feature_values = self._extract_new_feature_values_from_chunk(
+                        chunk, chunk_idx, new_features_added, existing_doc
+                    )
+                    if feature_values:
+                        chunk_new_feature_values.append(feature_values)
+                
+                # Consolidate the feature values found across all chunks
+                if chunk_new_feature_values:
+                    for new_feature in new_features_added:
+                        # Collect all values for this feature from different chunks
+                        values = []
+                        for feature_dict in chunk_new_feature_values:
+                            if new_feature in feature_dict and feature_dict[new_feature]:
+                                values.append(feature_dict[new_feature])
+                        
+                        # If we found values, consolidate them
+                        if values:
+                            prompt = build_feature_consolidation_prompt(
+                                new_feature, existing_doc.title, values
+                            )
+                            try:
+                                consolidated_model = self.json_generator.generate_json(prompt, StringResponseModel)
+                                consolidated_value = consolidated_model.response
+                                existing_features.features[new_feature] = {"value": consolidated_value}
+                            except Exception as e:
+                                logging.warning(f"Failed to consolidate feature {new_feature} for document {existing_doc.title}: {e}")
         
         # Combine all features for this paper
         all_features = {}
@@ -335,3 +374,34 @@ class PaperAdder:
     def _display_thoughts(self, thoughts: List[str]) -> str:
         """Format thesis thoughts for display"""
         return "\n".join([f"- {thought}" for thought in thoughts])
+    
+    def _extract_new_feature_values_from_chunk(
+        self,
+        chunk,
+        chunk_idx: int,
+        new_features: List[str],
+        doc: Document
+    ) -> Dict[str, str]:
+        """Extract values for specific new features from a document chunk"""
+        # Create a simple prompt to extract values for these specific features
+        prompt = build_new_feature_identification_prompt(
+            "Document Analyzer",  # Generic expert name
+            "Expert in extracting features from academic papers", # Generic description
+            doc.title,
+            doc.authors,
+            chunk.chunk,
+            new_features  # Only looking for the new features
+        )
+        
+        try:
+            response_model = self.json_generator.generate_json(prompt, DictResponseModel)
+            response = response_model.data
+            feature_values = response.get("feature_values", {})
+            
+            # Only keep values for the specific new features we're looking for
+            filtered_values = {f: feature_values.get(f, "") for f in new_features if f in feature_values}
+            return filtered_values
+            
+        except Exception as e:
+            logging.warning(f"Failed to extract new feature values for chunk {chunk_idx} of {doc.title}: {e}")
+            return {}
