@@ -11,3 +11,8 @@ class VectorialDB(ABC):
     @abstractmethod
     def get_closest(self, vector: np.ndarray, k: int) -> List[int]:
         pass
+
+class VectorialDBFactory(ABC):
+    @abstractmethod
+    def create_vectorial_db(self) -> VectorialDB:
+        pass

@@ -2,7 +2,7 @@ from typing import List
 import faiss
 import numpy as np
 
-from rag_repo.interfaces.vectorial_db import VectorialDB
+from rag_repo.interfaces.vectorial_db import VectorialDB, VectorialDBFactory
 
 
 class FaissVectorialDB(VectorialDB):
@@ -29,3 +29,10 @@ class FaissVectorialDB(VectorialDB):
         vec = np.expand_dims(vector.astype(np.float32), axis=0)
         _, indices = self.id_map.search(vec, k)
         return indices[0].tolist()
+
+class FaissVecDBFactory(VectorialDBFactory):
+    def __init__(self, dim: int) -> None:
+        self.dim = dim
+
+    def create_vectorial_db(self) -> VectorialDB:
+        return FaissVectorialDB(self.dim)

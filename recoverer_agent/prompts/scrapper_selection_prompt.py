@@ -1,5 +1,3 @@
-from recoverer_agent.models.scrapper_selection_model import ScrapperSelectionModel
-
 def scrapper_selection_prompt(query: str, scrapper_infos: list, result_schema) -> str:
     descriptions = "\n".join([f"{info['name']}: {info['description']}" for info in scrapper_infos])
     return f"""

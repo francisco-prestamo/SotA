@@ -1,6 +1,8 @@
 from typing import List
 from board.board import Board
 from entities.sota_table import SotaTable
+from expert_set.document_remover import DocumentRemover
+from expert_set.paper_adder import PaperAdder
 from recoverer_agent import RecovererAgent
 from .interfaces import KnowledgeRepositoryFactory, JsonGenerator, UserQuerier
 from .models import RoundAction, BuildExpertCommand
@@ -35,6 +37,7 @@ class ExpertSet:
             document_recoverer, knowledge_repository_factory
         )
         self.experts = self.expert_builder.build_experts(expert_build_commands)
+        self.history = []
 
     def build_sota(self) -> SotaTable:
         """
@@ -66,6 +69,7 @@ class ExpertSet:
             self._handle_user_questions(action_result)
         elif action_result.action == RoundAction.AddDocument:
             self._handle_add_documents()
+
 
         return action_result
 

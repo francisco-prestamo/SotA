@@ -94,6 +94,10 @@ not relevant given the provided description
 {RoundAction.AskUser.value}: Ask the user, this choice is to be made when clarification is needed for some part of the description of the paper,
 the user commanded this entire operation, and it is they who help build the description of the paper
 
+{RoundAction.AcceptSota.value}: Accept Sota (State of the Art), this choice is to be made when the experts are
+completely sure there are no relevant topics explored in the research paper that aren't covered in the existing
+state of the art table
+
 Given this information, each expert will now intervene in the process of making a decision, following a similar schema
 as when they were described, their answers will be of the following form, consider that the expert ids must match with the id in their descriptions above
 
