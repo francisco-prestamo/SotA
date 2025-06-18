@@ -89,7 +89,8 @@ class ActionPicker:
     def _parse_answer_and_count_votes(
         self, id_to_intervention: BaseModel
     ) -> RoundAction:
-        votes = {action: 0 for action in RoundAction}
+
+        votes = {action.value: 0 for action in RoundAction}
         for _, intervention in id_to_intervention.model_dump().items():
             intervention = ExpertIntervention.model_validate(intervention)
             votes[intervention.action_choice] += 1
@@ -154,7 +155,7 @@ class ActionPicker:
     ) -> Dict[str, List[DocumentChunk]]:
 
         answ = {}
-        for expert_id, expert_answer in answer.model_json_schema().items():
+        for expert_id, expert_answer in answer.model_dump().items():
             expert = experts[expert_id]
 
             validated_answer = ExpertAnswerModel.model_validate(expert_answer)

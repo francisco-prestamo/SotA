@@ -31,6 +31,10 @@ class ExpertIntervention(BaseModel):
     reasoning: str
     action_choice: RoundAction
 
+    class Config:
+        use_enum_values = True
+
+
 
 def create_answers_model(experts: Dict[str, ExpertDescription]) -> Type[BaseModel]:
     """
@@ -109,6 +113,9 @@ class SummaryAnswerModel(BaseModel):
     summary: str
 
 def pick_action_summary_prompt(pick_action_prompt: str, answer: BaseModel, chosen_action: RoundAction) -> str:
+    print("answer")
+    print(answer)
+    print(answer.model_dump())
     return f"""
 
 As the moderator in a discussion between experts in order to build a state of the art table for a research paper, your role at the moment

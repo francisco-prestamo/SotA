@@ -69,7 +69,8 @@ class RecovererAgent:
         Returns:
             A list of retrieved documents from the first scrapper (Semantic Scholar Scrapper)
         """
-        return self.scrappers[0].recover(query)[:k]
+        
+        return list(self.scrappers[0].recover(query))[:k]
 
 
 

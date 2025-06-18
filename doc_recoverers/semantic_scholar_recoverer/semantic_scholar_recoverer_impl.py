@@ -12,7 +12,7 @@ from doc_recoverers.doc_utils.doc_cleaner import DocumentContentCleaner
 class SemanticScholarRecoverer(DocRecoverer):
     """Recover documents from Semantic Scholar with arXiv PDF fallback."""
     BASE_URL = "https://api.semanticscholar.org/graph/v1/paper/search"
-    MAX_RETRIES = 5
+    MAX_RETRIES = 100
 
     @property
     def name(self) -> str:
@@ -40,7 +40,7 @@ class SemanticScholarRecoverer(DocRecoverer):
                 if resp.status_code == 200:
                     break
                 if resp.status_code in {403, 429}:
-                    time.sleep(2 ** attempt)
+                    time.sleep(0.5)
                 else:
                     resp.raise_for_status()
             except requests.RequestException:
@@ -48,7 +48,7 @@ class SemanticScholarRecoverer(DocRecoverer):
                     raise
 
         if not resp or resp.status_code != 200:
-            raise Exception(f"Failed Semantic Scholar query after {self.MAX_RETRIES} attempts")
+            raise Exception(f"Failed Semantic Scholar query after {self.MAX_RETRIES} attempts: {resp.text}")
 
         papers = resp.json().get("data", [])
         documents = set()
