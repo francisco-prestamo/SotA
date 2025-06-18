@@ -447,6 +447,28 @@ class GraphRag:
         top_docs = [doc_id_to_doc[doc_id] for doc_id, _ in doc_avg_sim[:k] if doc_id in doc_id_to_doc]
         return top_docs
 
+
+    def filter_relevant_text_units(self, text_units, query, top_n=3):
+        response_embedding = self.text_embedder.embed(query)
+
+        # Map: doc_id -> [similarities]
+        tu_similarities = {}
+
+        for tu in text_units:
+            tu_embedding = tu.embedding
+            # Cosine similarity
+            dot = sum(a * b for a, b in zip(response_embedding.vector, tu_embedding.vector))
+            norm1 = sum(a * a for a in response_embedding.vector) ** 0.5
+            norm2 = sum(b * b for b in tu_embedding.vector) ** 0.5
+            similarity = dot / (norm1 * norm2 + 1e-8)
+            tu_similarities[tu] = similarity
+
+        # Sort by similarity descending
+        sorted_tus = sorted(tu_similarities.items(), key=lambda x: x[1], reverse=True)
+        # Return top n text units
+        top_tus = [tu for tu, _ in sorted_tus[:top_n]]
+        return top_tus
+
     def respond(self, query: str, kg: KnowledgeGraph, c: int = 3) -> str:
         """
         Improved DRIFT search: All reasoning steps use LLM prompts and JsonGenerator.
@@ -470,11 +492,11 @@ class GraphRag:
         global_prompt = (
             f"User Query: {query}\n"
             f"Community Summaries:\n"
-            + "\n".join(f"- {s}" for s in community_summaries[:3])
+            + "\n".join(f"- {s}" for s in community_summaries[:5])
             + "\nKey Entities:\n"
-            + ", ".join(f"{e.name} ({e.type.value})" for e in community_entities[:5])
+            + ", ".join(f"{e.name} ({e.type.value})" for e in community_entities[:10])
             + "\nKey Relationships:\n"
-            + "\n".join(f"{rel.source} -> {rel.target}: {rel.description}" for rel in community_relationships[:3])
+            + "\n".join(f"{rel.source} -> {rel.target}: {rel.description}" for rel in community_relationships[:10])
             + "\n\n"
             "Based on the above, provide:\n"
             "- A comprehensive answer to the query\n"
@@ -499,11 +521,12 @@ class GraphRag:
         intermediate_responses = []
         for i, follow_up_q in enumerate(follow_up_questions):
             # Build a local search prompt
+
+            relevant_text_units = self.filter_relevant_text_units(kg.text_units, follow_up_q)
+
             local_prompt = (
                 f"User Follow-up Question: {follow_up_q}\n"
-                f"Relevant Entities: {[e.name for e in kg.entities[:10]]}\n"
-                f"Relevant Relationships: {[f'{r.source}->{r.target}' for r in kg.relationships[:10]]}\n"
-                f"Relevant Text Units: {[tu.text[:100] for tu in kg.text_units[:3]]}\n"
+                f"Relevant Text Units: {[tu.text[:100] for tu in relevant_text_units]}\n"
                 "Provide:\n"
                 "- A detailed answer\n"
                 "- List of evidence sources\n"
