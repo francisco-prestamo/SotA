@@ -17,85 +17,78 @@ class ThesisAssessmentModel(BaseModel):
         description="Suggested questions to ask to gather more knowledge", default=[]
     )
 
+
 def thesis_assessment_prompt(thesis_knowledge: ThesisKnowledgeModel) -> str:
     prompt = (
         (
             f"""
-As an AI thesis advisor, your task is to determine if we have sufficient knowledge about a thesis topic to recommend expert reviewers and surveys.
+You are an expert assistant, part of a system specialized in building state of the art sections for research papers,
+the system should be able to investigate sources based on the description of a research paper and retrieve documents
+that confom the state of the art in the different fields of research it covers. Your current task is much simpler 
+than that: your objective is to assess the specific fields of research of the user's research paper, in order to 
+discern which domain experts should be recruited so they can compile the state of the art for each field.
 
-Here is the current knowledge about the thesis:
-
-Thesis Description: {thesis_knowledge.description}
+Currently, you have gathered the following information about the user's paper:
+Paper Description: {thesis_knowledge.description}
 
 Collected Knowledge Points:
 {"".join(f"- {t}\n" for t in thesis_knowledge.thoughts)}
 
 Based on the above information, assess whether we have sufficient knowledge about the thesis topic to recommend expert reviewers and surveys, if the information isn't enough, you must output a set of missing aspects in the knowledge of the
-paper, and based on those a set of questions the user can ask you the answers of which would clarify the topic of their 
-paper.
+paper, and based on those a set of questions to ask the user to better clarify their intentions
 
 Examples of Sufficient vs. Insufficient Knowledge:
 
 Example Knowledge:
-Description: A study on deep learning methods for computer vision tasks
+Description: A study on deep learning methods for medical computer vision tasks, with accurate testing of results
 Knowledge points:
 - This thesis is about deep learning for computer vision
-- Several papers mention transformers for image recognition
-- There are benchmark datasets like ImageNet
+- Testing through different benchmarks is planned
+- The thesis is focused on medical applications
 
 Assessment:"""
         )
         + ThesisAssessmentModel(
             is_sufficient=False,
             reasoning=(
-                "While the general topic is known, specific research questions, "
-                "methodologies, and recent advancements are not clear."
+                "While the general topic is known, specific research questions and methodologies are not specified, "
+                "for example, while we know the applications are to be medical in nature, we do not know any specific "
+                "field of medicine the thesis will focus on, similarly, we do not know any specific benchmarks to be "
+                "used for evaluation, and we would need clarification in the previous aspect to be able to decide this"
             ),
             missing_aspects=[
-                "Specific research questions",
-                "Current state‑of‑the‑art methods",
-                "Application domains",
-                "Evaluation metrics",
+                "Field of medicine of focus (e.g. cancer research, psychological assistance)",
+                "What specific benchmarks are to be used to assess the quality of the solutions",
+                "Technologies and methods to be used for the computer vision tasks",
             ],
             suggested_questions=[
-                "What are the current state‑of‑the‑art deep learning models used in vision tasks?",
-                "What novel research questions are being posed in recent papers?",
-                "Which application domains (e.g., medical imaging, autonomous vehicles) are most impacted?",
-                "What evaluation metrics best reflect real‑world performance in these tasks?",
+                "What specific field of medicine will your research focus on? (e.g. cancer research, psychological assistance)",
+                "What specific benchmarks are you planning to employ?",
+                "What methods are you using for the computer vision tasks?",
+                "What medical problems do you plan on solving?",
             ],
         ).model_dump_json(indent=2)
         + """
 Example Knowledge:
-Description: A comprehensive study on optimizing request latency and resource utilization in large‑scale, geo‑distributed microservice architectures. 
-This work builds a novel latency‑aware sharding layer that integrates with Kubernetes to dynamically reassign microservice partitions based on 
-real‑time network performance and workload distribution. A deep reinforcement‑learning agent continuously learns optimal shard placements, 
-balancing the trade‑off between migration overhead and tail‑latency reduction. The system is evaluated under multi‑region deployment traces, 
-measuring improvements in 99th‑percentile latency, cross‑region bandwidth consumption, and cost of VM migrations. Results aim to demonstrate 
-significant latency gains over static and heuristic‑based approaches while maintaining cluster stability.
+Description: An investigation into the use of composite materials for next-generation hypersonic aircraft structures, focusing on thermal resistance and structural integrity at extreme velocities
 
 Knowledge points:
-- This thesis tackles dynamic load balancing in geo‑distributed microservice clusters
-- Existing solutions assume uniform network latency, but real‑world links vary by up to 300 ms
-- Workload skews (e.g. user hotspots) cause hot partitions that current sharding schemes can’t mitigate
-- Proposed system introduces a latency‑aware sharding layer atop Kubernetes’ scheduler
-- Sharding decisions use a reinforcement‑learning agent trained on synthetic and trace‑driven workloads
-- Controller adapts at 5 second intervals, trading off migration cost vs. request latency reduction
-- Evaluation metrics include 99th‑percentile tail latency, cross‑region bandwidth usage, and VM‐spinup overhead
-- Research questions: Can RL‑guided sharding outperform static heuristics? How does adaptation frequency impact stability?
+- The thesis is in the field of aerospace engineering
+- It specifically focuses on hypersonic aircraft design
+- It involves the use of composite materials
+- Key performance concerns include thermal resistance and structural integrity
+- The study is interested in extreme velocity flight conditions
+
 
 Assessment:"""
         + ThesisAssessmentModel(
-            reasoning=(
-                "The proposal presents a clear problem statement, detailed pipeline (latency‑aware sharding, "
-                "RL agent, adaptation cadence), and concrete evaluation metrics (tail latency, bandwidth usage, "
-                "migration cost). It covers both algorithmic design and real‑world deployment concerns."
-            ),
+            reasoning="The research topic is clearly within aerospace engineering and identifies specific areas of focus: hypersonic aircraft, composite materials, and their performance under thermal and structural stress. These are well-defined subfields, and we can confidently recruit experts in hypersonic systems, aerospace materials, and high-temperature structural analysis.",
             is_sufficient=True,
             missing_aspects=[],
             suggested_questions=[],
         ).model_dump_json(indent=2)
         + f"""
-Now, please assess the current thesis knowledge and determine if it's sufficient.
+Now, please assess the current thesis knowledge and determine if it's sufficient for the purpose of assessing which experts would cover its themes and topics
 If it's not sufficient, please suggest questions to ask the user to gather more knowledge.
 
 Output your assessment following this schema:
