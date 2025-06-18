@@ -1,0 +1,33 @@
+[
+  {
+    "query_id": "691346",
+    "query_text": "what is a modified roof",
+    "direct_docs": [
+      "D591489",
+      "D2162065",
+      "D144327"
+    ],
+    "response_based_docs": [
+      "D591489",
+      "D2162065",
+      "D186691"
+    ],
+    "direct_time": 0.7542529106140137,
+    "response_time": 18.655718088150024,
+    "find_docs_time": 1.024831771850586,
+    "total_response_based_time": 19.68054986000061,
+    "relevant_doc_ids": [
+      "D591489",
+      "D186691",
+      "D144327"
+    ],
+    "direct_precision": 0.6666666666666666,
+    "response_precision": 0.6666666666666666,
+    "direct_recall": 0.6666666666666666,
+    "response_recall": 0.6666666666666666,
+    "direct_ndcg": 0.0,
+    "response_ndcg": 0.0,
+    "direct_avg_score": -4.961533333333333,
+    "response_avg_score": -4.960226666666666
+  }
+]
