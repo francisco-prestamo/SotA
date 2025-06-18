@@ -90,102 +90,59 @@ class ReceptionistAgent:
         query_parts = [
             "Welcome to the Thesis State-of-the-Art Assistant!",
             "I'll help you gather knowledge about your thesis topic and recommend experts.",
-            "Let's start by discussing your thesis topic.",
+            "Let's start with a simple question: What is your thesis topic?",
         ]
         self.user_api.message_user("\n".join(query_parts))
 
         if not self.board.thesis_knowledge.description:
-            user_input = self.user_api.query_user("What is your thesis topic about? ")
-            # Initialize thesis knowledge with first input
+            user_input = self.user_api.query_user("Please describe your thesis topic: ")
+            if not user_input.strip():
+                self.user_api.message_user("No input received. Please provide a description to continue.")
+                return []
             self.board.thesis_knowledge = ThesisKnowledgeModel(
                 thoughts=[], description=user_input
             )
 
-        knowledge_sufficient = False
-
-        while not knowledge_sufficient:
-            # Check if knowledge is sufficient
+        while True:
             assessment = self._is_knowledge_sufficient()
-            knowledge_sufficient = assessment.is_sufficient
-
-            if knowledge_sufficient:
-                query_parts = [
-                    "Great! I now have sufficient knowledge about your thesis topic."
-                ]
-                self.user_api.message_user("\n".join(query_parts))
+            if assessment.is_sufficient:
+                self.user_api.message_user("Great! I now have enough information about your thesis topic.")
                 break
 
-            # If not sufficient, ask more questions
-            query_parts = [
-                "I need to know more about your thesis to provide the best recommendations."
+            followup = [
+                "To help you better, I need a bit more information about your thesis."
             ]
-
             if assessment.missing_aspects:
-                query_parts.append("I'm missing information about these aspects:")
+                followup.append("Could you tell me more about these aspects?")
                 for aspect in assessment.missing_aspects:
-                    query_parts.append(f"- {aspect}")
+                    followup.append(f"- {aspect}")
+            self.user_api.message_user("\n".join(followup))
 
-            # Suggest questions or let user ask freely
+            qa_pairs = []
             if assessment.suggested_questions:
-                query_parts.append("Here are some questions I could help with:")
-                for i, question in enumerate(assessment.suggested_questions, 1):
-                    query_parts.append(f"{i}. {question}")
-                query_parts.append("0. Ask your own question")
-
-                self.user_api.message_user("\n".join(query_parts))
-                choice = self.user_api.query_user(
-                    "\nEnter the number of a question or 0 to ask your own: "
-                )
-
-                if choice.isdigit() and 1 <= int(choice) <= len(
-                    assessment.suggested_questions
-                ):
-                    user_query = assessment.suggested_questions[int(choice) - 1]
-                else:
-                    user_query = self.user_api.query_user(
-                        "\nWhat would you like to know about your thesis topic? "
-                    )
+                for question in assessment.suggested_questions:
+                    user_answer = self.user_api.query_user(f"{question} ")
+                    if not user_answer.strip():
+                        self.user_api.message_user("No input received. Please respond to continue.")
+                        continue
+                    # Optionally, you could use recoverer_agent here if needed
+                    qa_pairs.append((question, user_answer))
             else:
                 user_query = self.user_api.query_user(
-                    "\nWhat would you like to know about your thesis topic? "
+                    "What would you like to add or clarify about your thesis topic? "
                 )
+                if not user_query.strip():
+                    self.user_api.message_user("No input received. Please respond to continue.")
+                    continue
+                qa_pairs.append((user_query, user_query))
 
-            # Get response using the recoverer agent
-            docs = self.recoverer_agent.recover_docs(
-                user_query, self.board.knowledge_graph, 3
-            )
+            # Update thesis knowledge with all Q&A pairs
+            for user_query, user_response in qa_pairs:
+                self._update_thesis_knowledge(user_query, user_response)
 
-            # Format a response based on the retrieved documents
-            response_parts = []
-            if docs:
-                response_parts.append("Based on the information I've found:")
-                for i, doc in enumerate(docs, 1):
-                    response_parts.append(f"\nSource {i}: {doc.title}")
-                    response_parts.append(f"Abstract: {doc.abstract}")
-                    if len(doc.content) > 300:
-                        response_parts.append(
-                            f"Content (excerpt): {doc.content[:300]}..."
-                        )
-                    else:
-                        response_parts.append(f"Content: {doc.content}")
-            else:
-                response_parts.append(
-                    "I couldn't find specific information about that. Could you provide more details or rephrase your question?"
-                )
-
-            # Update thesis knowledge
-            self._update_thesis_knowledge(user_query, "\n".join(response_parts))
-
-        # Generate experts list when knowledge is sufficient
         experts_list = self._generate_experts_list()
-
-        # Display experts
-        print("\n--- Recommended Experts ---")
+        self.user_api.message_user("\n--- Recommended Experts ---")
         for i, expert in enumerate(experts_list.experts, 1):
-            print(f"\nExpert {i}: {expert.name}")
-            print(f"Expertise: {expert.description}")
-            print(f"Recommended search query: '{expert.query}'")
-
-        print("\nThank you for using the Thesis State-of-the-Art Assistant!")
-
+            self.user_api.message_user(f"\nExpert {i}: {expert.name}\nExpertise: {expert.description}\nRecommended search query: '{expert.query}'")
+        self.user_api.message_user("\nThank you for using the Thesis State-of-the-Art Assistant!")
         return experts_list.experts
