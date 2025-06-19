@@ -18,13 +18,20 @@ class ThesisAssessmentModel(BaseModel):
     )
 
 
-def thesis_assessment_prompt(thesis_knowledge: ThesisKnowledgeModel, messages=None) -> str:
+def thesis_assessment_prompt(
+    thesis_knowledge: ThesisKnowledgeModel, messages=None
+) -> str:
     keyknowledge_points = "".join(f"- {t}\n" for t in thesis_knowledge.thoughts)
     chat_history = ""
     if messages:
-        chat_history = "\nChat history so far (user and receptionist):\n" + "\n".join(
-            f"{m['sender'].capitalize()}: {m['content']}" for m in messages
-        ) + "\n"
+        chat_history = (
+            "\n### Chat history so far (user and receptionist) ###\n"
+            + "\n".join(
+                f"## {m['sender'].capitalize()} ## \n {m['content']} \n"
+                for m in messages
+            )
+            + "\n"
+        )
     prompt = (
         (
             f"""
@@ -34,12 +41,6 @@ that conform the state of the art in the different fields of research it covers.
 than that: your objective is to assess the specific fields of research of the user's research paper, in order to 
 discern which domain experts should be recruited so they can compile the state of the art for each field.
 
-Currently, you have gathered the following information about the user's paper:
-Paper Description: {thesis_knowledge.description}
-
-Collected Knowledge Points:
-{keyknowledge_points}
-{chat_history}
 
 CRITICAL STOPPING CONDITIONS - READ CAREFULLY:
 1. FIRST, analyze the chat history for ANY indication that the user doesn't know more information. Look for phrases like:
@@ -50,7 +51,7 @@ CRITICAL STOPPING CONDITIONS - READ CAREFULLY:
    - "I don't have more details"
    - Any expression of uncertainty or lack of knowledge
 
-2. IF the chat history shows the user has indicated they don't know more details about their research, then IMMEDIATELY set is_sufficient=True and DO NOT ask any more questions, regardless of missing information.
+2. IF the chat history shows the user has indicated they don't know more details about their research, then DO NOT ask for further clarification about the subjects where they have shown uncertainty.
 
 3. The user saying they don't know IS A VALID ENDPOINT. Don't keep pushing for information they've already said they don't have.
 
@@ -84,43 +85,58 @@ Assessment:"""
             missing_aspects=[
                 "Specific medical domain or application area",
                 "Planned deep learning methodologies or approaches",
-                "Research objectives and expected outcomes"
+                "Research objectives and expected outcomes",
             ],
             suggested_questions=[
                 "What specific medical domain will your research focus on? (e.g., radiology, pathology, dermatology)",
                 "What deep learning approaches are you planning to use or investigate?",
-                "What are the main research objectives you want to achieve?"
+                "What are the main research objectives you want to achieve?",
             ],
         ).model_dump_json(indent=2)
         + """
 
 Example with user indicating limited knowledge:
-Chat History:
-User: I'm working on machine learning for healthcare
-Receptionist: What specific healthcare applications are you targeting?
+### Chat History ###
+## User ##
+I'm working on machine learning for healthcare
+## System ##
+What specific healthcare applications are you targeting?
+## User ##
 User: I'm not sure yet, I'm still exploring the field
+
 
 Assessment:"""
         + ThesisAssessmentModel(
-            is_sufficient=True,
+            is_sufficient=False,
             reasoning=(
                 "The user has explicitly stated 'I'm not sure yet' and 'I'm still exploring', which are clear indicators "
                 "that they don't have more specific information to provide. The general domain (machine learning for healthcare) "
-                "is sufficient to begin expert recruitment. Continuing to ask questions would be unproductive since the user "
-                "has already expressed uncertainty. This is a valid stopping point."
+                "is sufficient to begin expert recruitment. Continuing to ask questions about this subject would be unproductive since the user "
+                "has already expressed uncertainty. However, the other mentioned field, machine learning, has not been explored"
+                "In the chat history, as such it would be reasonable to inquire about it, if the user also shows uncertainty"
+                "in this aspect, then it would be a valid stopping point"
             ),
-            missing_aspects=[],
-            suggested_questions=[],
+            missing_aspects=[
+                    "Further clarification on what techniques and processes are to be explored in the machine learning aspect of the research"
+                ],
+            suggested_questions=["What machine learning techinques are you planning on using to achieve your goals in your research?"],
         ).model_dump_json(indent=2)
         + """
 
 Example with user saying they don't know:
-Chat History:
-User: I want to research artificial intelligence
-Receptionist: What specific AI applications are you interested in?
-User: I don't know exactly, maybe something with data analysis
-Receptionist: What type of data analysis methods do you plan to use?
-User: I don't know, I'm just starting
+### Chat History ###
+
+## User ##
+I want to research artificial intelligence for data analysis
+## System ##
+What specific AI applications are you interested in?
+## User ##
+I don't know exactly, maybe something with data analysis
+## System ##
+What type of data do you plan on analysing?
+## User ##
+I don't know, I'm just starting
+
 
 Assessment:"""
         + ThesisAssessmentModel(
@@ -158,11 +174,19 @@ Now, please assess the current thesis knowledge and determine if it's sufficient
 
 MANDATORY CHECKLIST BEFORE RESPONDING:
 □ Have I checked the chat history for expressions of uncertainty or "I don't know"?
-□ If the user expressed uncertainty, am I setting is_sufficient=True and asking NO questions?
-□ Am I only asking questions if the user has NOT expressed lack of knowledge?
+□ Am I only asking questions on a subject if the user has NOT expressed lack of knowledge on it?
 □ Are my questions about USER knowledge, not SYSTEM responsibilities?
 
-Remember: A user saying "I don't know" is a STOP signal, not a request for more questions.
+--- Input: ---
+
+Currently, you have gathered the following information about the user's paper:
+Paper Description: {thesis_knowledge.description}
+
+Collected Knowledge Points:
+{keyknowledge_points}
+{chat_history}
+
+---  ---
 
 Output your assessment following this schema:
 {json.dumps(ThesisAssessmentModel.model_json_schema(), indent=2)}
