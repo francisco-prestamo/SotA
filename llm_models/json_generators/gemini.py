@@ -1,12 +1,19 @@
 from google import genai
-from graphrag.interfaces.json_generator import JsonGenerator, T
+from graphrag.interfaces.json_generator import JsonGenerator as GraphRagJsonGen, T
+from board.board import JsonGenerator as BoardJsonGen
+from expert_set.interfaces import JsonGenerator as ExpertSetJsonGen
+from recoverer_agent.interfaces import JsonGenerator as RecovJsonGen
+from receptionist_agent.interfaces import JsonGenerator as ReceptJsonGen
 from typing import Type
 import time
 from pydantic import BaseModel, Field
 
-class GeminiJsonGenerator(JsonGenerator):
-    def __init__(self: str, model: str = "gemini-2.0-flash-lite"):
-        self.client = genai.Client(api_key="")
+
+class GeminiJsonGenerator(
+    GraphRagJsonGen, BoardJsonGen, ExpertSetJsonGen, RecovJsonGen, ReceptJsonGen
+):
+    def __init__(self, model: str = "gemini-2.0-flash-lite"):
+        self.client = genai.Client(api_key="AIzaSyCYnrp56-_cToVfP4JWR1-t6SVG_K-in5c")
         self.model = model
 
     def generate_json(self, query: str, schema: Type[T]) -> T:
@@ -38,11 +45,9 @@ class GeminiJsonGenerator(JsonGenerator):
                 "response_schema": schema,
             },
         )
-        print(query)
-        print(response.text)
-        print("-"*200)
         return schema.model_validate_json(response.text)
-    
+
+
 def example_usage():
     class GreetingModel(BaseModel):
         greeting: str = Field(..., description="A friendly greeting message.")
@@ -56,6 +61,7 @@ def example_usage():
     # Generate the JSON response
     result = generator.generate_json(query, GreetingModel)
     print(result)
+
 
 if __name__ == "__main__":
     example_usage()
