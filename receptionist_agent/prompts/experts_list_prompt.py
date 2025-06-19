@@ -1,3 +1,5 @@
+from inspect import indentsize
+import json
 from board.board import ThesisKnowledgeModel
 from ..models import BuildExpertCommandList
 
@@ -36,11 +38,10 @@ For each expert, provide:
 
 Expected Output:
 ```
-{BuildExpertCommandList.model_json_schema()}
+{json.dumps(BuildExpertCommandList.model_json_schema(), indent=2)}
 ```
 
 Generate a diverse list of experts covering different aspects of the thesis topic. The experts should be complementary, not redundant.
-Output your list following the provided model schema.
 """
     
     return prompt

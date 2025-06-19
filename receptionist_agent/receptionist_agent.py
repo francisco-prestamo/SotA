@@ -7,6 +7,7 @@ from receptionist_agent.models import ThesisAssessmentModel, BuildExpertCommandL
 from receptionist_agent.prompts.thesis_assessment_prompt import thesis_assessment_prompt
 from receptionist_agent.prompts.experts_list_prompt import experts_list_prompt
 from receptionist_agent.prompts.update_thesis_knowledge_prompt import (
+    QAndA,
     update_thesis_knowledge_prompt,
 )
 
@@ -42,9 +43,7 @@ class ReceptionistAgent:
     def add_message(self, sender: str, content: str):
         self.messages.append({"sender": sender, "content": content})
 
-    def _update_thesis_knowledge(
-        self, user_query: str, response: str
-    ) -> ThesisKnowledgeModel:
+    def _update_thesis_knowledge(self, qa_pairs: List[QAndA]) -> ThesisKnowledgeModel:
         """
         Update the thesis knowledge based on the user query and response.
 
@@ -55,9 +54,7 @@ class ReceptionistAgent:
         Returns:
             Updated thesis knowledge model
         """
-        prompt = update_thesis_knowledge_prompt(
-            self.board.thesis_knowledge, user_query, response, ThesisKnowledgeModel
-        )
+        prompt = update_thesis_knowledge_prompt(self.board.thesis_knowledge, qa_pairs)
 
         updated_knowledge = self.json_generator.generate_json(
             prompt, ThesisKnowledgeModel
@@ -105,8 +102,13 @@ class ReceptionistAgent:
             user_input = self.user_api.query_user("Please describe your thesis topic: ")
             self.add_message("user", user_input)
             if not user_input.strip():
-                self.user_api.message_user("No input received. Please provide a description to continue.")
-                self.add_message("receptionist", "No input received. Please provide a description to continue.")
+                self.user_api.message_user(
+                    "No input received. Please provide a description to continue."
+                )
+                self.add_message(
+                    "receptionist",
+                    "No input received. Please provide a description to continue.",
+                )
                 return []
             self.board.thesis_knowledge = ThesisKnowledgeModel(
                 thoughts=[], description=user_input
@@ -114,10 +116,16 @@ class ReceptionistAgent:
 
         while True:
             # Use chat history and thesis knowledge in the assessment prompt
-            assessment_prompt = thesis_assessment_prompt(self.board.thesis_knowledge, self.messages)
-            assessment = self.json_generator.generate_json(assessment_prompt, ThesisAssessmentModel)
+            assessment_prompt = thesis_assessment_prompt(
+                self.board.thesis_knowledge, self.messages
+            )
+            assessment = self.json_generator.generate_json(
+                assessment_prompt, ThesisAssessmentModel
+            )
             if assessment.is_sufficient:
-                done_msg = "Great! I now have enough information about your thesis topic."
+                done_msg = (
+                    "Great! I now have enough information about your thesis topic."
+                )
                 self.user_api.message_user(done_msg)
                 self.add_message("receptionist", done_msg)
                 break
@@ -140,25 +148,39 @@ class ReceptionistAgent:
                     self.add_message("receptionist", question)
                     self.add_message("user", user_answer)
                     if not user_answer.strip():
-                        self.user_api.message_user("No input received. Please respond to continue.")
-                        self.add_message("receptionist", "No input received. Please respond to continue.")
+                        self.user_api.message_user(
+                            "No input received. Please respond to continue."
+                        )
+                        self.add_message(
+                            "receptionist",
+                            "No input received. Please respond to continue.",
+                        )
                         continue
-                    qa_pairs.append((question, user_answer))
+                    qa_pairs.append(
+                        QAndA(system_question=question, user_answer=user_answer)
+                    )
             else:
-                user_query = self.user_api.query_user(
+                question = (
                     "What would you like to add or clarify about your thesis topic? "
                 )
-                self.add_message("receptionist", "What would you like to add or clarify about your thesis topic?")
-                self.add_message("user", user_query)
-                if not user_query.strip():
-                    self.user_api.message_user("No input received. Please respond to continue.")
-                    self.add_message("receptionist", "No input received. Please respond to continue.")
+                user_answer = self.user_api.query_user(question)
+                self.add_message(
+                    "receptionist",
+                    question,
+                )
+                self.add_message("user", user_answer)
+                if not user_answer.strip():
+                    self.user_api.message_user(
+                        "No input received. Please respond to continue."
+                    )
+                    self.add_message(
+                        "receptionist", "No input received."
+                    )
                     continue
-                qa_pairs.append((user_query, user_query))
+                qa_pairs.append(QAndA(system_question=question, user_answer=user_answer))
 
             # Update thesis knowledge with all Q&A pairs
-            for user_query, user_response in qa_pairs:
-                self._update_thesis_knowledge(user_query, user_response)
+            self._update_thesis_knowledge(qa_pairs)
 
         experts_list = self._generate_experts_list()
         experts_msg = "\n--- Recommended Experts ---"

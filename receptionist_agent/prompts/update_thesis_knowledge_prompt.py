@@ -1,33 +1,41 @@
-def update_thesis_knowledge_prompt(current_knowledge, user_query, response, update_model):
-    """
-    Prompt for updating thesis knowledge based on user query and response.
-    
-    Args:
-        current_knowledge: The current knowledge about the thesis topic
-        user_query: The user's query
-        response: The response provided to the query
-        update_model: The model class for the updated knowledge
-        
-    Returns:
-        str: The formatted prompt
-    """
-    prompt = f"""As an AI thesis advisor, your task is to update our knowledge about a thesis topic based on a new interaction with the user.
+from typing import List
+from pydantic import BaseModel
+from board.board import ThesisKnowledgeModel
 
-Current Knowledge:
+class QAndA(BaseModel):
+    system_question: str
+    user_answer: str
+
+def update_thesis_knowledge_prompt(current_knowledge: ThesisKnowledgeModel, qa_pairs: List[QAndA]):
+    prompt = f"""
+You are an expert system, tasked with interacting with a user with the objective of discerning the subject
+and themes of their research paper, as part of this process, you proceeded to ask the user a set of 
+questions in order to better better understand their purposes.
+
+Currently, this is the knowledge you have about the research paper
+### Knowledge ###
 Description: {current_knowledge.description}
 
-Current Knowledge Points:
 """
-    
     for thought in current_knowledge.thoughts:
         prompt += f"- {thought}\n"
-    
     prompt += f"""
-New User Query:
-"{user_query}"
+### ###
 
-Response Provided:
-"{response}"
+This is the process of questions asked by you and answered by the user:
+
+### Q and A ###
+"""
+    qa = []
+    for i, pair in enumerate(qa_pairs):
+        qa.append(f"""### Your Question {i + 1} ###
+        {pair.system_question}
+        ### User's Answer ###
+        {pair.user_answer}
+        """)
+
+    prompt += "\n".join(qa) + """
+### ###
 
 Based on this interaction, please extract new knowledge about the thesis topic and update the existing knowledge.
 If the user's query and the response provide new information about the thesis topic, add it to the knowledge.
