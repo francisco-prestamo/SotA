@@ -1,19 +1,25 @@
+import os
 from google import genai
 from graphrag.interfaces.json_generator import JsonGenerator as GraphRagJsonGen, T
 from board.board import JsonGenerator as BoardJsonGen
 from expert_set.interfaces import JsonGenerator as ExpertSetJsonGen
 from recoverer_agent.interfaces import JsonGenerator as RecovJsonGen
 from receptionist_agent.interfaces import JsonGenerator as ReceptJsonGen
+from tests.user_agent.interfaces import JsonGenerator as UserAgentJsonGen
 from typing import Type
 import time
 from pydantic import BaseModel, Field
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 class GeminiJsonGenerator(
-    GraphRagJsonGen, BoardJsonGen, ExpertSetJsonGen, RecovJsonGen, ReceptJsonGen
+    GraphRagJsonGen, BoardJsonGen, ExpertSetJsonGen, RecovJsonGen, ReceptJsonGen, UserAgentJsonGen
 ):
     def __init__(self, model: str = "gemini-2.0-flash-lite"):
-        self.client = genai.Client(api_key="AIzaSyCYnrp56-_cToVfP4JWR1-t6SVG_K-in5c")
+        self.client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
         self.model = model
 
     def generate_json(self, query: str, schema: Type[T]) -> T:
@@ -22,7 +28,7 @@ class GeminiJsonGenerator(
         {query}
         Please respond in JSON format that matches the following schema:\n{schema.model_json_schema()}
         """
-        for _ in range(80):  # Try up to 2 times
+        for _ in range(80):
             try:
                 response = self.client.models.generate_content(
                     model=self.model,

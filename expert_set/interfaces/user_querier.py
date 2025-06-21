@@ -4,5 +4,5 @@ from abc import ABC, abstractmethod
 class UserQuerier(ABC):
 
     @abstractmethod
-    def ask_user(self, query: str) -> str:
+    def expert_set_query_user(self, query: str) -> str:
         pass
