@@ -9,6 +9,7 @@ from .models import RoundAction, BuildExpertCommand
 from .expert_builder import ExpertBuilder
 from .action_picker import ActionPicker, PickActionResult
 from .document_remover import DocumentRemover, DocumentRemovalResult
+from .models.paper_addition_result_model import PaperAdditionResult
 from .user_questioner import UserQuestioner
 from .prompts.update_description import update_description_prompt, DescriptionUpdate
 from .prompts.update_expert_set import update_expert_set_prompt, ExpertSetUpdate
@@ -203,7 +204,17 @@ class ExpertSet:
 
     def _handle_add_documents(self) -> None:
         """Placeholder for document addition workflow."""
-        # TODO: Implement document addition logic
+        adder = PaperAdder(
+            self.json_generator,
+            self.board,
+            self.document_recoverer
+        )
+        action_resume: PaperAdditionResult = adder.add_papers(self.experts)
+        for paper in action_resume.papers_added:
+            print("Added paper:")
+            print(paper.title())
+        print("Summary of papers added: ")
+        print(action_resume.summary)
 
     def _should_terminate(self, action: RoundAction) -> bool:
         """

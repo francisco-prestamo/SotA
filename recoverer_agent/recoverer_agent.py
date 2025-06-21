@@ -19,12 +19,21 @@ class RecovererAgent:
         self.scrappers: List[DocRecoverer] = scrappers
 
     def recover_docs(self, query: str, kg: KnowledgeGraph, k: int) -> List[Document]:
+        print("Searching for:")
+        print(query)
         for i in range(3):
+            # Get the most relevant text units
             response = self.graphrag.respond(query, kg, k)
+            relevant_text_units = self.graphrag.get_relevant_text_units_distinct_docs(kg, response, top_n=k)
+            text_units_strs = [tu.text for tu in relevant_text_units]
 
-            prompt = is_necessary_search_prompt(query, response, BoolAnswerModel)
+            prompt = is_necessary_search_prompt(query, text_units_strs, BoolAnswerModel)
             result = self.json_generator.generate_json(prompt, BoolAnswerModel)
-
+            print(f"Iteration for {query} ==================================================================================> {i+1}: {result.answer}")
+            print(f"Reasoning: {result.reasoning}")
+            if (len(relevant_text_units) > 0):
+                print(text_units_strs[0])
+            print("-"*100)
             if result.answer:
                 return self.graphrag.find_documents(response, kg, k)
             else:
@@ -49,11 +58,36 @@ class RecovererAgent:
                 selection_result = self.json_generator.generate_json(selection_prompt, DynamicScrapperSelectionModel)
 
                 def recover_and_update(s):
-                    if getattr(selection_result, s.name, False):
-                        searched_docs = s.recover(query)
+                    print(f"Processing scraper: {s.name}")
+
+                    # Check if this scraper was selected
+                    scraper_selected = getattr(selection_result, s.name, False)
+
+                    if scraper_selected:
+                        # Get the specific query generated for this scraper
+                        query_field_name = f"{s.name}_query_to_search"
+                        scraper_query = getattr(selection_result, query_field_name, None)
+
+                        # Use the scraper-specific query if available, otherwise fall back to original
+                        search_query = scraper_query if scraper_query else query
+
+                        print(f"Using query for {s.name}: {search_query}")
+
+                        # Search using the appropriate query
+                        searched_docs = s.recover(search_query)
+                        print(f"Found {len(searched_docs)} documents using {s.name}")
+
+                        for doc in searched_docs:
+                            print(f"Found document: {doc.title}")
+
+                        # Update knowledge graph with found documents
                         self.graphrag.update_knowledge_graph(kg, searched_docs)
-                with ThreadPoolExecutor(max_workers=4) as executor:
-                    executor.map(recover_and_update, self.scrappers)
+                    else:
+                        print(f"Scraper {s.name} was not selected for this research")
+
+                # Process each scraper
+                for s in self.scrapers:  # Note: fixed typo from 'scrappers' to 'scrapers'
+                    recover_and_update(s)
 
         response = self.graphrag.respond(query, kg, k)
         return self.graphrag.find_documents(response, kg, k)
@@ -69,7 +103,8 @@ class RecovererAgent:
         Returns:
             A list of retrieved documents from the first scrapper (Semantic Scholar Scrapper)
         """
-        
+        print("Searching surveys about:")
+        print(query)
         return list(self.scrappers[0].recover(query))[:k]
 
 

@@ -210,6 +210,7 @@ class GraphRag:
                     textunit_entities[tu_union.unit_id] = entities
                     tu_union = None
         else:
+            print("Updating Entities and Relationships...")
             with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
                 future_to_tu = {
                     executor.submit(self.extract_entities_and_relationships_from_textunit, tu): tu
@@ -448,13 +449,13 @@ class GraphRag:
         return top_docs
 
 
-    def filter_relevant_text_units(self, text_units, query, top_n=3):
+    def get_relevant_text_units(self, kg, query, top_n=3):
         response_embedding = self.text_embedder.embed(query)
 
         # Map: doc_id -> [similarities]
         tu_similarities = {}
 
-        for tu in text_units:
+        for tu in kg.text_units:
             tu_embedding = tu.embedding
             # Cosine similarity
             dot = sum(a * b for a, b in zip(response_embedding.vector, tu_embedding.vector))
@@ -467,6 +468,33 @@ class GraphRag:
         sorted_tus = sorted(tu_similarities.items(), key=lambda x: x[1], reverse=True)
         # Return top n text units
         top_tus = [tu for tu, _ in sorted_tus[:top_n]]
+        return top_tus
+
+    def get_relevant_text_units_distinct_docs(self, kg, query, top_n=3):
+        response_embedding = self.text_embedder.embed(query)
+
+        # Map: doc_id -> [text units and their similarities]
+        tu_similarities = []
+        for tu in kg.text_units:
+            tu_embedding = tu.embedding
+            # Cosine similarity
+            dot = sum(a * b for a, b in zip(response_embedding.vector, tu_embedding.vector))
+            norm1 = sum(a * a for a in response_embedding.vector) ** 0.5
+            norm2 = sum(b * b for b in tu_embedding.vector) ** 0.5
+            similarity = dot / (norm1 * norm2 + 1e-8)
+            tu_similarities.append((tu, similarity))
+
+        # Sort by similarity descending
+        sorted_tus = sorted(tu_similarities, key=lambda x: x[1], reverse=True)
+        # Select top_n text units from distinct documents
+        seen_doc_ids = set()
+        top_tus = []
+        for tu, _ in sorted_tus:
+            if tu.document_id not in seen_doc_ids:
+                top_tus.append(tu)
+                seen_doc_ids.add(tu.document_id)
+            if len(top_tus) >= top_n:
+                break
         return top_tus
 
     def respond(self, query: str, kg: KnowledgeGraph, c: int = 3) -> str:
@@ -522,7 +550,7 @@ class GraphRag:
         for i, follow_up_q in enumerate(follow_up_questions):
             # Build a local search prompt
 
-            relevant_text_units = self.filter_relevant_text_units(kg.text_units, follow_up_q)
+            relevant_text_units = self.get_relevant_text_units(kg, follow_up_q)
 
             local_prompt = (
                 f"User Follow-up Question: {follow_up_q}\n"

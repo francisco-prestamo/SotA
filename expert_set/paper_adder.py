@@ -53,6 +53,7 @@ class PaperAdder:
         search for relevant documents, and add them to the table.
         """
         # Get expert search reasoning
+        print("Adding papers to SOTA table...")
         expert_names = [expert.name for expert in experts]
         expert_search_reasoning_model = build_expert_search_reasoning_model(expert_names)
         
@@ -74,10 +75,10 @@ class PaperAdder:
         synthesis_prompt = build_search_query_synthesis_prompt(all_queries)
         summary_query_model = self.json_generator.generate_json(synthesis_prompt, StringResponseModel)
         summary_query = summary_query_model.response
-        
+        print(f"Search query: {summary_query}")
         # Recover new documents
         new_docs = self.recoverer_agent.recover_docs(summary_query, self.board.knowledge_graph, self.k)
-        
+
         if not new_docs:
             logging.warning("No new documents were recovered.")
             return PaperAdditionResult(papers_added=[], summary="No new documents were recovered.")
@@ -87,6 +88,7 @@ class PaperAdder:
         original_features = set(self.board.sota_table.features)
         
         for doc in new_docs:
+            print(f"Adding {doc.title} to SOTA table...")
             self._add_paper_to_sota_table(doc, experts)
             added_titles.append(doc.title)
         
