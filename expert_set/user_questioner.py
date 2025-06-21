@@ -5,7 +5,6 @@ from board.board import Board
 from entities.sota_table import sota_table_to_markdown
 
 from .action_picker import PickActionResult
-from .prompts.pick_action import ExpertPresentation
 from .prompts.ask_questions import (
     AnswerModel,
     create_answer_model,
@@ -68,7 +67,7 @@ class UserQuestioner:
 
         questions_answer = self.json_generator.generate_json(prompt, answer_model)
         questions_summary = self._parse_answer_and_extract_questions(questions_answer)
-        user_answers = self.user_querier.ask_user(questions_summary)
+        user_answers = self.user_querier.expert_set_query_user(questions_summary)
 
         return questions_summary, user_answers
 

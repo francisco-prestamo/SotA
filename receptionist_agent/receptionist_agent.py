@@ -95,14 +95,14 @@ class ReceptionistAgent:
             "Let's start with a simple question: What is your thesis topic?",
         ]
         welcome_msg = "\n".join(query_parts)
-        self.user_api.message_user(welcome_msg)
+        self.user_api.receptionist_message_user(welcome_msg)
         self.add_message("receptionist", welcome_msg)
 
         if not self.board.thesis_knowledge.description:
-            user_input = self.user_api.query_user("Please describe your thesis topic: ")
+            user_input = self.user_api.receptionist_query_user("Please describe your thesis topic: ")
             self.add_message("user", user_input)
             if not user_input.strip():
-                self.user_api.message_user(
+                self.user_api.receptionist_message_user(
                     "No input received. Please provide a description to continue."
                 )
                 self.add_message(
@@ -126,7 +126,7 @@ class ReceptionistAgent:
                 done_msg = (
                     "Great! I now have enough information about your thesis topic."
                 )
-                self.user_api.message_user(done_msg)
+                self.user_api.receptionist_message_user(done_msg)
                 self.add_message("receptionist", done_msg)
                 break
 
@@ -138,17 +138,17 @@ class ReceptionistAgent:
                 for aspect in assessment.missing_aspects:
                     followup.append(f"- {aspect}")
             followup_msg = "\n".join(followup)
-            self.user_api.message_user(followup_msg)
+            self.user_api.receptionist_message_user(followup_msg)
             self.add_message("receptionist", followup_msg)
 
             qa_pairs = []
             if assessment.suggested_questions:
                 for question in assessment.suggested_questions:
-                    user_answer = self.user_api.query_user(f"{question} ")
+                    user_answer = self.user_api.receptionist_query_user(f"{question} ")
                     self.add_message("receptionist", question)
                     self.add_message("user", user_answer)
                     if not user_answer.strip():
-                        self.user_api.message_user(
+                        self.user_api.receptionist_message_user(
                             "No input received. Please respond to continue."
                         )
                         self.add_message(
@@ -163,14 +163,14 @@ class ReceptionistAgent:
                 question = (
                     "What would you like to add or clarify about your thesis topic? "
                 )
-                user_answer = self.user_api.query_user(question)
+                user_answer = self.user_api.receptionist_query_user(question)
                 self.add_message(
                     "receptionist",
                     question,
                 )
                 self.add_message("user", user_answer)
                 if not user_answer.strip():
-                    self.user_api.message_user(
+                    self.user_api.receptionist_message_user(
                         "No input received. Please respond to continue."
                     )
                     self.add_message(
@@ -184,13 +184,13 @@ class ReceptionistAgent:
 
         experts_list = self._generate_experts_list()
         experts_msg = "\n--- Recommended Experts ---"
-        self.user_api.message_user(experts_msg)
+        self.user_api.receptionist_message_user(experts_msg)
         self.add_message("receptionist", experts_msg)
         for i, expert in enumerate(experts_list.experts, 1):
             expert_msg = f"\nExpert {i}: {expert.name}\nExpertise: {expert.description}\nRecommended search query: '{expert.query}'"
-            self.user_api.message_user(expert_msg)
+            self.user_api.receptionist_message_user(expert_msg)
             self.add_message("receptionist", expert_msg)
         thanks_msg = "\nThank you for using the Thesis State-of-the-Art Assistant!"
-        self.user_api.message_user(thanks_msg)
+        self.user_api.receptionist_message_user(thanks_msg)
         self.add_message("receptionist", thanks_msg)
         return experts_list.experts

@@ -9,10 +9,16 @@ class ConsoleUserApi(UserAPI, UserQuerier):
     def query_user(self, query: str) -> str:
         return input(query)
 
-    def ask_user(self, query: str) -> str:
-        return self.query_user(query)
-
     def message_user(self, text: str) -> None:
         print(text)
+
+    def receptionist_message_user(self, text: str) -> None:
+        self.message_user(text)
+
+    def receptionist_query_user(self, query: str) -> str:
+        return self.query_user(query)
+
+    def expert_set_query_user(self, query: str) -> str:
+        return self.query_user(query)
 
 
