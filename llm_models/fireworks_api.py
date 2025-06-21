@@ -15,7 +15,7 @@ from expert_set.interfaces import JsonGenerator as ExpertSetJsonGen
 from recoverer_agent.interfaces import JsonGenerator as RecovererJsonGen
 from rag_repo.interfaces import RagRepoTextEmbedder
 from graphrag.interfaces import (
-    JsonGenerator as GraphRagJsonGen,
+    JsonGenerator as JsonGenerator,
     TextEmbedder as GraphRagTextEmbedder,
 )
 from board.interfaces import JsonGenerator as BoardJsonGen
@@ -46,7 +46,7 @@ class FireworksApi(
     ReceptionistJsonGen,
     ExpertSetJsonGen,
     RecovererJsonGen,
-    GraphRagJsonGen,
+    JsonGenerator,
     RagRepoTextEmbedder,
     GraphRagTextEmbedder,
     BoardJsonGen,
@@ -84,8 +84,8 @@ class FireworksApi(
             ],
             temperature=0.2,
         )
-        print("Waiting 5 seconds...")
-        time.sleep(5)
+        print("Waiting 6 seconds...")
+        time.sleep(6)
         print("Wait is up")
         response = response.choices[0].message.content
         if config.inspect_query():
@@ -121,8 +121,8 @@ class FireworksApi(
                 .data[0]
                 .embedding
             )
-            print("Waiting 5 seconds...")
-            time.sleep(5)
+            print("Waiting 6 seconds...")
+            time.sleep(6)
             print("Wait is up")
             embedding = FireworksEmbedding(np.array(vector))
             answ += [embedding]
