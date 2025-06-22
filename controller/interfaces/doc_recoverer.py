@@ -26,12 +26,13 @@ class DocRecoverer(ABC):
         return "A document recoverer that retrieves documents based on a text query."
 
     @abstractmethod
-    def recover(self, query: str) -> Set[Document]:
+    def recover(self, query: str, k: int) -> Set[Document]:
         """
         Search logic to retrieve documents matching the given query.
 
         Args:
             query: A text query.
+            k: Number of documents to retrieve
 
         Returns:
             A set of Document instances matching the query.

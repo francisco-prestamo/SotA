@@ -1,21 +1,23 @@
-import time
+import random
 import re
 import xml.etree.ElementTree as ET
 from io import BytesIO
 from typing import Set, Dict, Any
 import requests
 from PyPDF2 import PdfReader
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from controller.interfaces.doc_recoverer import DocRecoverer
 from entities.document import Document
 from doc_recoverers.doc_utils.doc_cleaner import DocumentContentCleaner
 
 
 class ArXivRecoverer(DocRecoverer):
-    """Retrieve documents from arXiv based on text queries with PDF processing."""
-    BASE_SEARCH_URL = "http://export.arxiv.org/api/query"
-    MAX_RESULTS = 10
-    MAX_RETRIES = 3
+    BACKOFF_MIN = 3.0
+    BACKOFF_MAX = 5.0
     TIMEOUT = 15
+    MAX_RETRIES = 100
+    BASE_SEARCH_URL = "http://export.arxiv.org/api/query"
+    PDF_THREADS = 20
 
     @property
     def name(self) -> str:
@@ -25,44 +27,58 @@ class ArXivRecoverer(DocRecoverer):
     def description(self) -> str:
         return "Retrieves documents from arXiv using text queries with inline PDF download and cleaning."
 
-    def recover(self, query: str) -> Set[Document]:
+    def recover(self, query: str, k: int) -> Set[Document]:
         """Retrieve documents from arXiv based on a query.
 
         Args:
             query: Search query string
+            k: Number of documents to retrieve
 
         Returns:
             Set of recovered Document objects
         """
-        entries = self._search_arxiv(query)
+        entries = self._search_arxiv(query, k)
         documents = set()
+        futures = []
 
-        for entry in entries:
-            try:
-                resp = requests.get(entry["pdf_url"], timeout=self.TIMEOUT)
-                resp.raise_for_status()
-                reader = PdfReader(BytesIO(resp.content))
-                raw = "\n".join(page.extract_text() or "" for page in reader.pages)
-                content = DocumentContentCleaner.clean_document(raw)
+        with ThreadPoolExecutor(max_workers=self.PDF_THREADS) as executor:
+            for entry in entries:
+                futures.append(executor.submit(self._process_entry, entry))
 
-                if content:
-                    documents.add(Document(
-                        id=entry["id"],
-                        title=entry["title"],
-                        abstract=entry["summary"],
-                        authors=entry["authors"],
-                        content=content
-                    ))
-            except Exception:
-                continue
+            for future in as_completed(futures):
+                doc = future.result()
+                if doc:
+                    documents.add(doc)
 
         return documents
 
-    def _search_arxiv(self, query: str) -> list[Dict[str, Any]]:
+    def _process_entry(self, entry: Dict[str, Any]) -> Document | None:
+        try:
+            resp = requests.get(entry["pdf_url"], timeout=self.TIMEOUT)
+            resp.raise_for_status()
+            reader = PdfReader(BytesIO(resp.content))
+            raw = "\n".join(page.extract_text() or "" for page in reader.pages)
+            content = DocumentContentCleaner.clean_document(raw)
+
+            if not content:
+                return None
+
+            return Document(
+                id=entry["id"],
+                title=entry["title"],
+                abstract=entry["summary"],
+                authors=entry["authors"],
+                content=content
+            )
+        except Exception:
+            return None
+
+    def _search_arxiv(self, query: str, k: int) -> list[Dict[str, Any]]:
         """Search arXiv for documents matching the query.
 
         Args:
             query: Search query string
+            k: Number of documents to retrieve
 
         Returns:
             List of document metadata dictionaries
@@ -70,7 +86,7 @@ class ArXivRecoverer(DocRecoverer):
         params = {
             "search_query": query,
             "start": 0,
-            "max_results": self.MAX_RESULTS,
+            "max_results": k,
             "sortBy": "relevance",
             "sortOrder": "descending"
         }
@@ -78,15 +94,20 @@ class ArXivRecoverer(DocRecoverer):
         for attempt in range(self.MAX_RETRIES):
             try:
                 resp = requests.get(self.BASE_SEARCH_URL, params=params, timeout=self.TIMEOUT)
-                if resp.status_code == 200:
-                    return self._parse_response(resp.content)
-                if resp.status_code in {429, 500, 503}:
-                    time.sleep(2 ** attempt)
+                if resp.status_code in {429, 503, 301}:
+                    sleep_time = self._get_sleep_time(resp)
+                    time.sleep(sleep_time)
+                    continue
+                resp.raise_for_status()
+                return self._parse_response(resp.content)
+            except requests.HTTPError as e:
+                if e.response.status_code in {429, 503, 301}:
+                    sleep_time = self._get_sleep_time(e.response)
+                    time.sleep(sleep_time)
                 else:
-                    resp.raise_for_status()
-            except requests.RequestException:
-                if attempt == self.MAX_RETRIES - 1:
                     return []
+            except requests.RequestException:
+                time.sleep(random.uniform(self.BACKOFF_MIN, self.BACKOFF_MAX))
         return []
 
     def _parse_response(self, xml_content: bytes) -> list[Dict[str, Any]]:
@@ -118,6 +139,15 @@ class ArXivRecoverer(DocRecoverer):
             })
 
         return entries
+
+    def _get_sleep_time(self, response) -> float:
+        retry_after = response.headers.get('Retry-After')
+        if retry_after:
+            try:
+                return float(retry_after) + random.uniform(0.1, 0.5)
+            except ValueError:
+                pass
+        return random.uniform(self.BACKOFF_MIN, self.BACKOFF_MAX)
 
     @staticmethod
     def _extract_arxiv_id(url: str) -> str:
