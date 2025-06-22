@@ -86,7 +86,7 @@ class RecovererAgent:
                         print(f"Scraper {s.name} was not selected for this research")
 
                 # Process each scraper
-                for s in self.scrapers:  # Note: fixed typo from 'scrappers' to 'scrapers'
+                for s in self.scrappers:  # Note: fixed typo from 'scrappers' to 'scrapers'
                     recover_and_update(s)
 
         response = self.graphrag.respond(query, kg, k)

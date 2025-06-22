@@ -58,7 +58,8 @@ class GraphRag:
         def process_document(doc):
             text_units: List[TextUnit] = self._chunk_document(doc, max_tokens=self.max_tokens, overlap_tokens=self.overlap_tokens)
             return text_units
-            
+
+        from tqdm import tqdm
         all_text_units = []
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
             future_to_doc = {executor.submit(process_document, doc): doc for doc in documents}
@@ -107,7 +108,8 @@ class GraphRag:
         print("Finished extracting entities/relationships.")
         merged_entities: Dict[str, Tuple[EntityType,List[str]]] = {}
         entity_type_map: Dict[EntityType, List[str]] = {}
-        for ent in all_entities:
+        from tqdm import tqdm
+        for ent in tqdm(all_entities, desc="Merging entities"):
             key = ent.name
             if key not in merged_entities:
                 merged_entities[key] = (ent.type, [ent.description])
@@ -124,13 +126,13 @@ class GraphRag:
         #         kg.add_covariate(cov)
 
         summarized_entities: List[Entity] = []
-        for name, (type_, descriptions) in merged_entities.items():
+        for name, (type_, descriptions) in tqdm(merged_entities.items(), desc="Summarizing entities"):
             summary: str = self.summary_descriptions(descriptions)
             entity = Entity(name=name, type=type_, description=summary)
             summarized_entities.append(entity)
 
         summarized_entities_types: Dict[EntityType, str] = {}
-        for type_, descriptions in entity_type_map.items():
+        for type_, descriptions in tqdm(entity_type_map.items(), desc="Summarizing entity types"):
             summary = self.summary_descriptions(descriptions)
             summarized_entities_types[type_] = summary
 
@@ -141,14 +143,14 @@ class GraphRag:
             kg.add_textunits_entities(textunit_id, entities)
 
         merged_relationships: Dict[Tuple[str, str], List[str]] = {}
-        for rel in all_relationships:
+        for rel in tqdm(all_relationships, desc="Merging relationships"):
             key = (rel.source, rel.target)
             if key not in merged_relationships:
                 merged_relationships[key] = [rel.description]
             else:
                 merged_relationships[key].append(rel.description)
         summarized_relationships: List[Relationship] = []
-        for (source, target), descriptions in merged_relationships.items():
+        for (source, target), descriptions in tqdm(merged_relationships.items(), desc="Summarizing relationships"):
             summary = self.summary_descriptions(descriptions)
             summarized_relationships.append(Relationship(source=source, target=target, description=summary))
         for rel in summarized_relationships:
@@ -181,7 +183,8 @@ class GraphRag:
         # 1. Chunk new documents and add text units using threads
         def process_document(doc):
             return self._chunk_document(doc, max_tokens=self.max_tokens, overlap_tokens=self.overlap_tokens)
-            
+
+        from tqdm import tqdm
         new_text_units = []
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future_to_doc = {executor.submit(process_document, doc): doc for doc in docs}
@@ -222,19 +225,21 @@ class GraphRag:
                     all_entities.extend(entities)
                     all_relationships.extend(relationships)
                     textunit_entities[tu.unit_id] = entities
+        print("Merging entities and relationships...")
 
         # 3. Merge new entities and relationships
         merged_entities = {e.name: e for e in kg.entities}
-        for ent in all_entities:
+        for ent in tqdm(all_entities, desc="Merging entities"):
             if ent.name in merged_entities:
                 # Optionally update description (e.g., merge summaries)
-                merged_entities[ent.name].description += f"; {ent.description}"
+                merged_entities[ent.name].description += f"| {ent.description}"
             else:
                 merged_entities[ent.name] = ent
         # Summarize entity descriptions
-        for name, ent in merged_entities.items():
-            descs = ent.description.split(';')
-            ent.description = self.summary_descriptions(descs)
+        for name, ent in tqdm(merged_entities.items(), desc="Summarizing entities"):
+            descs = ent.description.split('|')
+            if len(descs) > 2:
+                ent.description = self.summary_descriptions(descs)
         kg.entities = list(merged_entities.values())
 
         # Update textunit-entity mapping
@@ -244,16 +249,17 @@ class GraphRag:
         # Merge relationships
         rel_key = lambda r: (r.source, r.target)
         merged_relationships = {(r.source, r.target): r for r in kg.relationships}
-        for rel in all_relationships:
+        for rel in tqdm(all_relationships, desc="Merging relationships"):
             key = rel_key(rel)
             if key in merged_relationships:
-                merged_relationships[key].description += f"; {rel.description}"
+                merged_relationships[key].description += f"| {rel.description}"
             else:
                 merged_relationships[key] = rel
         # Summarize relationship descriptions
-        for rel in merged_relationships.values():
-            descs = rel.description.split(';')
-            rel.description = self.summary_descriptions(descs)
+        for rel in tqdm(merged_relationships.values(), desc="Summarizing relationships"):
+            descs = rel.description.split('|')
+            if len(descs) > 2:
+                rel.description = self.summary_descriptions(descs)
         kg.relationships = list(merged_relationships.values())
 
         # 4. Re-run community detection and summarization
@@ -262,13 +268,14 @@ class GraphRag:
         communities = self.detect_communities(kg)
         for comm in communities:
             kg.add_community(comm)
-            
+        
+        from tqdm import tqdm
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
             future_to_comm = {
                 executor.submit(self.summarize_community, comm, kg): comm
                 for comm in kg.communities
             }
-            for future in concurrent.futures.as_completed(future_to_comm):
+            for future in tqdm(concurrent.futures.as_completed(future_to_comm), total=len(kg.communities), desc="Summarizing communities"):
                 comm = future_to_comm[future]
                 report = future.result()
                 comm.report = report
