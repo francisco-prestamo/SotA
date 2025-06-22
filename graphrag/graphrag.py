@@ -23,6 +23,7 @@ from graphrag.models.entity_relationship import EntityRelationshipModel
 from graphrag.models.summary_community import SummaryCommunityModel
 from graphrag.models.text_unit import TextUnit
 from graphrag.models.claim_list import ClaimListModel
+from graphrag.utils.community_selector import CommunitySelector
 from graphrag.utils.text_chunking import chunk_document
 from graphrag.models.graph_types import Entity, Relationship, Claim, EntityType, Community, CommunityReport
 from graphrag.models.summary_description import SummaryDescriptionModel
@@ -630,45 +631,44 @@ class GraphRag:
 
     def _find_relevant_communities(self, query: str, kg: KnowledgeGraph, k: int) -> List[Community]:
         """Find the top K most semantically relevant communities for the query."""
-        
+
         if not kg.communities or not kg.community_reports:
             return []
-        
-        query_lower = query.lower()
-        community_scores = []
-        
-        for community in kg.communities:
-            if not community.report:
-                continue
-                
-            score = 0.0
-            
-            # Score based on community report summary
-            if community.report.summary:
-                summary_lower = community.report.summary.lower()
-                # Simple keyword matching (in real implementation, use semantic similarity)
-                common_words = set(query_lower.split()) & set(summary_lower.split())
-                score += len(common_words) * 2
-            
-            # Score based on key entities
-            for entity in community.report.key_entities:
-                if entity.name.lower() in query_lower:
-                    score += 3
-                if any(word in entity.description.lower() for word in query_lower.split()):
-                    score += 1
-            
-            # Score based on key relationships
-            for rel in community.report.key_relationships:
-                if rel.source.lower() in query_lower or rel.target.lower() in query_lower:
-                    score += 2
-                if any(word in rel.description.lower() for word in query_lower.split()):
-                    score += 1
-            
-            community_scores.append((community, score))
-        
-        # Sort by score and return top K
-        community_scores.sort(key=lambda x: x[1], reverse=True)
-        return [comm for comm, score in community_scores[:k]]
+
+        # Filter communities with reports
+        valid_communities = []
+        for comm in kg.communities:
+            if comm.report and comm.report.summary.strip():
+                valid_communities.append(comm)
+
+        if not valid_communities:
+            return []
+
+        # Compute query embedding
+        query_embedding = self.text_embedder.embed(query).vector
+
+        # Compute community embeddings (cached for performance)
+        community_embeddings = []
+        for comm in valid_communities:
+            # Use summary for embedding
+            text = comm.report.summary
+            # Add entity/relationship context
+            text += " Key entities: " + ", ".join(e.name for e in comm.report.key_entities[:3])
+            text += " Key relationships: " + ", ".join(
+                f"{rel.source}-{rel.target}" for rel in comm.report.key_relationships[:3]
+            )
+            embedding = self.text_embedder.embed(text).vector
+            community_embeddings.append(embedding)
+
+        # Run optimization
+        selector = CommunitySelector(
+            query_embedding=query_embedding,
+            community_embeddings=community_embeddings,
+            communities=valid_communities,
+            k=min(k, len(valid_communities))
+        )
+
+        return selector.optimize()
 
     def _generate_initial_answer(self, query: str, communities: List[Community]) -> Tuple[str, float]:
         """Generate initial broad answer from community reports."""
