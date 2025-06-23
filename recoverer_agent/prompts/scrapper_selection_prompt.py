@@ -12,43 +12,48 @@ def scrapper_selection_prompt(research_description: str, scraper_infos: list, re
         for info in scraper_infos
     ])
 
-    return f"""You are an expert research assistant tasked with selecting the most appropriate document scrapers for a specific research need and generating effective search queries for each selected scraper.
+    return f"""You are a research query specialist. Your task is to select the most relevant document sources and craft precise search queries that will retrieve the most targeted academic content.
 
-RESEARCH DESCRIPTION:
+RESEARCH OBJECTIVE:
 {research_description}
 
-AVAILABLE SCRAPERS:
+AVAILABLE SOURCES:
 {scraper_descriptions}
 
-TASK:
-Analyze the research description and determine which scrapers would be most effective for finding relevant academic content. For each scraper, you need to:
+YOUR MISSION:
+1. Select sources that directly align with the research domain
+2. Generate laser-focused search queries that capture the core research intent
 
-1. **Decide if it should be used**: Evaluate relevance, coverage, quality, and specificity
-2. **Generate a search query**: If selected, create a concise, targeted search query
+SELECTION STRATEGY:
+• Prioritize sources with strong domain alignment over general coverage
+• Choose specialized databases for niche research areas
+• Include 2-4 complementary sources for comprehensive coverage
+• Skip sources with minimal relevance to avoid noise
 
-SELECTION CRITERIA:
-- Choose scrapers that best match the research domain and methodology described
-- Prioritize academic databases and repositories for scholarly research
-- Consider both broad coverage and specialized sources when appropriate
-- Avoid scrapers that are clearly irrelevant to the research focus
+QUERY CRAFTING PRINCIPLES:
+• Use 3-5 strategic keywords that encapsulate the research essence
+• Combine domain-specific terms with methodological keywords
+• Target the language researchers actually use in titles and abstracts
+• Avoid generic terms that produce too many irrelevant results
+• No operators, quotes, or complex syntax - keep it clean and searchable
 
-QUERY GENERATION GUIDELINES:
-- Create concise, specific search queries (2-6 words typically)
-- Focus on key terms and concepts from the research description
-- Avoid operators like "OR", "AND", quotation marks, or complex syntax
-- Use simple keyword combinations that capture the essence of the research
-- Tailor each query to the specific scraper's content domain
+QUERY EXAMPLES BY RESEARCH TYPE:
+• Technical research: "convolutional neural networks image classification", "variational quantum algorithms optimization", "transformer architecture attention mechanisms"
+• Social sciences: "participatory urban design community engagement", "loss aversion behavioral finance", "social network analysis political polarization"
+• Medical research: "CAR-T cell therapy leukemia", "CRISPR Cas9 therapeutic applications", "mRNA vaccine immunogenicity"
+• Environmental: "lithium-ion battery energy storage", "carbonic acid coral calcification", "photovoltaic efficiency perovskite materials"
+• Business/Economics: "supply chain resilience risk management", "digital transformation organizational change", "cryptocurrency market volatility"
+• Psychology/Neuroscience: "working memory prefrontal cortex", "cognitive behavioral therapy depression", "neuroplasticity rehabilitation therapy"
 
-INSTRUCTIONS:
-For each scraper, decide whether it should be used (true/false) and if true, provide a targeted search query. Include reasoning for your decisions focusing on how well each scraper aligns with the research needs.
+OPTIMIZATION FOCUS:
+Each query should be specific enough to filter out irrelevant papers while broad enough to capture variations in terminology. Think about what keywords would appear in the title or abstract of your ideal research paper.
 
-Return your response as a JSON object following this exact schema:
-{result_schema.model_json_schema()}
+OUTPUT FORMAT:
+Return a JSON object matching this schema: {result_schema.model_json_schema()}
 
-Example query formats:
-- "machine learning healthcare"
-- "climate change adaptation"
-- "neural networks optimization"
-- "sustainable energy systems"
+For each selected source, provide:
+- Clear rationale for why it's relevant to the research
+- A targeted search query optimized for that source's content domain
+- Confidence level in the query's effectiveness (if schema includes this)
 
-Ensure queries are simple, relevant, and optimized for finding the most pertinent research documents."""
+Remember: The goal is precision over quantity. Better to have fewer, highly relevant results than many irrelevant ones."""

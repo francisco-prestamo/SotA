@@ -1,3 +1,4 @@
+import json
 from typing import List, Dict
 import logging
 from pydantic import create_model
@@ -19,12 +20,18 @@ from .models.string_response_model import StringResponseModel
 from .models.dict_response_model import DictResponseModel
 
 from .prompts.feature_extraction_prompt import build_feature_extraction_prompt
-from .prompts.new_feature_identification_prompt import build_new_feature_identification_prompt
+from .prompts.new_feature_identification_prompt import build_new_feature_identification_prompt, \
+    build_feature_value_extraction_prompt
 from .prompts.feature_consolidation_prompt import build_feature_consolidation_prompt
 from .prompts.domain_extraction_prompt import build_domain_extraction_prompt
 from .prompts.addition_summary_prompt import build_addition_summary_prompt
 from .prompts.search_query_synthesis_prompt import build_search_query_synthesis_prompt
 
+from pydantic import BaseModel
+from typing import List
+
+class NewFeaturesListModel(BaseModel):
+    new_features: List[str]
 
 def create_features_extraction_model(feature_list: List[str]):
     """Create a dynamic model with all features as fields"""
@@ -107,6 +114,7 @@ class PaperAdder:
     def _add_paper_to_sota_table(self, doc: Document, experts: List[Expert]) -> None:
         """Add a single paper to the SOTA table by extracting features"""
         # Extract features from the document
+        print(f"Extracting features from {doc.title}...")
         extraction_result = self._extract_paper_features(doc, experts)
          # Update SOTA table features if new ones were found
         new_features_added = []
@@ -179,27 +187,32 @@ class PaperAdder:
             domain=self._extract_domain(doc, experts),
             features=all_features
         )
-        
+        print(f"Paper {doc.title}")
+        print("*"*100)
         # Add to SOTA table
         self.board.sota_table.document_features.append((doc, paper_features))
 
     def _extract_paper_features(self, doc: Document, experts: List[Expert]) -> PaperFeatureExtraction:
         """Extract features from a paper using multiple experts across chunks"""
         from expert_set.utils.document_chunking import chunk_document
-        chunks = chunk_document(doc)
+        chunks = chunk_document(doc,window_size=400)
         
         chunk_features = []
         chunk_new_features = []
-        
+        has_existing_features = bool(self.board.sota_table.features)
+        print(len(chunks))
         # Process each chunk with each expert
         for chunk_idx, chunk in enumerate(chunks):
-            for expert in experts:
-                # Extract existing features
-                existing_features = self._extract_features_from_chunk(
-                    expert, doc, chunk, chunk_idx
-                )
-                chunk_features.append(existing_features)
-                
+            for expert in experts[0:1]:
+                # Extract existing features only if any exist in the SOTA table
+                if has_existing_features:
+
+                    existing_features = self._extract_features_from_chunk(
+                        expert, doc, chunk, chunk_idx
+                    )
+                    print("existing features:")
+                    print(existing_features)
+                    chunk_features.append(existing_features)
                 # Identify new features
                 new_features = self._identify_new_features_from_chunk(
                     expert, doc, chunk, chunk_idx
@@ -207,9 +220,19 @@ class PaperAdder:
                 chunk_new_features.append(new_features)
         
         # Consolidate features across all chunks and experts
-        consolidated_features = self._consolidate_features(chunk_features, doc.title)
+        consolidated_features = (
+            self._consolidate_features(chunk_features, doc.title) if has_existing_features else {}
+        )
         consolidated_new_features = self._consolidate_new_features(chunk_new_features, doc.title)
-        
+
+        print("_"*120)
+        print("Paper:")
+        # Build dict for JSON serialization
+        paper_dict = {
+            'consolidated_features': consolidated_features,
+            'consolidated_new_features': consolidated_new_features
+        }
+        print(json.dumps(paper_dict, indent=4, default=str))
         return PaperFeatureExtraction(
             document=doc,
             chunk_features=chunk_features,
@@ -225,7 +248,7 @@ class PaperAdder:
         chunk, 
         chunk_idx: int
     ) -> Dict[str, str]:
-        """Extract existing SOTA table features from a chunk using an expert"""
+        """Extract existing SOTA table features from a chunk using an expert, expecting a brief description/value for each feature."""
         prompt = build_feature_extraction_prompt(
             expert.name,
             expert.expert_model.description,
@@ -234,32 +257,32 @@ class PaperAdder:
             chunk.chunk,
             self.board.sota_table.features
         )
-        
-        # Create dynamic model with all features
         FeaturesModel = create_features_extraction_model(self.board.sota_table.features)
-        
         try:
             response = self.json_generator.generate_json(prompt, FeaturesModel)
-            # Extract all features from the model instance
             extracted_features = {}
             for feature in self.board.sota_table.features:
-                extracted_features[feature] = getattr(response, feature, "")
-            
+                # Accept string or dict, but prefer string (brief description)
+                value = getattr(response, feature, "")
+                if isinstance(value, dict) and 'value' in value:
+                    value = value['value']
+                extracted_features[feature] = value
         except Exception as e:
             logging.warning(f"Failed to extract features for expert {expert.name}, chunk {chunk_idx}: {e}")
-            extracted_features = {feature: "" for feature in self.board.sota_table.features}
-        
+            extracted_features = {feature: "Not Available" for feature in self.board.sota_table.features}
         return extracted_features
 
     def _identify_new_features_from_chunk(
-        self, 
-        expert: Expert, 
-        doc: Document, 
-        chunk, 
+        self,
+        expert: Expert,
+        doc: Document,
+        chunk,
         chunk_idx: int
     ) -> ExpertChunkNewFeatures:
-        """Identify new features in a chunk using an expert"""
-        prompt = build_new_feature_identification_prompt(
+        """Identify new features in a chunk using an expert, first extracting names, then values."""
+        
+        # Step 1: Identify new feature names
+        prompt_names = build_new_feature_identification_prompt(
             expert.name,
             expert.expert_model.description,
             doc.title,
@@ -268,15 +291,31 @@ class PaperAdder:
             self.board.sota_table.features
         )
         
+        print(f"Extracting new feature names from paper chunk {chunk_idx}:")
         try:
-            response_model = self.json_generator.generate_json(prompt, DictResponseModel)
-            response = response_model.data
-            new_features = response.get("new_features", [])
-            feature_values = response.get("feature_values", {})
+            response_names = self.json_generator.generate_json(prompt_names, NewFeaturesListModel)
+            new_features = response_names.new_features
         except Exception as e:
-            logging.warning(f"Failed to identify new features for expert {expert.name}, chunk {chunk_idx}: {e}")
+            logging.warning(f"Failed to identify new feature names for expert {expert.name}, chunk {chunk_idx}: {e}")
             new_features = []
-            feature_values = {}
+        
+        # Step 2: For each new feature, extract its value
+        feature_values = {}
+        if new_features:
+            for feature in new_features:
+                value_prompt = build_feature_value_extraction_prompt(
+                    feature,
+                    doc.title,
+                    doc.authors,
+                    chunk.chunk
+                )
+                try:
+                    value_response = self.json_generator.generate_json(value_prompt, StringResponseModel)
+                    feature_values[feature] = value_response.response
+                    print(f"  {feature}: {value_response.response}")
+                except Exception as e:
+                    logging.warning(f"Failed to extract value for new feature '{feature}' for expert {expert.name}, chunk {chunk_idx}: {e}")
+                    feature_values[feature] = "Not Available"
         
         return ExpertChunkNewFeatures(
             expert_name=expert.name,

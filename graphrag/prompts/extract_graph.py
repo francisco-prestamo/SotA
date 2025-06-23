@@ -135,6 +135,12 @@ Output:
 def initial_extract_graph_prompt(text: str, entity_types: str, examples: str = "") -> str:
     example_text = get_graph_extraction_examples()
 
+    # Handle entity_types properly to avoid empty brackets
+    if entity_types and entity_types.strip():
+        entity_types_instruction = f"One of the following types: {entity_types}"
+    else:
+        entity_types_instruction = "PERSON, ORGANIZATION, LOCATION, EVENT, or CONCEPT"
+
     return f"""
 -Goal-
 Given a text document that is potentially relevant to this activity and a list of entity types, identify all entities of those types from the text and all relationships among the identified entities.
@@ -142,7 +148,7 @@ Given a text document that is potentially relevant to this activity and a list o
 -Steps-
 1. Identify all entities. For each identified entity, extract the following information:
    - name: Name of the entity, capitalized
-   - type: One of the following types: [{entity_types}]
+   - type: {entity_types_instruction}
    - description: Comprehensive description of the entity's attributes and activities
 
 2. From the entities identified in step 1, identify all pairs of (source, target) that are *clearly related* to each other.
@@ -150,6 +156,8 @@ Given a text document that is potentially relevant to this activity and a list o
    - source: name of the source entity, as identified in step 1
    - target: name of the target entity, as identified in step 1
    - description: brief explanation of the relationship between source and target entities
+
+3. Format your response as valid JSON with "entities" and "relationships" arrays.
 
 ######################
 -Examples-
@@ -161,6 +169,5 @@ Given a text document that is potentially relevant to this activity and a list o
 ######################
 Text: {text}
 
-
-IMPORTANT: Ensure the JSON is complete and properly closed with all brackets and braces.
+Output the result as valid JSON only. Ensure the JSON is complete and properly closed with all brackets and braces.
 """
