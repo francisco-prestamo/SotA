@@ -18,9 +18,10 @@ class Entity(BaseModel):
     description: str
 
 class Relationship(BaseModel):
+    description: str
     source: str
     target: str
-    description: str
+
 
 class Claim(BaseModel):
     subject: str

@@ -180,6 +180,8 @@ class GraphRag:
         """
         Incrementally update the knowledge graph with new documents.
         """
+        for doc in docs:
+            kg.add_document(doc)
         # 1. Chunk new documents and add text units using threads
         def process_document(doc):
             return self._chunk_document(doc, max_tokens=self.max_tokens, overlap_tokens=self.overlap_tokens)
@@ -308,6 +310,7 @@ class GraphRag:
         Returns:
             Tuple[List[Entity], List[Relationship]]: Lists of merged entities and relationships.
         """
+
         entity_types = ",".join([e.value for e in EntityType])
         prompt = initial_extract_graph_prompt(text_unit.text, entity_types, example)
         entity_relationships:EntityRelationshipModel = self.json_generator.generate_json(prompt, EntityRelationshipModel)
@@ -394,7 +397,7 @@ class GraphRag:
             entity_descs = "; ".join([e.description for e in key_entities])
             rel_descs = "; ".join([r.description for r in key_relationships])
             summary = f"Entities: {entity_descs}. Relationships: {rel_descs}"
-            summary = summary[:5000] + ("..." if len(summary) > 2000 else "")
+            summary = summary[:8000] + ("..." if len(summary) > 8000 else "")
 
         return CommunityReport(summary=summary, key_entities=key_entities, key_relationships=key_relationships)
 

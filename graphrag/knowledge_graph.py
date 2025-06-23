@@ -29,6 +29,9 @@ class KnowledgeGraph:
         self.community_reports: List[CommunityReport] = []
         self.textunit_entities: Dict[str, List[Entity]] = {}
 
+    def add_document(self, document: Document):
+        self.documents.append(document)
+
     def add_text_unit(self, text_unit: TextUnit):
         self.text_units.append(text_unit)
 
