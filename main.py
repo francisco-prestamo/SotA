@@ -4,7 +4,9 @@ from console_user_api import ConsoleUserApi
 from entities.sota_table import sota_table_to_markdown
 from expert_set import ExpertSet
 from graphrag import GraphRag
-from llm_models import GeminiJsonGenerator, NomicAIEmbedder, JsonGeneratorInspectionWrapper
+from llm_models import NomicAIEmbedder
+from llm_models.json_generators.gemini import GeminiJsonGenerator
+from llm_models.text_embedders.gemini import GeminiEmbedder
 from receptionist_agent import ReceptionistAgent
 from recoverer_agent import RecovererAgent
 from vectorial_db import FaissVecDBFactory
@@ -17,14 +19,12 @@ _parse_args()
 
 json_gen = GeminiJsonGenerator()
 
-embedder = NomicAIEmbedder()
-graph_rag = GraphRag(embedder, json_gen, json_gen)
+embedder = GeminiEmbedder(dimensions=128)
+graph_rag = GraphRag(text_embedder=embedder, json_generator=json_gen,low_consume=False,max_tokens=1800)
 board = Board(json_gen, graph_rag)
 scrappers = [
     SemanticScholarRecoverer(),
-    ArXivRecoverer(),
-    PubMedRecoverer(),
-    DOIRecoverer(),
+    ArXivRecoverer()
 ]
 recoverer = RecovererAgent(json_gen, graph_rag, scrappers)
 vector_repo_factory = FaissVecDBFactory(embedder.dim)

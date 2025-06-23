@@ -4,6 +4,7 @@ from entities.document import Document
 from graphrag.models.text_unit import TextUnit
 from pydantic import ValidationError
 from graphrag.interfaces.text_embedder import TextEmbedder
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 nlp = spacy.load("en_core_web_sm")
 
@@ -62,7 +63,7 @@ def chunk_text(text: str, max_tokens=30000, overlap_tokens=50) -> list[str]:
 
     return chunks
 
-def chunk_document(text_embedder: TextEmbedder,document: Document, max_tokens=30000, overlap_tokens=50) -> List[TextUnit]:
+def chunk_document(text_embedder: TextEmbedder, document: Document, max_tokens=30000, overlap_tokens=50) -> List[TextUnit]:
     """
     Chunk document's content into semantically meaningful chunks using spaCy, with overlap,
     and convert them to TextUnit objects.
@@ -80,11 +81,10 @@ def chunk_document(text_embedder: TextEmbedder,document: Document, max_tokens=30
     
     # Get raw text chunks using the chunking function
     text_chunks = chunk_text(document.content, max_tokens=max_tokens, overlap_tokens=overlap_tokens)
-    
-    # Convert chunks to TextUnit objects
-    text_units = []
-    for i, chunk in enumerate(text_chunks):
-        text_unit = TextUnit(
+
+    def create_text_unit(i_chunk):
+        i, chunk = i_chunk
+        return TextUnit(
             document_id=document.id,
             text=chunk,
             unit_id=f"{document.id}_chunk_{i}",
@@ -92,6 +92,14 @@ def chunk_document(text_embedder: TextEmbedder,document: Document, max_tokens=30
             number_tokens=len(nlp(chunk)),
             embedding=text_embedder.embed(chunk)
         )
-        text_units.append(text_unit)
-    
+
+    text_units = []
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        futures = {executor.submit(create_text_unit, (i, chunk)): i for i, chunk in enumerate(text_chunks)}
+        for future in as_completed(futures):
+            text_unit = future.result()
+            text_units.append(text_unit)
+
+    # Sort to preserve original order
+    text_units.sort(key=lambda tu: tu.position)
     return text_units
