@@ -14,7 +14,7 @@ from .user_questioner import UserQuestioner
 from .prompts.update_description import update_description_prompt, DescriptionUpdate
 from .prompts.update_expert_set import update_expert_set_prompt, ExpertSetUpdate
 
-MAX_ROUNDS = 10
+MAX_ROUNDS = 20
 
 class ExpertSet:
     """Orchestrates expert set to build State-of-the-Art tables through iterative refinement."""

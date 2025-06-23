@@ -74,7 +74,7 @@ class RecovererAgent:
                         print(f"Using query for {s.name}: {search_query}")
 
                         # Search using the appropriate query
-                        searched_docs = s.recover(search_query)
+                        searched_docs = [doc for doc in s.recover(search_query, 20) if getattr(doc, 'content', None)]
                         print(f"Found {len(searched_docs)} documents using {s.name}")
 
                         for doc in searched_docs:
@@ -105,7 +105,12 @@ class RecovererAgent:
         """
         print("Searching surveys about:")
         print(query)
-        return list(self.scrappers[0].recover(query))[:k]
+        result = list(self.scrappers[0].recover(query, k))
+        for doc in result:
+            print(f"Found document: {doc.title}")
+            print(doc.content[:100])
+            print("#"*30)
+        return result
 
 
 

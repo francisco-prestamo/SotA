@@ -42,6 +42,8 @@ class SemanticScholarRecoverer(DocRecoverer):
         params = {"query": query, "fields": "title,abstract,authors,openAccessPdf", "limit": k}
         resp = None
 
+
+
         for attempt in range(self.MAX_RETRIES):
             try:
                 resp = requests.get(self.BASE_URL, params=params, timeout=self.TIMEOUT)
@@ -56,52 +58,97 @@ class SemanticScholarRecoverer(DocRecoverer):
             except requests.RequestException:
                 time.sleep(random.uniform(self.SEMANTIC_BACKOFF_MIN, self.SEMANTIC_BACKOFF_MAX))
 
+
+
         if not resp or resp.status_code != 200:
             return set()
 
         papers = resp.json().get("data", [])
         documents = set()
-        futures = []
 
+        # Use thread pool to process all papers concurrently
         with ThreadPoolExecutor(max_workers=self.PDF_THREADS) as executor:
+            # Submit all papers for processing
+            futures = []
             for paper in papers:
-                if paper.get("openAccessPdf", {}).get("url"):
-                    futures.append(executor.submit(
-                        self._fetch_and_clean,
-                        paper["openAccessPdf"]["url"],
-                        paper.get("paperId")
-                    ))
+                futures.append(executor.submit(self._process_paper, paper))
 
+            # Collect results as they complete
             for future in as_completed(futures):
                 doc = future.result()
                 if doc:
                     documents.add(doc)
 
-        recovered_ids = {doc.id for doc in documents}
+        return documents
 
-        for paper in papers:
-            paper_id = paper.get("paperId")
-            if paper_id in recovered_ids or not paper.get("title"):
-                continue
+    def _process_paper(self, paper: dict) -> Document | None:
+        """Process a single paper from Semantic Scholar response.
 
-            title = paper.get("title", "").strip()
-            abstract = paper.get("abstract", "") or ""
-            authors = [a.get("name", "") for a in paper.get("authors", [])]
+        Args:
+            paper: Paper dictionary from Semantic Scholar API
 
+        Returns:
+            Document object or None if processing fails
+        """
+
+        paper_id = paper.get("paperId")
+        title = paper.get("title", "").strip()
+        abstract = paper.get("abstract", "") or ""
+        authors = [a.get("name", "") for a in paper.get("authors", [])]
+        print(f"start => {paper_id}")
+        start_time = time.time()
+
+
+        # First try to get PDF content if available
+        if paper.get("openAccessPdf", {}).get("url"):
+            pdf_doc = self._fetch_and_clean(paper["openAccessPdf"]["url"], paper_id)
+            if pdf_doc:
+                end_time = time.time()
+                print(f"end => {paper_id}")
+                print(f"Time elapsed: {end_time - start_time:.2f} seconds")
+                # Update with metadata from Semantic Scholar
+                return Document(
+                    id=paper_id,
+                    title=title,
+                    abstract=abstract,
+                    authors=authors,
+                    content=pdf_doc.content
+                )
+
+        # Fallback to arXiv if no PDF available and title exists
+        if title:
             arxiv_docs = self._recover_from_arxiv(title)
             if arxiv_docs:
                 doc = next(iter(arxiv_docs))
-                documents.add(
-                    Document(
-                        id=doc.id,
-                        title=title or doc.title,
-                        abstract=abstract or doc.abstract,
-                        authors=authors or doc.authors,
-                        content=doc.content
-                    )
+                end_time = time.time()
+                print(f"end => {paper_id}")
+                print(f"Time elapsed: {end_time - start_time:.2f} seconds")
+                return Document(
+                    id=doc.id,
+                    title=title or doc.title,
+                    abstract=abstract or doc.abstract,
+                    authors=authors or doc.authors,
+                    content=doc.content
                 )
 
-        return documents
+        # If no content available, return document with metadata only (optional)
+        # You might want to skip these entirely by returning None
+        if title:
+            end_time = time.time()
+            print(f"end => {paper_id}")
+            print(f"Time elapsed: {end_time - start_time:.2f} seconds")
+            # Only return if we have at least a title
+            return Document(
+                id=paper_id,
+                title=title,
+                abstract=abstract,
+                authors=authors,
+                content=""  # Empty content
+            )
+        end_time = time.time()
+        print(f"end => {paper_id}")
+        print(f"Time elapsed: {end_time - start_time:.2f} seconds")
+        return None
 
     def _fetch_and_clean(self, url: str, paper_id: str) -> Document | None:
         """Fetch PDF content from URL and clean it.
