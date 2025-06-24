@@ -60,9 +60,54 @@ INSTRUCTIONS:
 4. Provide both the feature name and its value from this chunk
 5. Limit to the 3 most important new features
 
-**An empty list is a VALID RESPONSE, as a matter of fact it is PREFERRED, you should ONLY identify features that are
-both CLEARLY MISSING from the currently existing features, relevant to the description of your target research paper
-and clearly appearing in the document chunk
+These are some example `feature name -> value` pairs, representing structured metadata typically extracted from research papers for building a state-of-the-art comparison table in the field of computer science, and specifically AI-related
+studies
+
+### EXAMPLES ###
+Example 1:
+
+- AutoML for LLM → No
+- LLMs for AutoML → No
+- AutoML → No
+- Pre-training → No
+- Fine-tuning → No
+- Inferences → No
+- Meta-learning → Yes
+- Tool → None
+- LLM → Yes
+- Model Selection → No
+- HPO → No
+- Prompt Tuning → No
+- In-Context Learning → No
+- Multi-modal → Yes
+- Datasets → "Amazon-531", "DBPedia-298"
+
+Example 2:
+
+- AutoML for LLM → Yes
+- LLMs for AutoML → Yes
+- AutoML → Yes
+- Pre-training → No
+- Fine-tuning → No
+- Inferences → No
+- Meta-learning → No
+- Tool → AutoGen
+- LLM → Yes
+- Model Selection → No
+- HPO → No
+- Prompt Tuning → No
+- In-Context Learning → No
+- Multi-modal → No
+- Datasets → Not specified
+### END ###
+
+As you can see they are concise, short and direct, note that for different fields of research, the names and
+values could change a bit, perhaps more than 'Yes' and 'No' would be necessary to explain each feature for a 
+given paper, but the conciseness should remain.
+
+**An empty list of new features is a VALID RESPONSE, as a matter of fact it is PREFERRED, you should ONLY 
+identify features that are both CLEARLY MISSING from the currently existing features, relevant to the 
+description of your target research paper and clearly appearing in the document chunk.
 
 Respond as a JSON object with:
 - "new_features": array of new feature names"""
@@ -77,7 +122,57 @@ def build_feature_value_extraction_prompt(
     """Build prompt for extracting the value of a specific feature from a document chunk."""
     authors_str = ", ".join(document_authors)
 
-    return f"""Extract the value for the feature '{feature_name}' from the given document chunk.
+    return f"""
+You are an expert, sequentially reading a paper, trying to assert whether or not a feature is present in each
+of the chunks of text you iterate through
+
+
+These are some example `feature name -> value` pairs, representing structured metadata typically extracted from research papers for building a state-of-the-art comparison table in the field of computer science, and specifically AI-related
+studies
+
+### EXAMPLES ###
+Example 1:
+
+- AutoML for LLM → No
+- LLMs for AutoML → No
+- AutoML → No
+- Pre-training → No
+- Fine-tuning → No
+- Inferences → No
+- Meta-learning → Yes
+- Tool → None
+- LLM → Yes
+- Model Selection → No
+- HPO → No
+- Prompt Tuning → No
+- In-Context Learning → No
+- Multi-modal → Yes
+- Datasets → "Amazon-531", "DBPedia-298"
+
+Example 2:
+
+- AutoML for LLM → Yes
+- LLMs for AutoML → Yes
+- AutoML → Yes
+- Pre-training → No
+- Fine-tuning → No
+- Inferences → No
+- Meta-learning → No
+- Tool → AutoGen
+- LLM → Yes
+- Model Selection → No
+- HPO → No
+- Prompt Tuning → No
+- In-Context Learning → No
+- Multi-modal → No
+- Datasets → Not specified
+### END ###
+
+As you can see they are concise, short and direct, note that for different fields of research, the names and
+values could change a bit, perhaps more than 'Yes' and 'No' would be necessary to explain each feature for a 
+given paper, but the conciseness should remain.
+
+Assert the value for the feature '{feature_name}' from the given document chunk.
 
 DOCUMENT INFORMATION:
 - Title: {document_title}

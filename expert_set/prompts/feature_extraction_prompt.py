@@ -43,6 +43,51 @@ whatever is appropriate given the description of the feature
 {features_list}
 ### END ###
 
+These are some example `feature name -> value` pairs, representing structured metadata typically extracted from research papers for building a state-of-the-art comparison table in the field of computer science, and specifically AI-related
+studies
+
+### EXAMPLES ###
+Example 1:
+
+- AutoML for LLM → No
+- LLMs for AutoML → No
+- AutoML → No
+- Pre-training → No
+- Fine-tuning → No
+- Inferences → No
+- Meta-learning → Yes
+- Tool → None
+- LLM → Yes
+- Model Selection → No
+- HPO → No
+- Prompt Tuning → No
+- In-Context Learning → No
+- Multi-modal → Yes
+- Datasets → "Amazon-531", "DBPedia-298"
+
+Example 2:
+
+- AutoML for LLM → Yes
+- LLMs for AutoML → Yes
+- AutoML → Yes
+- Pre-training → No
+- Fine-tuning → No
+- Inferences → No
+- Meta-learning → No
+- Tool → AutoGen
+- LLM → Yes
+- Model Selection → No
+- HPO → No
+- Prompt Tuning → No
+- In-Context Learning → No
+- Multi-modal → No
+- Datasets → Not specified
+### END ###
+
+As you can see they are concise, short and direct, note that for different fields of research, the names and
+values could change a bit, perhaps more than 'Yes' and 'No' would be necessary to explain each feature for a 
+given paper, but the conciseness should remain.
+
 ### DOCUMENT INFORMATION ###
 - Title: {document_title}
 - Authors: {authors_str}
