@@ -60,7 +60,7 @@ class PaperAdder:
         # Build context for reasoning
         sota_md = sota_table_to_markdown(self.board.sota_table)
         thesis_desc = self.board.thesis_knowledge.description
-        thesis_thoughts = self._display_thoughts(self.board.thesis_knowledge.thoughts)
+        thesis_thoughts = self.board.thesis_knowledge.thoughts
         expert_context = {
             expert.name: {"expert_description": expert.expert_model.description}
             for expert in experts
@@ -227,8 +227,8 @@ class PaperAdder:
     ) -> Dict[str, str]:
         """Extract existing SOTA table features from a chunk using an expert"""
         prompt = build_feature_extraction_prompt(
-            expert.name,
             expert.expert_model.description,
+            self.board.thesis_knowledge.description,
             doc.title,
             doc.authors,
             chunk.chunk,
@@ -260,8 +260,8 @@ class PaperAdder:
     ) -> ExpertChunkNewFeatures:
         """Identify new features in a chunk using an expert"""
         prompt = build_new_feature_identification_prompt(
-            expert.name,
             expert.expert_model.description,
+            self.board.thesis_knowledge.description,
             doc.title,
             doc.authors,
             chunk.chunk,
@@ -387,8 +387,8 @@ class PaperAdder:
         """Extract values for specific new features from a document chunk"""
         # Create a simple prompt to extract values for these specific features
         prompt = build_new_feature_identification_prompt(
-            "Document Analyzer",  # Generic expert name
             "Expert in extracting features from academic papers", # Generic description
+            self.board.thesis_knowledge.description,
             doc.title,
             doc.authors,
             chunk.chunk,
