@@ -48,9 +48,6 @@ QUERY EXAMPLES BY RESEARCH TYPE:
 OPTIMIZATION FOCUS:
 Each query should be specific enough to filter out irrelevant papers while broad enough to capture variations in terminology. Think about what keywords would appear in the title or abstract of your ideal research paper.
 
-OUTPUT FORMAT:
-Return a JSON object matching this schema: {result_schema.model_json_schema()}
-
 For each selected source, provide:
 - Clear rationale for why it's relevant to the research
 - A targeted search query optimized for that source's content domain

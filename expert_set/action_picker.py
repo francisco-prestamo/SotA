@@ -57,7 +57,6 @@ class ActionPicker:
             self.sota_table_md,
             self.thesis_description,
             self.thesis_thoughts,
-            answer_model,
         )
 
         id_to_intervention = self.json_generator.generate_json(prompt, answer_model)
@@ -143,7 +142,6 @@ class ActionPicker:
             self.thesis_description,
             self.thesis_thoughts,
             expert_descriptions,
-            answer_model,
         )
 
         answer = self.json_generator.generate_json(prompt, answer_model)

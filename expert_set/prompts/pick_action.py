@@ -58,12 +58,10 @@ def pick_action_prompt(
     sota_table_md: str,
     thesis_desc: str,
     thesis_thoughts: str,
-    answer_model: Type[BaseModel],
 ) -> str:
     expert_presentation_model_str = json.dumps(
         [{"expert_id": ExpertPresentation.model_json_schema()}], indent=2
     )
-    answer_model_str = json.dumps(answer_model.model_json_schema(), indent=2)
 
     expert_strs = json.dumps(
         {id: pres.model_dump() for id, pres in presentations.items()}, indent=2
@@ -104,9 +102,6 @@ state of the art table
 
 Given this information, each expert will now intervene in the process of making a decision, following a similar schema
 as when they were described, their answers will be of the following form, consider that the expert ids must match with the id in their descriptions above
-
-Output only an answer in the following schema, no extra text
-{answer_model_str}
 """
 
 class SummaryAnswerModel(BaseModel):

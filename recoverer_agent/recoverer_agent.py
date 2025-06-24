@@ -31,7 +31,7 @@ class RecovererAgent(ReceptionistKR, ExpertSetKR):
             relevant_text_units = self.graphrag.get_relevant_text_units_distinct_docs(self.kg, response, top_n=k)
             text_units_strs = [tu.text for tu in relevant_text_units]
 
-            prompt = is_necessary_search_prompt(query, text_units_strs, BoolAnswerModel)
+            prompt = is_necessary_search_prompt(query, text_units_strs)
             result = self.json_generator.generate_json(prompt, BoolAnswerModel)
             print(f"Iteration for {query} ==================================================================================> {i+1}: {result.answer}")
             print(f"Reasoning: {result.reasoning}")
