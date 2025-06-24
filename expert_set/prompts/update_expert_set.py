@@ -9,35 +9,18 @@ class ExpertSetUpdate(BaseModel):
     """
 
     whether_to_remove_reasoning: str = Field(
-        description="The reasoning behind removing experts from the set, explaining why specific experts are no longer suitable.",
-        examples=[
-            "The removed experts primarily focus on outdated statistical models, which do not align with the deep learning techniques emphasized in the paper.",
-            "No experts are redundant or unnecessary to understand the research paper, so none should be removed"
-        ],
+        description="The reasoning behind removing experts from the set, explaining why specific experts are no longer suitable."
     )
     to_remove: Optional[List[str]] = Field(
         default=None,
         description="List of expert IDs to remove from the set, or None if no experts should be removed",
-        examples=[["expert_2", "expert_1"]],
     )
     whether_to_add_reasoning: str = Field(
-        description="The reasoning behind why experts should or should not be added to the set, explaining why additional expertise is needed, or why not.",
-        examples=[
-            "The current expert set lacks coverage in distributed systems, which is now a key focus of the paper. Adding a distributed systems expert to evaluate scalability aspects.",
-            "The current expert set has a broad enough coverage of the themes and topic treated in the research paper in question"
-        ],
+        description="The reasoning behind why experts should or should not be added to the set, explaining why additional expertise is needed, or why not."
     )
     to_add: Optional[List[str]] = Field(
         default=None,
         description="List of new expert descriptions to add to the set, or None if no experts should be added.",
-        examples=[
-            [
-                "Expert in transformer-based language models, specializing in attention mechanisms and model architecture optimization. Evaluates technical soundness and innovation in model design.",
-                "Computer vision specialist with focus on object detection and segmentation. Expert in evaluating accuracy metrics and implementation efficiency.",
-                "Natural language processing researcher with expertise in multilingual models and cross-lingual transfer learning. Assesses language coverage and transfer capabilities.",
-                "Machine learning engineer specializing in distributed training systems and model optimization. Evaluates scalability and computational efficiency.",
-            ]
-        ],
     )
 
 
@@ -89,11 +72,28 @@ Consider the following guidelines:
 5. The expert set should be as small as possible while still covering all necessary research fields
 6. Compare the old and new descriptions to identify any shifts in research focus that might require expert set changes
 
+Example reasoning explanations
+
+- For removal reasoning:
+  - "The removed experts primarily focus on outdated statistical models, which do not align with the deep learning techniques emphasized in the paper."
+  - "No experts are redundant or unnecessary to understand the research paper, so none should be removed."
+
+- For addition reasoning:
+  - "The current expert set lacks coverage in distributed systems, which is now a key focus of the paper. Adding a distributed systems expert to evaluate scalability aspects."
+  - "The current expert set has a broad enough coverage of the themes and topic treated in the research paper in question."
+
 When adding new experts, follow these guidelines for expert descriptions:
 - Be specific about the research field and subfield
 - Include relevant methodologies or techniques they specialize in
 - Mention their role in evaluating the research
 - Keep descriptions concise but informative
+
+Example new expert descriptions:
+
+- "Expert in transformer-based language models, specializing in attention mechanisms and model architecture optimization. Evaluates technical soundness and innovation in model design."
+- "Computer vision specialist with focus on object detection and segmentation. Expert in evaluating accuracy metrics and implementation efficiency."
+- "Natural language processing researcher with expertise in multilingual models and cross-lingual transfer learning. Assesses language coverage and transfer capabilities."
+- "Machine learning engineer specializing in distributed training systems and model optimization. Evaluates scalability and computational efficiency."
 
 The output should contain:
 1. A clear explanation of why experts were added or removed (or why no changes were needed)
@@ -102,4 +102,3 @@ The output should contain:
 
 Output only a json object, no additional text.
 """
-
