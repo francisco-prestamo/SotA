@@ -47,7 +47,7 @@ class PaperAdder:
         json_generator: JsonGenerator,
         board: Board,
         recoverer_agent: RecovererAgent,
-        k: int = 5
+        k: int = 3
     ):
         self.json_generator = json_generator
         self.recoverer_agent = recoverer_agent
@@ -118,11 +118,15 @@ class PaperAdder:
         extraction_result = self._extract_paper_features(doc, experts)
          # Update SOTA table features if new ones were found
         new_features_added = []
+        print(f"Adding features to SOTA table...")
+        print(extraction_result.new_features)
+
         for new_feature in extraction_result.new_features:
             if new_feature not in self.board.sota_table.features:
+
                 self.board.sota_table.features.append(new_feature)
                 new_features_added.append(new_feature)
-        
+        print(self.board.sota_table.features)
         # If we added new features, process all existing documents to check for these features
         if new_features_added:
             pass
@@ -158,8 +162,8 @@ class PaperAdder:
         
         chunk_features = []
         chunk_new_features = []
-        has_existing_features = bool(self.board.sota_table.features)
-        print(f"Processing {len(chunks)} chunks with multithreading")
+        has_existing_features = len(self.board.sota_table.features)>0
+        print(f"Processing {len(chunks)} chunks with multithreading {has_existing_features}")
         
         # Create thread-safe data structures with locks
         chunk_features_lock = Lock()
@@ -168,13 +172,14 @@ class PaperAdder:
         # Function to process a single chunk with an expert
         def process_chunk(chunk_info):
             chunk_idx, chunk = chunk_info
-            results = []
-            
+
+            print(f"Processing chunk {chunk_idx} {has_existing_features}")
             # We're using only the first expert for now as in the original code
             expert = experts[0]
                 
             # Extract existing features only if any exist in the SOTA table
             if has_existing_features:
+                print("bbbbb")
                 existing_features = self._extract_features_from_chunk(
                     expert, doc, chunk, chunk_idx
                 )
@@ -182,7 +187,7 @@ class PaperAdder:
                 print(existing_features)
                 with chunk_features_lock:
                     chunk_features.append(existing_features)
-                    
+
             # Identify new features
             new_features = self._identify_new_features_from_chunk(
                 expert, doc, chunk, chunk_idx
@@ -190,12 +195,13 @@ class PaperAdder:
             print(f"Chunk {chunk_idx} - New features:")
             print(new_features)
             with chunk_new_features_lock:
+                print(f"Adding new features for chunk {chunk_idx}: {new_features.new_features}")
                 chunk_new_features.append(new_features)
                 
             return True
         
         # Execute processing in parallel with thread pool
-        with concurrent.futures.ThreadPoolExecutor() as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
             # Create a list of (chunk_idx, chunk) tuples
             chunk_items = list(enumerate(chunks))
             # Submit all chunks for processing and wait for completion
@@ -212,6 +218,7 @@ class PaperAdder:
         print("Paper:")
 
         print(json.dumps({"old_features": all_old_features, "new_features": all_new_features}, indent=4, default=str))
+        print(chunk_features)
         return PaperFeatureExtraction(
             document=doc,
             old_features=all_old_features,
@@ -225,6 +232,7 @@ class PaperAdder:
         chunk, 
         chunk_idx: int
     ) -> Dict[str, str]:
+        print(f"Extracting features for chunk {chunk_idx}")
         """Extract existing SOTA table features from a chunk using an expert, expecting a brief description/value for each feature."""
         prompt = build_feature_extraction_prompt(
             expert.expert_model.description,
@@ -257,7 +265,7 @@ class PaperAdder:
         chunk_idx: int
     ) -> ExpertChunkNewFeatures:
         """Identify new features in a chunk using an expert"""
-        prompt_names = build_new_feature_identification_prompt(
+        prompt = build_new_feature_identification_prompt(
             expert.expert_model.description,
             self.board.thesis_knowledge.description,
             doc.title,
@@ -268,7 +276,7 @@ class PaperAdder:
         
         print(f"Extracting new feature names from paper chunk {chunk_idx}:")
         try:
-            response_names = self.json_generator.generate_json(prompt_names, NewFeaturesListModel)
+            response_names = self.json_generator.generate_json(prompt, NewFeaturesListModel)
             new_features = response_names.new_features
             print(f"Found new features: {new_features}")
         except Exception as e:
@@ -502,3 +510,5 @@ class PaperAdder:
         except Exception as e:
             logging.warning(f"Failed to extract new feature values for chunk {chunk_idx} of {doc.title}: {e}")
             return {}
+
+
