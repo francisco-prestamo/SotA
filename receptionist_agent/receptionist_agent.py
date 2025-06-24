@@ -1,8 +1,7 @@
 from typing import List
 from board.board import Board, ThesisKnowledgeModel
 from expert_set.models.build_expert_model import BuildExpertCommand
-from recoverer_agent.recoverer_agent import RecovererAgent
-from receptionist_agent.interfaces import JsonGenerator, UserAPI
+from receptionist_agent.interfaces import JsonGenerator, UserAPI, KnowledgeRecoverer
 from receptionist_agent.models import ThesisAssessmentModel, BuildExpertCommandList
 from receptionist_agent.prompts.thesis_assessment_prompt import thesis_assessment_prompt
 from receptionist_agent.prompts.experts_list_prompt import experts_list_prompt
@@ -22,7 +21,7 @@ class ReceptionistAgent:
         self,
         json_generator: JsonGenerator,
         board: Board,
-        recoverer_agent: RecovererAgent,
+        recoverer_agent: KnowledgeRecoverer,
         user_api: UserAPI,
     ):
         """

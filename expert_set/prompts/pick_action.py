@@ -151,7 +151,3 @@ After a count of the votes, the following action was chosen: {chosen_action}
 
 
 
-
-
-
-

@@ -3,7 +3,6 @@ from pydantic import BaseModel
 
 from board.board import Board
 from entities.sota_table import sota_table_to_markdown
-from recoverer_agent import RecovererAgent
 
 from .prompts.acquire_context import (
     ExpertAnswerModel,
@@ -19,7 +18,7 @@ from .prompts.pick_action import (
     SummaryAnswerModel,
 )
 from .models import Expert, DocumentChunk, ExpertDescription, RoundAction
-from .interfaces import JsonGenerator
+from .interfaces import JsonGenerator, KnowledgeRecoverer
 
 
 EXTRA_CONTEXT_AMOUNT_OF_PAPERS = 2
@@ -36,13 +35,13 @@ class ActionPicker:
         self,
         json_generator: JsonGenerator,
         board: Board,
-        recoverer_agent: RecovererAgent,
+        knowledge_recoverer: KnowledgeRecoverer,
     ):
         self.json_generator = json_generator
         self.sota_table_md = sota_table_to_markdown(board.sota_table)
         self.thesis_thoughts = self._display_thoughts(board.thesis_knowledge.thoughts)
         self.thesis_description = board.thesis_knowledge.description
-        self.document_recoverer = recoverer_agent
+        self.document_recoverer = knowledge_recoverer
 
     def pick_action(self, experts: List[Expert]) -> PickActionResult:
         id_to_expert = self._generate_expert_id_dict(experts)
@@ -93,13 +92,14 @@ class ActionPicker:
         votes = {action.value: 0 for action in RoundAction}
         for _, intervention in id_to_intervention.model_dump().items():
             intervention = ExpertIntervention.model_validate(intervention)
+            # the action choice is actually returned as a string
             votes[intervention.action_choice] += 1
 
         votes = list([(action, vote_count) for action, vote_count in votes.items()])
 
         votes = sorted(votes, key=lambda x: -x[1])
 
-        return votes[0][0]
+        return RoundAction(votes[0][0])
 
     def _generate_expert_presentations(
         self,
@@ -125,7 +125,7 @@ class ActionPicker:
         return answ
 
     def _display_chunk(self, chunk: DocumentChunk) -> str:
-        return f'"Excerpt from  + chunk.document_title":' + "\n" + chunk.chunk
+        return "Excerpt from '" + chunk.document_title + "': \n" + chunk.chunk
 
     def _acquire_context_if_necessary(
         self,
