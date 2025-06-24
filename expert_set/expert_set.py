@@ -3,8 +3,7 @@ from board.board import Board
 from entities.sota_table import SotaTable
 from expert_set.document_remover import DocumentRemover
 from expert_set.paper_adder import PaperAdder
-from recoverer_agent import RecovererAgent
-from .interfaces import KnowledgeRepositoryFactory, JsonGenerator, UserQuerier
+from .interfaces import KnowledgeRepositoryFactory, JsonGenerator, UserQuerier, KnowledgeRecoverer
 from .models import RoundAction, BuildExpertCommand
 from .expert_builder import ExpertBuilder
 from .action_picker import ActionPicker, PickActionResult
@@ -23,7 +22,7 @@ class ExpertSet:
             self,
             json_generator: JsonGenerator,
             expert_build_commands: List[BuildExpertCommand],
-            document_recoverer: RecovererAgent,
+            document_recoverer: KnowledgeRecoverer,
             knowledge_repository_factory: KnowledgeRepositoryFactory,
             board: Board,
             user_querier: UserQuerier,

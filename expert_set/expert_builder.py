@@ -1,8 +1,7 @@
 from typing import List
 from entities import Document
-from recoverer_agent import RecovererAgent
 
-from .interfaces import KnowledgeRepositoryFactory, KnowledgeRepository
+from .interfaces import KnowledgeRepositoryFactory, KnowledgeRepository, KnowledgeRecoverer
 from .utils import chunk_document
 from .models import BuildExpertCommand, Expert
 
@@ -10,7 +9,7 @@ from .models import BuildExpertCommand, Expert
 class ExpertBuilder:
     def __init__(
         self,
-        document_recoverer: RecovererAgent,
+        document_recoverer: KnowledgeRecoverer,
         knowledge_repository_factory: KnowledgeRepositoryFactory,
     ):
         self.document_recoverer = document_recoverer

@@ -1,12 +1,12 @@
 import os
+from typing import Type
 from google import genai
 from graphrag.interfaces.json_generator import JsonGenerator as GraphRagJsonGen, T
 from board.board import JsonGenerator as BoardJsonGen
 from expert_set.interfaces import JsonGenerator as ExpertSetJsonGen
 from recoverer_agent.interfaces import JsonGenerator as RecovJsonGen
 from receptionist_agent.interfaces import JsonGenerator as ReceptJsonGen
-from tests.user_agent.interfaces import JsonGenerator as UserAgentJsonGen
-from typing import Type, List
+from mocks.user_agent.interfaces import JsonGenerator as UserAgentJsonGen
 import time
 from pydantic import BaseModel, Field
 from pydantic import ValidationError
@@ -16,12 +16,18 @@ load_dotenv()
 
 
 class GeminiJsonGenerator(
-    GraphRagJsonGen, BoardJsonGen, ExpertSetJsonGen, RecovJsonGen, ReceptJsonGen, UserAgentJsonGen
+    GraphRagJsonGen,
+    BoardJsonGen,
+    ExpertSetJsonGen,
+    RecovJsonGen,
+    ReceptJsonGen,
+    UserAgentJsonGen,
 ):
     def __init__(self, model: str = "gemini-2.0-flash-lite"):
         # List of API keys, can be loaded from env or passed directly
         
         self.api_keys = []
+        self.api_keys = [os.getenv("GEMINI_API_KEY_1"), os.getenv("GEMINI_API_KEY_2"), os.getenv("GEMINI_API_KEY_3")]
         self.model = model
         self.key_index = 0
         self.client = genai.Client(api_key=self.api_keys[self.key_index])

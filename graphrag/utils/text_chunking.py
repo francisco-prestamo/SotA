@@ -6,7 +6,11 @@ from pydantic import ValidationError
 from graphrag.interfaces.text_embedder import TextEmbedder
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-nlp = spacy.load("en_core_web_sm")
+# Load spaCy with only the tokenizer enabled
+nlp = spacy.load(
+    "en_core_web_sm",
+    disable=["parser", "tagger", "ner", "lemmatizer", "attribute_ruler"],
+)
 
 def chunk_text(text: str, max_tokens=30000, overlap_tokens=50) -> list[str]:
     """

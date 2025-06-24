@@ -30,7 +30,6 @@ from .prompts.domain_extraction_prompt import build_domain_extraction_prompt
 from .prompts.addition_summary_prompt import build_addition_summary_prompt
 from .prompts.search_query_synthesis_prompt import build_search_query_synthesis_prompt
 
-from pydantic import BaseModel
 from typing import List
 
 
@@ -85,7 +84,7 @@ class PaperAdder:
         summary_query = summary_query_model.response
         print(f"Search query: {summary_query}")
         # Recover new documents
-        new_docs = self.recoverer_agent.recover_docs(summary_query, self.board.knowledge_graph, self.k)
+        new_docs = self.recoverer_agent.recover_docs(summary_query, self.k)
 
         if not new_docs:
             logging.warning("No new documents were recovered.")

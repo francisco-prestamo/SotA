@@ -4,9 +4,7 @@ from console_user_api import ConsoleUserApi
 from entities.sota_table import sota_table_to_markdown
 from expert_set import ExpertSet
 from graphrag import GraphRag
-from llm_models import NomicAIEmbedder
-from llm_models.json_generators.gemini import GeminiJsonGenerator
-from llm_models.text_embedders.gemini import GeminiEmbedder
+from llm_models import GeminiJsonGenerator, NomicAIEmbedder, JsonGeneratorInspectionWrapper, GeminiEmbedder
 from receptionist_agent import ReceptionistAgent
 from recoverer_agent import RecovererAgent
 from vectorial_db import FaissVecDBFactory
@@ -26,7 +24,7 @@ scrappers = [
     SemanticScholarRecoverer(),
     ArXivRecoverer()
 ]
-recoverer = RecovererAgent(json_gen, graph_rag, scrappers)
+recoverer = RecovererAgent(json_gen, graph_rag, scrappers, board.knowledge_graph)
 vector_repo_factory = FaissVecDBFactory(embedder.dim)
 knowledge_repo_fatory = RagRepoFactory(embedder, vector_repo_factory)
 
