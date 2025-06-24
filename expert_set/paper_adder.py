@@ -20,6 +20,7 @@ from .models.expert_chunk_new_features_model import ExpertChunkNewFeatures
 from .models.paper_feature_extraction_model import PaperFeatureExtraction
 from .models.string_response_model import StringResponseModel
 from .models.dict_response_model import DictResponseModel
+from .models import NewFeaturesListModel
 
 from .prompts.feature_extraction_prompt import build_feature_extraction_prompt
 from .prompts.new_feature_identification_prompt import build_new_feature_identification_prompt, \
@@ -32,8 +33,6 @@ from .prompts.search_query_synthesis_prompt import build_search_query_synthesis_
 from pydantic import BaseModel
 from typing import List
 
-class NewFeaturesListModel(BaseModel):
-    new_features: List[str]
 
 def create_features_extraction_model(feature_list: List[str]):
     """Create a dynamic model with all features as fields"""
@@ -229,8 +228,8 @@ class PaperAdder:
     ) -> Dict[str, str]:
         """Extract existing SOTA table features from a chunk using an expert, expecting a brief description/value for each feature."""
         prompt = build_feature_extraction_prompt(
-            expert.name,
             expert.expert_model.description,
+            self.board.thesis_knowledge.description,
             doc.title,
             doc.authors,
             chunk.chunk,
@@ -259,9 +258,9 @@ class PaperAdder:
         chunk_idx: int
     ) -> ExpertChunkNewFeatures:
         """Identify new features in a chunk using an expert"""
-        prompt = build_new_feature_identification_prompt(
-            expert.name,
+        prompt_names = build_new_feature_identification_prompt(
             expert.expert_model.description,
+            self.board.thesis_knowledge.description,
             doc.title,
             doc.authors,
             chunk.chunk,
@@ -484,8 +483,8 @@ class PaperAdder:
         """Extract values for specific new features from a document chunk"""
         # Create a simple prompt to extract values for these specific features
         prompt = build_new_feature_identification_prompt(
-            "Document Analyzer",  # Generic expert name
             "Expert in extracting features from academic papers", # Generic description
+            self.board.thesis_knowledge.description,
             doc.title,
             doc.authors,
             chunk.chunk,

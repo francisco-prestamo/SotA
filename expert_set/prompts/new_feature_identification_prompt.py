@@ -1,31 +1,57 @@
 from typing import List
 
-
 def build_new_feature_identification_prompt(
-    expert_name: str,
+    paper_description: str,
     expert_description: str,
     document_title: str,
     document_authors: List[str],
     chunk_content: str,
-    existing_features: List[str]
+    existing_features: List[str],
 ) -> str:
     """Build prompt for identifying NEW FEATURE NAMES ONLY in a document chunk."""
-    existing_features_list = "\n".join([f"- {feature}" for feature in existing_features])
+    existing_features_list = "\n".join(
+        [f"- {feature}" for feature in existing_features]
+    )
     authors_str = ", ".join(document_authors)
-    
-    return f"""You are {expert_name}, {expert_description}.
+
+    return f"""
+You are an expert, part of a group who is tasked with examining a set of research papers and extracting features
+from it, in order to compose a state of the art section for a specific target research paper, the state of the art 
+section is the section of a research paper that explores similar investigations on the subject by other 
+researchers, and compares them with their own work. The features should relate to the research paper, exemplifying
+the ways in which the same subject was addressed (i.e. if the paper you're reading solves a problem stated in the
+paper you're composing the state of the art section for in a different way, or shows a result that is similar
+to the ones shown in your target research paper). The objective is to create a state of the art TABLE, which
+has as rows the documents, and as columns, features, with a short description of why they were deemed detected
+in a given research paper
+
+This is a description of your target research paper
+
+### DESCRIPTION ###
+{paper_description}
+### END ###
+
+As such you're specialized in a specific domain which relates with the target research paper, this is your description:
+### DESCRIPTION ###
+{expert_description}
+### END ###
+
+You are reading the documents chunk by chunk, this is one of the chunks for a given research paper.
 
 Your task is to identify NEW features in the given document chunk that are NOT already covered by the existing features.
 
-EXISTING FEATURES (DO NOT include these):
+### EXISTING FEATURES (DO NOT include these) ###
 {existing_features_list}
+### END ###
 
-DOCUMENT INFORMATION:
+### DOCUMENT INFORMATION ###
 - Title: {document_title}
 - Authors: {authors_str}
+### END ####
 
-DOCUMENT CHUNK:
+### DOCUMENT CHUNK ###
 {chunk_content}
+### END ###
 
 INSTRUCTIONS:
 1. Look for important characteristics, metrics, methods, or properties mentioned in the chunk
@@ -34,16 +60,19 @@ INSTRUCTIONS:
 4. Provide both the feature name and its value from this chunk
 5. Limit to the 3 most important new features
 
+**An empty list is a VALID RESPONSE, as a matter of fact it is PREFERRED, you should ONLY identify features that are
+both CLEARLY MISSING from the currently existing features, relevant to the description of your target research paper
+and clearly appearing in the document chunk
+
 Respond as a JSON object with:
-- "new_features": array of new feature names
-- "feature_values": object mapping each new feature name to its value in this chunk"""
+- "new_features": array of new feature names"""
 
 
 def build_feature_value_extraction_prompt(
-        feature_name: str,
-        document_title: str,
-        document_authors: List[str],
-        chunk_content: str
+    feature_name: str,
+    document_title: str,
+    document_authors: List[str],
+    chunk_content: str,
 ) -> str:
     """Build prompt for extracting the value of a specific feature from a document chunk."""
     authors_str = ", ".join(document_authors)
@@ -73,3 +102,4 @@ Examples of good responses:
 
 Respond with just the value as a simple string.
 """
+
