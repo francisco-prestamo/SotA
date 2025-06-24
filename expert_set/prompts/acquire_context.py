@@ -40,6 +40,8 @@ def rag_queries_prompt(
     """
     answer_model_json = answer_model.model_json_schema()
     answer_model_str = json.dumps(answer_model_json, indent=2)
+    experts_dict = {key: desc.model_dump() for key, desc in experts_model.items()}
+    experts_str = json.dumps(experts_dict, indent=2)
 
     prompt = f"""
 This is a conversation of a team of domain experts to update a State of the Art (SOTA) table for a research thesis.
@@ -56,7 +58,7 @@ Key Thoughts:
 {thoughts_on_thesis}
 
 Expert Profiles:
-{experts_model}
+{experts_str}
 
 Each expert above will provide their reasoning of whether or not they need to recover more context from their internal survey paper repository.
 The output must be a JSON object mapping each expert key to an object of the form {{"reasoning":"...","requires_more_context":true|false,"rag_query":"..."}}.

@@ -279,10 +279,8 @@ class PaperAdder:
         chunk,
         chunk_idx: int
     ) -> ExpertChunkNewFeatures:
-        """Identify new features in a chunk using an expert, first extracting names, then values."""
-        
-        # Step 1: Identify new feature names
-        prompt_names = build_new_feature_identification_prompt(
+        """Identify new features in a chunk using an expert"""
+        prompt = build_new_feature_identification_prompt(
             expert.name,
             expert.expert_model.description,
             doc.title,
@@ -298,7 +296,7 @@ class PaperAdder:
         except Exception as e:
             logging.warning(f"Failed to identify new feature names for expert {expert.name}, chunk {chunk_idx}: {e}")
             new_features = []
-        
+
         # Step 2: For each new feature, extract its value
         feature_values = {}
         if new_features:
