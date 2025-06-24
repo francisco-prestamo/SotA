@@ -95,14 +95,11 @@ When adding new experts, follow these guidelines for expert descriptions:
 - Mention their role in evaluating the research
 - Keep descriptions concise but informative
 
-Output a json object with the following schema:
-{json.dumps(ExpertSetUpdate.model_json_schema(), indent=2)}
-
 The output should contain:
 1. A clear explanation of why experts were added or removed (or why no changes were needed)
 2. A list of expert IDs to remove (if any)
 3. A list of new expert descriptions to add (if any), following the format of the examples above
 
-Output only the json object, no additional text.
+Output only a json object, no additional text.
 """
 

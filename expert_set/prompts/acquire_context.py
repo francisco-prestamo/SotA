@@ -33,13 +33,10 @@ def rag_queries_prompt(
     thesis_desc: str,
     thoughts_on_thesis: str,
     experts_model: Dict[str, ExpertDescription],
-    answer_model: Type[BaseModel],
 ) -> str:
     """
     Build a prompt for expert agents to update the State of the Art (SOTA) table.
     """
-    answer_model_json = answer_model.model_json_schema()
-    answer_model_str = json.dumps(answer_model_json, indent=2)
     experts_dict = {key: desc.model_dump() for key, desc in experts_model.items()}
     experts_str = json.dumps(experts_dict, indent=2)
 
@@ -69,9 +66,6 @@ Be concise and explicit:
 - "rag_query": a short, focused query string to retrieve context if needed; null otherwise.
 
 Return only the JSON object. No additional text.
-
-Expected output schema:
-{answer_model_str}
 """
     return prompt
 

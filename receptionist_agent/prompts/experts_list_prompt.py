@@ -2,7 +2,6 @@ import json
 from board.board import ThesisKnowledgeModel
 from ..models import BuildExpertCommandList
 
-
 def experts_list_prompt(thesis_knowledge: ThesisKnowledgeModel) -> str:
     """
     Generate a prompt for creating a list of experts based on thesis knowledge.
@@ -47,11 +46,6 @@ Examples of good search queries:
 - "natural language processing clinical notes survey"
 - "computer vision diagnostic systems survey"
 - "reinforcement learning drug discovery survey"
-
-Expected Output Format:
-```json
-{json.dumps(BuildExpertCommandList.model_json_schema(), indent=2)}
-```
 
 Generate a diverse list of experts covering different aspects of the thesis topic. The experts should be complementary, not redundant. Each expert should represent a distinct area of expertise that contributes to understanding the broader thesis landscape.
 

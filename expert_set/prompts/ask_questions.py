@@ -81,8 +81,6 @@ The questions should be focused on:
 
 Given this information, each expert will now formulate their question, following a similar schema
 as when they were described, their answers will be of the following form, consider that the expert ids must match with the id in their descriptions above
-
-Output a json object of the provided schema and only that.
 """
 
 

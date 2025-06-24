@@ -187,9 +187,6 @@ Collected Knowledge Points:
 {chat_history}
 
 ---  ---
-
-Output your assessment following this schema:
-{json.dumps(ThesisAssessmentModel.model_json_schema(), indent=2)}
 """
     )
 

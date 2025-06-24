@@ -41,7 +41,7 @@ Based on this interaction, please extract new knowledge about the thesis topic a
 If the user's query and the response provide new information about the thesis topic, add it to the knowledge.
 If the description needs to be refined, please update it.
 
-Output the updated knowledge following the provided model schema. Include both existing knowledge points that are still relevant and new knowledge points extracted from this interaction.
+In your output, you shoudl include both existing knowledge points that are still relevant and new knowledge points extracted from this interaction.
 """
     
     return prompt
