@@ -1,0 +1,30 @@
+{
+  "documents": {
+    "paper_123": {
+      "doi": null,
+      "document": {
+        "id": "paper_123",
+        "title": "Deep Learning for Cancer Diagnosis",
+        "abstract": "A novel deep learning approach...",
+        "authors": [
+          "Jane Smith",
+          "John Doe"
+        ],
+        "content": "Full research content here..."
+      }
+    },
+    "datacite_paper": {
+      "doi": null,
+      "document": {
+        "id": "datacite_paper",
+        "title": "Data management plan for climate research data",
+        "abstract": "This data management plan outlines procedures...",
+        "authors": [
+          "Emma Thompson",
+          "James Wilson"
+        ],
+        "content": "Detailed data management procedures..."
+      }
+    }
+  }
+}

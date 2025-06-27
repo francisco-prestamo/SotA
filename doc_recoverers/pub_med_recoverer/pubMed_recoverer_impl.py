@@ -14,14 +14,11 @@ from doc_recoverers.doc_utils.doc_cleaner import DocumentContentCleaner
 class PubMedRecoverer(DocRecoverer):
     PUBMED_BACKOFF_MIN = 1.0
     PUBMED_BACKOFF_MAX = 2.0
-    ARXIV_BACKOFF_MIN = 3.0
-    ARXIV_BACKOFF_MAX = 5.0
     TIMEOUT = 15
     MAX_RETRIES = 100
     PDF_THREADS = 20
     ESEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
     EFETCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
-    ARXIV_API = "http://export.arxiv.org/api/query"
 
     @property
     def name(self) -> str:
@@ -29,7 +26,7 @@ class PubMedRecoverer(DocRecoverer):
 
     @property
     def description(self) -> str:
-        return "Retrieves documents from PubMed using a text query, fetches metadata, attempts PDF via DOI negotiation, then falls back to arXiv by title."
+        return "Retrieves documents from PubMed using a text query and fetches PDFs via DOI negotiation."
 
     def recover(self, query: str, k: int) -> Set[Document]:
         """Retrieve documents from PubMed based on a query.
@@ -43,12 +40,12 @@ class PubMedRecoverer(DocRecoverer):
         """
         ids = self._search_pubmed(query, k)
         documents = set()
-        doi_docs = set()
         futures = []
 
         metas = []
         for pmid in ids:
-            metas.append((pmid, self._fetch_metadata(pmid)))
+            meta = self._fetch_metadata(pmid)
+            metas.append((pmid, meta))
 
         with ThreadPoolExecutor(max_workers=self.PDF_THREADS) as executor:
             for pmid, meta in metas:
@@ -65,18 +62,7 @@ class PubMedRecoverer(DocRecoverer):
             for future in as_completed(futures):
                 doc = future.result()
                 if doc:
-                    doi_docs.add(doc)
-
-        documents.update(doi_docs)
-        recovered_pmids = {doc.id for doc in doi_docs}
-
-        for pmid, meta in metas:
-            if pmid in recovered_pmids or not meta.get("title"):
-                continue
-            arxiv_docs = self._recover_from_arxiv(meta["title"])
-            if arxiv_docs:
-                doc = next(iter(arxiv_docs))
-                documents.add(doc)
+                    documents.add(doc)
 
         return documents
 
@@ -139,7 +125,7 @@ class PubMedRecoverer(DocRecoverer):
                 title = article.find("ArticleTitle").text or ""
                 abstract = " ".join(e.text or "" for e in article.findall(".//AbstractText")).strip()
                 authors = [
-                    f"{a.findtext('ForeName', '')} {a.findtext('LastName', '')}".strip()
+                    f"\n{a.findtext('ForeName', '')} {a.findtext('LastName', '')}".strip()
                     for a in article.findall(".//Author")
                 ]
 
@@ -148,6 +134,10 @@ class PubMedRecoverer(DocRecoverer):
                     if a.attrib.get("IdType") == "doi":
                         doi = a.text.strip()
                         break
+                    else:
+                        print(f"{title} {a.attrib.get("IdType")} {a.attrib.get("Url")}\n")
+
+                print(f"Doi: {doi} , Title: {title}")
 
                 return {"title": title, "abstract": abstract, "authors": authors, "doi": doi}
             except requests.HTTPError as e:
@@ -184,7 +174,10 @@ class PubMedRecoverer(DocRecoverer):
             )
             head.raise_for_status()
             pdf_resp = requests.get(head.url, timeout=self.TIMEOUT)
+            print(f"{head.url}\n\n")
             pdf_resp.raise_for_status()
+
+
 
             reader = PdfReader(BytesIO(pdf_resp.content))
             raw = "\n".join(page.extract_text() or "" for page in reader.pages)
@@ -202,76 +195,6 @@ class PubMedRecoverer(DocRecoverer):
             )
         except Exception:
             return None
-
-    def _recover_from_arxiv(self, query: str) -> Set[Document]:
-        """Fallback to arXiv when PubMed PDF is unavailable.
-
-        Args:
-            query: Title or arXiv ID to search for
-
-        Returns:
-            Set containing single Document or empty set
-        """
-        search_q = f"id:{query.split('/')[-1]}" if (":" in query or "arxiv.org" in query) else f"all:{query}"
-
-        for attempt in range(self.MAX_RETRIES):
-            try:
-                resp = requests.get(
-                    f"{self.ARXIV_API}?search_query={search_q}&start=0&max_results=1",
-                    timeout=self.TIMEOUT
-                )
-                if resp.status_code in {429, 503, 301}:
-                    sleep_time = self._get_sleep_time(resp, self.ARXIV_BACKOFF_MIN, self.ARXIV_BACKOFF_MAX)
-                    time.sleep(sleep_time)
-                    continue
-                resp.raise_for_status()
-                break
-            except requests.HTTPError as e:
-                if e.response.status_code in {429, 503, 301}:
-                    sleep_time = self._get_sleep_time(e.response, self.ARXIV_BACKOFF_MIN, self.ARXIV_BACKOFF_MAX)
-                    time.sleep(sleep_time)
-                else:
-                    return set()
-            except requests.RequestException:
-                time.sleep(random.uniform(self.ARXIV_BACKOFF_MIN, self.ARXIV_BACKOFF_MAX))
-        else:
-            return set()
-
-        ns = {"atom": "http://www.w3.org/2005/Atom"}
-        root = ET.fromstring(resp.content)
-        if (entry := root.find("atom:entry", ns)) is None:
-            return set()
-
-        arxiv_id = entry.find("atom:id", ns).text.rsplit("/", 1)[-1]
-        title = entry.find("atom:title", ns).text.strip()
-        abstract = entry.find("atom:summary", ns).text.strip()
-        authors = [a.find("atom:name", ns).text for a in entry.findall("atom:author", ns)]
-        pdf_url = next(
-            (link.attrib["href"] for link in entry.findall("atom:link", ns)
-             if link.attrib.get("type") == "application/pdf" or link.attrib.get("title") == "pdf"
-             ), f"https://arxiv.org/pdf/{arxiv_id}.pdf")
-
-        try:
-            r = requests.get(pdf_url, timeout=self.TIMEOUT)
-            r.raise_for_status()
-            reader = PdfReader(BytesIO(r.content))
-            raw = "\n".join(p.extract_text() or "" for p in reader.pages)
-            content = DocumentContentCleaner.clean_document(raw)
-
-            if not content:
-                return set()
-
-            return {
-                Document(
-                    id=arxiv_id,
-                    title=title,
-                    abstract=abstract,
-                    authors=authors,
-                    content=content
-                )
-            }
-        except Exception:
-            return set()
 
     def _get_sleep_time(self, response, min_backoff, max_backoff) -> float:
         retry_after = response.headers.get('Retry-After')
