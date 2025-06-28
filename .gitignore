@@ -173,3 +173,5 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 llm_models/text_embedders/nomic.py
+.scrapper_data
+.test_case_data

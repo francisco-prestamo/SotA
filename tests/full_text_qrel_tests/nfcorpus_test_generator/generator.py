@@ -112,7 +112,6 @@ class TestCaseGenerator:
             for doc in documents
         }
 
-
         return TestCase(id=id, query=query, documents=documents, relevance=relevances)
 
     def _assign_documents(
@@ -158,7 +157,7 @@ class TestCaseGenerator:
     def _attempt_recover(self, documents: List[DatasetDocument]) -> List[Document]:
         answ = []
 
-        urls = [doc.id for doc in documents]
+        urls = [doc.url for doc in documents]
         recovered_docs = self.recoverer.get_documents(urls)
         for i, doc_to_recover in enumerate(recovered_docs):
             if doc_to_recover == None:
