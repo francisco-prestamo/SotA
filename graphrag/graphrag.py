@@ -23,6 +23,7 @@ from graphrag.models.entity_relationship import EntityRelationshipModel
 from graphrag.models.summary_community import SummaryCommunityModel
 from graphrag.models.text_unit import TextUnit
 from graphrag.models.claim_list import ClaimListModel
+from graphrag.utils.community_selector import CommunitySelector
 from graphrag.utils.text_chunking import chunk_document
 from graphrag.models.graph_types import Entity, Relationship, Claim, EntityType, Community, CommunityReport
 from graphrag.models.summary_description import SummaryDescriptionModel
@@ -58,9 +59,10 @@ class GraphRag:
         def process_document(doc):
             text_units: List[TextUnit] = self._chunk_document(doc, max_tokens=self.max_tokens, overlap_tokens=self.overlap_tokens)
             return text_units
-            
+
+        from tqdm import tqdm
         all_text_units = []
-        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
             future_to_doc = {executor.submit(process_document, doc): doc for doc in documents}
             for future in tqdm(concurrent.futures.as_completed(future_to_doc), total=len(documents), desc="Processing documents"):
                 text_units = future.result()
@@ -93,7 +95,7 @@ class GraphRag:
                     textunit_entities[tu_union.unit_id] = entities
                     tu_union = None
         else:
-            with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
                 future_to_tu = {
                     executor.submit(self.extract_entities_and_relationships_from_textunit, tu): tu
                     for tu in kg.text_units
@@ -107,7 +109,8 @@ class GraphRag:
         print("Finished extracting entities/relationships.")
         merged_entities: Dict[str, Tuple[EntityType,List[str]]] = {}
         entity_type_map: Dict[EntityType, List[str]] = {}
-        for ent in all_entities:
+        from tqdm import tqdm
+        for ent in tqdm(all_entities, desc="Merging entities"):
             key = ent.name
             if key not in merged_entities:
                 merged_entities[key] = (ent.type, [ent.description])
@@ -124,13 +127,13 @@ class GraphRag:
         #         kg.add_covariate(cov)
 
         summarized_entities: List[Entity] = []
-        for name, (type_, descriptions) in merged_entities.items():
+        for name, (type_, descriptions) in tqdm(merged_entities.items(), desc="Summarizing entities"):
             summary: str = self.summary_descriptions(descriptions)
             entity = Entity(name=name, type=type_, description=summary)
             summarized_entities.append(entity)
 
         summarized_entities_types: Dict[EntityType, str] = {}
-        for type_, descriptions in entity_type_map.items():
+        for type_, descriptions in tqdm(entity_type_map.items(), desc="Summarizing entity types"):
             summary = self.summary_descriptions(descriptions)
             summarized_entities_types[type_] = summary
 
@@ -141,14 +144,14 @@ class GraphRag:
             kg.add_textunits_entities(textunit_id, entities)
 
         merged_relationships: Dict[Tuple[str, str], List[str]] = {}
-        for rel in all_relationships:
+        for rel in tqdm(all_relationships, desc="Merging relationships"):
             key = (rel.source, rel.target)
             if key not in merged_relationships:
                 merged_relationships[key] = [rel.description]
             else:
                 merged_relationships[key].append(rel.description)
         summarized_relationships: List[Relationship] = []
-        for (source, target), descriptions in merged_relationships.items():
+        for (source, target), descriptions in tqdm(merged_relationships.items(), desc="Summarizing relationships"):
             summary = self.summary_descriptions(descriptions)
             summarized_relationships.append(Relationship(source=source, target=target, description=summary))
         for rel in summarized_relationships:
@@ -160,7 +163,7 @@ class GraphRag:
             kg.add_community(comm)
         #==============================================================================================================================
         # # Phase 4: Community Summarization
-        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
             future_to_comm = {
                 executor.submit(self.summarize_community, comm, kg): comm
                 for comm in kg.communities
@@ -178,12 +181,15 @@ class GraphRag:
         """
         Incrementally update the knowledge graph with new documents.
         """
+        for doc in docs:
+            kg.add_document(doc)
         # 1. Chunk new documents and add text units using threads
         def process_document(doc):
             return self._chunk_document(doc, max_tokens=self.max_tokens, overlap_tokens=self.overlap_tokens)
-            
+
+        from tqdm import tqdm
         new_text_units = []
-        with concurrent.futures.ThreadPoolExecutor() as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
             future_to_doc = {executor.submit(process_document, doc): doc for doc in docs}
             for future in tqdm(concurrent.futures.as_completed(future_to_doc), total=len(docs), desc="Processing new documents"):
                 tus = future.result()
@@ -210,7 +216,8 @@ class GraphRag:
                     textunit_entities[tu_union.unit_id] = entities
                     tu_union = None
         else:
-            with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            print("Updating Entities and Relationships...")
+            with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
                 future_to_tu = {
                     executor.submit(self.extract_entities_and_relationships_from_textunit, tu): tu
                     for tu in new_text_units
@@ -221,19 +228,21 @@ class GraphRag:
                     all_entities.extend(entities)
                     all_relationships.extend(relationships)
                     textunit_entities[tu.unit_id] = entities
+        print("Merging entities and relationships...")
 
         # 3. Merge new entities and relationships
         merged_entities = {e.name: e for e in kg.entities}
-        for ent in all_entities:
+        for ent in tqdm(all_entities, desc="Merging entities"):
             if ent.name in merged_entities:
                 # Optionally update description (e.g., merge summaries)
-                merged_entities[ent.name].description += f"; {ent.description}"
+                merged_entities[ent.name].description += f"| {ent.description}"
             else:
                 merged_entities[ent.name] = ent
         # Summarize entity descriptions
-        for name, ent in merged_entities.items():
-            descs = ent.description.split(';')
-            ent.description = self.summary_descriptions(descs)
+        for name, ent in tqdm(merged_entities.items(), desc="Summarizing entities"):
+            descs = ent.description.split('|')
+            if len(descs) > 9:
+                ent.description = self.summary_descriptions(descs)
         kg.entities = list(merged_entities.values())
 
         # Update textunit-entity mapping
@@ -243,16 +252,17 @@ class GraphRag:
         # Merge relationships
         rel_key = lambda r: (r.source, r.target)
         merged_relationships = {(r.source, r.target): r for r in kg.relationships}
-        for rel in all_relationships:
+        for rel in tqdm(all_relationships, desc="Merging relationships"):
             key = rel_key(rel)
             if key in merged_relationships:
-                merged_relationships[key].description += f"; {rel.description}"
+                merged_relationships[key].description += f"| {rel.description}"
             else:
                 merged_relationships[key] = rel
         # Summarize relationship descriptions
-        for rel in merged_relationships.values():
-            descs = rel.description.split(';')
-            rel.description = self.summary_descriptions(descs)
+        for rel in tqdm(merged_relationships.values(), desc="Summarizing relationships"):
+            descs = rel.description.split('|')
+            if len(descs) > 9:
+                rel.description = self.summary_descriptions(descs)
         kg.relationships = list(merged_relationships.values())
 
         # 4. Re-run community detection and summarization
@@ -261,13 +271,14 @@ class GraphRag:
         communities = self.detect_communities(kg)
         for comm in communities:
             kg.add_community(comm)
-            
-        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        
+        from tqdm import tqdm
+        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
             future_to_comm = {
                 executor.submit(self.summarize_community, comm, kg): comm
                 for comm in kg.communities
             }
-            for future in concurrent.futures.as_completed(future_to_comm):
+            for future in tqdm(concurrent.futures.as_completed(future_to_comm), total=len(kg.communities), desc="Summarizing communities"):
                 comm = future_to_comm[future]
                 report = future.result()
                 comm.report = report
@@ -300,6 +311,7 @@ class GraphRag:
         Returns:
             Tuple[List[Entity], List[Relationship]]: Lists of merged entities and relationships.
         """
+
         entity_types = ",".join([e.value for e in EntityType])
         prompt = initial_extract_graph_prompt(text_unit.text, entity_types, example)
         entity_relationships:EntityRelationshipModel = self.json_generator.generate_json(prompt, EntityRelationshipModel)
@@ -386,7 +398,7 @@ class GraphRag:
             entity_descs = "; ".join([e.description for e in key_entities])
             rel_descs = "; ".join([r.description for r in key_relationships])
             summary = f"Entities: {entity_descs}. Relationships: {rel_descs}"
-            summary = summary[:5000] + ("..." if len(summary) > 2000 else "")
+            summary = summary[:8000] + ("..." if len(summary) > 8000 else "")
 
         return CommunityReport(summary=summary, key_entities=key_entities, key_relationships=key_relationships)
 
@@ -411,21 +423,31 @@ class GraphRag:
             random.shuffle(descriptions)
             summary = "; ".join(descriptions)
             return summary[:5000] + ("..." if len(summary) > 5000 else "")
-        
-    
-    
-    def find_documents(self, query: str, kg: KnowledgeGraph, k: int) -> List[Document]:
+
+    def find_documents(self, query: str, kg: KnowledgeGraph, k: int, n: int = 2) -> List[Document]:
         """
         Find documents relevant to a query using the knowledge graph.
-        Uses cosine similarity between the response embedding and each text unit embedding,
-        then aggregates per document and sorts by average similarity.
+        Uses cosine similarity between the query embedding and each text unit embedding,
+        then for each document, takes the mean of the top n most similar text units.
+        If a document has fewer than n text units, uses all available text units.
+
+        Args:
+            query: The search query
+            kg: Knowledge graph containing documents and text units
+            k: Number of top documents to return
+            n: Number of top text units per document to average (default: 5)
+
+        Returns:
+            List of top k documents sorted by average similarity of their top n text units
         """
         response = query
         response_embedding = self.text_embedder.embed(response)
 
-        # Map: doc_id -> [similarities]
+        # Map: doc_id -> [(similarity, text_unit)]
         doc_similarities = defaultdict(list)
         doc_id_to_doc = {}
+
+        # Calculate similarities for all text units
         for tu in kg.text_units:
             tu_embedding = tu.embedding
             # Cosine similarity
@@ -433,19 +455,79 @@ class GraphRag:
             norm1 = sum(a * a for a in response_embedding.vector) ** 0.5
             norm2 = sum(b * b for b in tu_embedding.vector) ** 0.5
             similarity = dot / (norm1 * norm2 + 1e-8)
-            doc_similarities[tu.document_id].append(similarity)
+            doc_similarities[tu.document_id].append((similarity, tu))
+
+        # Build document lookup
         for doc in kg.documents:
             doc_id_to_doc[doc.id] = doc
-        
+
         doc_avg_sim = []
-        for doc_id, sims in doc_similarities.items():
-            avg_sim = sum((sim)**3 for sim in sims) / len(sims)
+        for doc_id, sim_tu_pairs in doc_similarities.items():
+            # Sort text units by similarity (descending)
+            sim_tu_pairs.sort(key=lambda x: x[0], reverse=True)
+
+            # Take top n text units (or all if fewer than n available)
+            top_n_similarities = [sim for sim, tu in sim_tu_pairs[:n]]
+
+            # Calculate mean of top n similarities
+            avg_sim = sum(top_n_similarities) / len(top_n_similarities)
             doc_avg_sim.append((doc_id, avg_sim))
-        # Sort by similarity descending
+
+        # Sort documents by average similarity (descending)
         doc_avg_sim.sort(key=lambda x: x[1], reverse=True)
+
         # Return top k documents
         top_docs = [doc_id_to_doc[doc_id] for doc_id, _ in doc_avg_sim[:k] if doc_id in doc_id_to_doc]
         return top_docs
+
+
+    def get_relevant_text_units(self, kg, query, top_n=3):
+        response_embedding = self.text_embedder.embed(query)
+
+        # Map: doc_id -> [similarities]
+        tu_similarities = {}
+
+        for tu in kg.text_units:
+            tu_embedding = tu.embedding
+            # Cosine similarity
+            dot = sum(a * b for a, b in zip(response_embedding.vector, tu_embedding.vector))
+            norm1 = sum(a * a for a in response_embedding.vector) ** 0.5
+            norm2 = sum(b * b for b in tu_embedding.vector) ** 0.5
+            similarity = dot / (norm1 * norm2 + 1e-8)
+            tu_similarities[tu] = similarity
+
+        # Sort by similarity descending
+        sorted_tus = sorted(tu_similarities.items(), key=lambda x: x[1], reverse=True)
+        # Return top n text units
+        top_tus = [tu for tu, _ in sorted_tus[:top_n]]
+        return top_tus
+
+    def get_relevant_text_units_distinct_docs(self, kg, query, top_n=3):
+        response_embedding = self.text_embedder.embed(query)
+
+        # Map: doc_id -> [text units and their similarities]
+        tu_similarities = []
+        for tu in kg.text_units:
+            tu_embedding = tu.embedding
+            # Cosine similarity
+            dot = sum(a * b for a, b in zip(response_embedding.vector, tu_embedding.vector))
+            norm1 = sum(a * a for a in response_embedding.vector) ** 0.5
+            norm2 = sum(b * b for b in tu_embedding.vector) ** 0.5
+            similarity = dot / (norm1 * norm2 + 1e-8)
+            tu_similarities.append((tu, similarity))
+
+        # Sort by similarity descending
+        sorted_tus = sorted(tu_similarities, key=lambda x: x[1], reverse=True)
+        # Select top_n text units from distinct documents
+        seen_doc_ids = set()
+        top_tus = []
+        for tu, _ in sorted_tus:
+            if tu.document_id not in seen_doc_ids:
+                top_tus.append(tu)
+                seen_doc_ids.add(tu.document_id)
+            if len(top_tus) >= top_n:
+                break
+        return top_tus
 
     def respond(self, query: str, kg: KnowledgeGraph, c: int = 3) -> str:
         """
@@ -470,11 +552,11 @@ class GraphRag:
         global_prompt = (
             f"User Query: {query}\n"
             f"Community Summaries:\n"
-            + "\n".join(f"- {s}" for s in community_summaries[:3])
+            + "\n".join(f"- {s}" for s in community_summaries[:5])
             + "\nKey Entities:\n"
-            + ", ".join(f"{e.name} ({e.type.value})" for e in community_entities[:5])
+            + ", ".join(f"{e.name} ({e.type.value})" for e in community_entities[:10])
             + "\nKey Relationships:\n"
-            + "\n".join(f"{rel.source} -> {rel.target}: {rel.description}" for rel in community_relationships[:3])
+            + "\n".join(f"{rel.source} -> {rel.target}: {rel.description}" for rel in community_relationships[:10])
             + "\n\n"
             "Based on the above, provide:\n"
             "- A comprehensive answer to the query\n"
@@ -499,11 +581,12 @@ class GraphRag:
         intermediate_responses = []
         for i, follow_up_q in enumerate(follow_up_questions):
             # Build a local search prompt
+
+            relevant_text_units = self.get_relevant_text_units(kg, follow_up_q)
+
             local_prompt = (
                 f"User Follow-up Question: {follow_up_q}\n"
-                f"Relevant Entities: {[e.name for e in kg.entities[:10]]}\n"
-                f"Relevant Relationships: {[f'{r.source}->{r.target}' for r in kg.relationships[:10]]}\n"
-                f"Relevant Text Units: {[tu.text[:100] for tu in kg.text_units[:3]]}\n"
+                f"Relevant Text Units: {[tu.text[:100] for tu in relevant_text_units]}\n"
                 "Provide:\n"
                 "- A detailed answer\n"
                 "- List of evidence sources\n"
@@ -561,56 +644,52 @@ class GraphRag:
         response_parts.append("\n" + "=" * 80)
         
         response = []
-
+        response.append(initial_answer)
         response.append(final_model.executive_summary)
         response.append(final_model.global_insights)
         response.append("\n".join(final_model.local_findings))
-        response.append(final_model.confidence_assessment)
-        response.append("\n".join(final_model.recommendations))
-
         return "\n".join(response)
 
     def _find_relevant_communities(self, query: str, kg: KnowledgeGraph, k: int) -> List[Community]:
         """Find the top K most semantically relevant communities for the query."""
-        
+
         if not kg.communities or not kg.community_reports:
             return []
-        
-        query_lower = query.lower()
-        community_scores = []
-        
-        for community in kg.communities:
-            if not community.report:
-                continue
-                
-            score = 0.0
-            
-            # Score based on community report summary
-            if community.report.summary:
-                summary_lower = community.report.summary.lower()
-                # Simple keyword matching (in real implementation, use semantic similarity)
-                common_words = set(query_lower.split()) & set(summary_lower.split())
-                score += len(common_words) * 2
-            
-            # Score based on key entities
-            for entity in community.report.key_entities:
-                if entity.name.lower() in query_lower:
-                    score += 3
-                if any(word in entity.description.lower() for word in query_lower.split()):
-                    score += 1
-            
-            # Score based on key relationships
-            for rel in community.report.key_relationships:
-                if rel.source.lower() in query_lower or rel.target.lower() in query_lower:
-                    score += 2
-                if any(word in rel.description.lower() for word in query_lower.split()):
-                    score += 1
-            
-            community_scores.append((community, score))
-        
-        # Sort by score and return top K
-        community_scores.sort(key=lambda x: x[1], reverse=True)
-        return [comm for comm, score in community_scores[:k]]
+
+        # Filter communities with reports
+        valid_communities = []
+        for comm in kg.communities:
+            if comm.report and comm.report.summary.strip():
+                valid_communities.append(comm)
+
+        if not valid_communities:
+            return []
+
+        # Compute query embedding
+        query_embedding = self.text_embedder.embed(query).vector
+
+        # Compute community embeddings (cached for performance)
+        community_embeddings = []
+        for comm in valid_communities:
+            # Use summary for embedding
+            text = comm.report.summary
+            # Add entity/relationship context
+            text += " Key entities: " + ", ".join(e.name for e in comm.report.key_entities[:3])
+            text += " Key relationships: " + ", ".join(
+                f"{rel.source}-{rel.target}" for rel in comm.report.key_relationships[:3]
+            )
+            embedding = comm.report.embedding.vector
+            community_embeddings.append(embedding)
+
+        # Run optimization
+        selector = CommunitySelector(
+            query_embedding=query_embedding,
+            community_embeddings=community_embeddings,
+            communities=valid_communities,
+            k=min(k, len(valid_communities))
+        )
+
+        return selector.optimize()
 
     def _generate_initial_answer(self, query: str, communities: List[Community]) -> Tuple[str, float]:
         """Generate initial broad answer from community reports."""

@@ -1,8 +1,7 @@
 from typing import List
 from entities import Document
-from recoverer_agent import RecovererAgent
 
-from .interfaces import KnowledgeRepositoryFactory, KnowledgeRepository
+from .interfaces import KnowledgeRepositoryFactory, KnowledgeRepository, KnowledgeRecoverer
 from .utils import chunk_document
 from .models import BuildExpertCommand, Expert
 
@@ -10,7 +9,7 @@ from .models import BuildExpertCommand, Expert
 class ExpertBuilder:
     def __init__(
         self,
-        document_recoverer: RecovererAgent,
+        document_recoverer: KnowledgeRecoverer,
         knowledge_repository_factory: KnowledgeRepositoryFactory,
     ):
         self.document_recoverer = document_recoverer
@@ -19,11 +18,12 @@ class ExpertBuilder:
     def build_experts(
         self, expert_build_commands: List[BuildExpertCommand]
     ) -> List[Expert]:
-        answ = []
-        for command in expert_build_commands:
-            answ.append(self._build_expert(command))
+        from concurrent.futures import ThreadPoolExecutor
 
-        return answ
+        # Use ThreadPoolExecutor to parallelize expert building
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            results = list(executor.map(self._build_expert, expert_build_commands))
+        return results
 
     def _build_expert(self, expert_build_command: BuildExpertCommand) -> Expert:
         query = expert_build_command.query

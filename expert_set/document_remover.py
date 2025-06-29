@@ -78,7 +78,6 @@ class DocumentRemover:
             self.sota_table_md,
             self.thesis_description,
             self.thesis_thoughts,
-            answer_model,
         )
 
         id_to_intervention = self.json_generator.generate_json(prompt, answer_model)

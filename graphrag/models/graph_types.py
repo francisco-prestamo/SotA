@@ -1,6 +1,8 @@
 from typing import List, Optional, Tuple
 from enum import Enum
 from pydantic import BaseModel
+from entities.embedding import Embedding
+
 
 class EntityType(str, Enum):
     PERSON = "Person"
@@ -18,9 +20,10 @@ class Entity(BaseModel):
     description: str
 
 class Relationship(BaseModel):
+    description: str
     source: str
     target: str
-    description: str
+
 
 class Claim(BaseModel):
     subject: str
@@ -35,6 +38,10 @@ class CommunityReport(BaseModel):
     key_entities: List[Entity]
     key_relationships: List[Relationship]
     summary: str
+    embedding: Embedding
+
+    class Config:
+        arbitrary_types_allowed = True
 
 class Community(BaseModel):
     id: str

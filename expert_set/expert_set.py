@@ -3,17 +3,17 @@ from board.board import Board
 from entities.sota_table import SotaTable
 from expert_set.document_remover import DocumentRemover
 from expert_set.paper_adder import PaperAdder
-from recoverer_agent import RecovererAgent
-from .interfaces import KnowledgeRepositoryFactory, JsonGenerator, UserQuerier
+from .interfaces import KnowledgeRepositoryFactory, JsonGenerator, UserQuerier, KnowledgeRecoverer
 from .models import RoundAction, BuildExpertCommand
 from .expert_builder import ExpertBuilder
 from .action_picker import ActionPicker, PickActionResult
 from .document_remover import DocumentRemover, DocumentRemovalResult
+from .models.paper_addition_result_model import PaperAdditionResult
 from .user_questioner import UserQuestioner
 from .prompts.update_description import update_description_prompt, DescriptionUpdate
 from .prompts.update_expert_set import update_expert_set_prompt, ExpertSetUpdate
 
-MAX_ROUNDS = 10
+MAX_ROUNDS = 20
 
 class ExpertSet:
     """Orchestrates expert set to build State-of-the-Art tables through iterative refinement."""
@@ -22,7 +22,7 @@ class ExpertSet:
             self,
             json_generator: JsonGenerator,
             expert_build_commands: List[BuildExpertCommand],
-            document_recoverer: RecovererAgent,
+            document_recoverer: KnowledgeRecoverer,
             knowledge_repository_factory: KnowledgeRepositoryFactory,
             board: Board,
             user_querier: UserQuerier,
@@ -203,7 +203,17 @@ class ExpertSet:
 
     def _handle_add_documents(self) -> None:
         """Placeholder for document addition workflow."""
-        # TODO: Implement document addition logic
+        adder = PaperAdder(
+            self.json_generator,
+            self.board,
+            self.document_recoverer
+        )
+        action_resume: PaperAdditionResult = adder.add_papers(self.experts)
+        for paper in action_resume.papers_added:
+            print("Added paper:")
+            print(paper.title())
+        print("Summary of papers added: ")
+        print(action_resume.summary)
 
     def _should_terminate(self, action: RoundAction) -> bool:
         """

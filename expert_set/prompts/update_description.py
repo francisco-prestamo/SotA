@@ -51,9 +51,6 @@ Please update the description by:
 3. Ensuring all important details from the original description are preserved
 4. Making the description more precise and complete based on the new information
 
-Output a json object with the following schema:
-{json.dumps(DescriptionUpdate.model_json_schema(), indent=2)}
-
 The output should contain:
 1. The updated description that incorporates the new information
 2. A clear explanation of how the user's answers were used to update the description

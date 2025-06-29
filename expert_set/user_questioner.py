@@ -5,9 +5,8 @@ from board.board import Board
 from entities.sota_table import sota_table_to_markdown
 
 from .action_picker import PickActionResult
-from .prompts.pick_action import ExpertPresentation
 from .prompts.ask_questions import (
-    AnswerModel,
+    ExpertQuestion,
     create_answer_model,
     questions_prompt
 )
@@ -63,12 +62,11 @@ class UserQuestioner:
             self.sota_table_md,
             self.thesis_description,
             self.thesis_thoughts,
-            answer_model,
         )
 
         questions_answer = self.json_generator.generate_json(prompt, answer_model)
         questions_summary = self._parse_answer_and_extract_questions(questions_answer)
-        user_answers = self.user_querier.ask_user(questions_summary)
+        user_answers = self.user_querier.expert_set_query_user(questions_summary)
 
         return questions_summary, user_answers
 
@@ -82,8 +80,15 @@ class UserQuestioner:
         Returns:
             String containing consolidated questions for the user
         """
-        validated_answer = AnswerModel.model_validate(answer)
-        return validated_answer.questions_summary
+        name = "expert_interventions"
+        assert hasattr(answer, name)
+        qs = []
+        for _, intervention in getattr(answer, name).model_dump().items():
+            intervention = ExpertQuestion.model_validate(intervention)
+            qs.append(intervention.question)
+
+        qs = [f"{i + 1}. {q}" for i, q in enumerate(qs)]
+        return "\n".join(["Questions: "] + qs)
 
     def _display_thoughts(self, thoughts: List[str]) -> str:
         """

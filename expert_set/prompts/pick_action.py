@@ -31,6 +31,10 @@ class ExpertIntervention(BaseModel):
     reasoning: str
     action_choice: RoundAction
 
+    class Config:
+        use_enum_values = True
+
+
 
 def create_answers_model(experts: Dict[str, ExpertDescription]) -> Type[BaseModel]:
     """
@@ -54,12 +58,10 @@ def pick_action_prompt(
     sota_table_md: str,
     thesis_desc: str,
     thesis_thoughts: str,
-    answer_model: Type[BaseModel],
 ) -> str:
     expert_presentation_model_str = json.dumps(
         [{"expert_id": ExpertPresentation.model_json_schema()}], indent=2
     )
-    answer_model_str = json.dumps(answer_model.model_json_schema(), indent=2)
 
     expert_strs = json.dumps(
         {id: pres.model_dump() for id, pres in presentations.items()}, indent=2
@@ -100,15 +102,15 @@ state of the art table
 
 Given this information, each expert will now intervene in the process of making a decision, following a similar schema
 as when they were described, their answers will be of the following form, consider that the expert ids must match with the id in their descriptions above
-
-Output only an answer in the following schema, no extra text
-{answer_model_str}
 """
 
 class SummaryAnswerModel(BaseModel):
     summary: str
 
 def pick_action_summary_prompt(pick_action_prompt: str, answer: BaseModel, chosen_action: RoundAction) -> str:
+    print("answer")
+    print(answer)
+    print(answer.model_dump())
     return f"""
 
 As the moderator in a discussion between experts in order to build a state of the art table for a research paper, your role at the moment
@@ -133,10 +135,6 @@ The process of decision making is as follows
 After a count of the votes, the following action was chosen: {chosen_action}
 
     """
-
-
-
-
 
 
 
