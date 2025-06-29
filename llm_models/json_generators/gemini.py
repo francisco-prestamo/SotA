@@ -6,7 +6,7 @@ from board.board import JsonGenerator as BoardJsonGen
 from expert_set.interfaces import JsonGenerator as ExpertSetJsonGen
 from recoverer_agent.interfaces import JsonGenerator as RecovJsonGen
 from receptionist_agent.interfaces import JsonGenerator as ReceptJsonGen
-from mocks.user_agent.interfaces import JsonGenerator as UserAgentJsonGen
+from tests.user_agent.interfaces import JsonGenerator as UserAgentJsonGen
 import time
 from pydantic import BaseModel, Field
 from pydantic import ValidationError

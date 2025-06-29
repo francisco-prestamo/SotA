@@ -1,0 +1,115 @@
+link: https://www.molgen.mpg.de/4688961/veenvliet_herrmann_science_2020.pdf
+
+
+References:
+1. M. N. Shahbazi, E. D. Siggia, M. Zernicka-Goetz,
+Self-organization of stem cells into embryos: A window on
+early mammalian development. Science 364, 948–951 (2019).
+doi: 10.1126/science.aax0164; pmid: 31171690
+2. M. N. Shahbazi, M. Zernicka-Goetz, Deconstructing and
+reconstructing the mouse and human early embryo. Nat. Cell
+Biol. 20, 878–887 (2018). doi: 10.1038/s41556-018-0144-x;
+pmid: 30038253
+3. L. Beccari et al., Multi-axial self-organization properties of
+mouse embryonic stem cells into gastruloids. Nature 562,
+272–276 (2018). doi: 10.1038/s41586-018-0578-0;
+pmid: 30283134
+4. I. Matsuo, R. Hiramatsu, Mechanical perspectives on the
+anterior-posterior axis polarization of mouse implanted
+embryos. Mech. Dev. 144A, 62–70 (2017). doi: 10.1016/
+j.mod.2016.09.002; pmid: 27697519
+5. H. K. Kleinman, D. Philp, M. P. Hoffman, Role of the
+extracellular matrix in morphogenesis. Curr. Opin. Biotechnol.
+14, 526–532 (2003). doi: 10.1016/j.copbio.2003.08.002;
+pmid: 14580584
+6. S. C. van den Brink et al., Single-cell and spatial
+transcriptomics reveal somitogenesis in gastruloids. Nature
+582, 405–409 (2020). doi: 10.1038/s41586-020-2024-3;
+pmid: 32076263
+7. J. A. Brassard, M. P. Lutolf, Engineering Stem Cell Selforganization to Build Better Organoids. Cell Stem Cell 24,
+860–876 (2019). doi: 10.1016/j.stem.2019.05.005;
+pmid: 31173716
+8. J. Chal, O. Pourquié, Making muscle: Skeletal myogenesis
+in vivo and in vitro. Development 144, 2104–2122 (2017).
+doi: 10.1242/dev.151035; pmid: 28634270
+9. A. S. Dias, I. de Almeida, J. M. Belmonte, J. A. Glazier,
+C. D. Stern, Somites without a clock. Science 343, 791–795
+(2014). doi: 10.1126/science.1247575; pmid: 24407478
+10. F. Koch et al., Antagonistic Activities of Sox2 and Brachyury
+Control the Fate Choice of Neuro-Mesodermal Progenitors.
+Dev. Cell 42, 514–526.e7 (2017). doi: 10.1016/
+j.devcel.2017.07.021; pmid: 28826820
+11. O. Pourquié, The segmentation clock: Converting embryonic
+time into spatial pattern. Science 301, 328–330 (2003).
+doi: 10.1126/science.1085887; pmid: 12869750
+12. J. Chal et al., Differentiation of pluripotent stem cells to muscle
+fiber to model Duchenne muscular dystrophy. Nat. Biotechnol.
+33, 962–969 (2015). doi: 10.1038/nbt.3297; pmid: 26237517
+13. A. Sagner, J. Briscoe, Establishing neuronal diversity in the
+spinal cord: A time and a place. Development 146, dev182154
+(2019). doi: 10.1242/dev.182154; pmid: 31767567
+14. J. von Maltzahn, N. C. Chang, C. F. Bentzinger, M. A. Rudnicki,
+Wnt signaling in myogenesis. Trends Cell Biol. 22, 602–609
+(2012). doi: 10.1016/j.tcb.2012.07.008; pmid: 22944199
+15. M. Rowton et al., Regulation of mesenchymal-to-epithelial
+transition by PARAXIS during somitogenesis. Dev. Dyn. 242,
+1332–1344 (2013). doi: 10.1002/dvdy.24033; pmid: 24038871
+16. L. Durbin et al., Eph signaling is required for segmentation and
+differentiation of the somites. Genes Dev. 12, 3096–3109
+(1998). doi: 10.1101/gad.12.19.3096; pmid: 9765210
+17. C. Marcelle, M. R. Stark, M. Bronner-Fraser, Coordinate
+actions of BMPs, Wnts, Shh and noggin mediate patterning
+of the dorsal somite. Development 124, 3955–3963 (1997).
+pmid: 9374393
+18. D. Jülich et al., Cross-Scale Integrin Regulation Organizes ECM
+and Tissue Topology. Dev. Cell 34, 33–44 (2015). doi: 10.1016/
+j.devcel.2015.05.005; pmid: 26096733
+19. J. H. Shawky, L. A. Davidson, Tissue mechanics and adhesion
+during embryo development. Dev. Biol. 401, 152–164 (2015).
+doi: 10.1016/j.ydbio.2014.12.005; pmid: 25512299
+20. S. Koshida et al., Integrinalpha5-dependent fibronectin
+accumulation for maintenance of somite boundaries in
+zebrafish embryos. Dev. Cell 8, 587–598 (2005). doi: 10.1016/
+j.devcel.2005.03.006; pmid: 15809040
+21. E. Nikolopoulou, G. L. Galea, A. Rolo, N. D. E. Greene,
+A. J. Copp, Neural tube closure: Cellular, molecular and
+biomechanical mechanisms. Development 144, 552–566
+(2017). doi: 10.1242/dev.145904; pmid: 28196803
+22. G. G. Martins et al., Dynamic 3D cell rearrangements guided by a
+fibronectin matrix underlie somitogenesis. PLOS ONE 4, e7429
+(2009). doi: 10.1371/journal.pone.0007429; pmid: 19829711
+23. J. Lu et al., Basement membrane regulates fibronectin
+organization using sliding focal adhesions driven by a
+contractile winch. Dev. Cell 52, 631–646.e4 (2020).
+doi: 10.1016/j.devcel.2020.01.007; pmid: 32004443
+24. S. Amin et al., Cdx and T Brachyury Co-activate Growth
+Signaling in the Embryonic Axial Progenitor Niche. Cell Rep. 17,
+3165–3177 (2016). doi: 10.1016/j.celrep.2016.11.069;
+pmid: 28009287
+25. G. La Manno et al., RNA velocity of single cells. Nature 560,
+494–498 (2018). doi: 10.1038/s41586-018-0414-6;
+pmid: 30089906
+26. M. Buckingham et al., The formation of skeletal muscle: From
+somite to limb. J. Anat. 202, 59–68 (2003). doi: 10.1046/
+j.1469-7580.2003.00139.x; pmid: 12587921
+27. S. Aramaki et al., A mesodermal factor, T, specifies mouse
+germ cell fate by directly activating germline determinants.
+Dev. Cell 27, 516–529 (2013). doi: 10.1016/
+j.devcel.2013.11.001; pmid: 24331926
+28. M. Saitou, M. Yamaji, Primordial germ cells in mice. Cold
+Spring Harb. Perspect. Biol. 4, a008375 (2012). doi: 10.1101/
+cshperspect.a008375; pmid: 23125014
+29. S. Grosswendt et al., Epigenetic regulator function through
+mouse gastrulation. Nature 584, 102–108 (2020).
+doi: 10.1038/s41586-020-2552-x; pmid: 32728215
+30. D. L. Chapman, V. E. Papaioannou, Three neural tubes in
+mouse embryos with mutations in the T-box gene Tbx6.
+Nature 391, 695–697 (1998). doi: 10.1038/35624;
+pmid: 9490412
+31. D. Concepcion et al., Cell lineage of timed cohorts of
+Tbx6-expressing cells in wild-type and Tbx6 mutant embryos.
+Biol. Open 6, 1065–1073 (2017). doi: 10.1242/bio.026203;
+pmid: 28606934
+32. A. Ranga et al., Neural tube morphogenesis in synthetic 3D
+microenvironments. Proc. Natl. Acad. Sci. U.S.A.113, E6831–E6839
+(2016). doi: 10.1073/pnas.1603529113; pmid: 27742791

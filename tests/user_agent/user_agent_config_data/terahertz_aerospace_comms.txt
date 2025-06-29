@@ -1,0 +1,39 @@
+link: https://arxiv.org/pdf/2502.17808
+
+References:
+[1] A. M. Elbir, K. V. Mishra, S. Chatzinotas, and M. Bennis, “Terahertzband integrated sensing and communications: Challenges and opportunities,” IEEE Aerospace and Electronic Systems Magazine, 2024.
+[2] W. Gao, C. Han, and Z. Chen, “Attenuation and loss of spatial coherence
+modeling for atmospheric turbulence in terahertz uav mimo channels,”
+IEEE Transactions on Wireless Communications, 2024.
+[3] T. Mao, L. Zhang, Z. Xiao, Z. Han, and X.-G. Xia, “Terahertz-band
+near-space communications: From a physical-layer perspective,” IEEE
+Communications Magazine, vol. 62, no. 2, pp. 110–116, 2022.
+[4] A. J. Alqaraghuli, J. V. Siles, and J. M. Jornet, “The road to high data
+rates in space: Terahertz versus optical wireless communication,” IEEE
+Aerospace and Electronic Systems Magazine, vol. 38, no. 6, pp. 4–13,
+2023.
+[5] ITU-R, “Attenuation by atmospheric gases and related effects,” Recommendation ITU-R P.676-12, Aug. 2019.
+[6] J. Wang, C.-X. Wang, J. Huang, and Y. Chen, “6g thz propagation
+channel characteristics and modeling: Recent developments and future
+challenges,” IEEE Communications Magazine, 2022.
+[7] Y. Li, N. Li, and C. Han, “Ray-tracing simulation and hybrid channel
+modeling for low-terahertz uav communications,” in ICC 2021-IEEE
+International Conference on Communications. IEEE, 2021, pp. 1–6.
+[8] C. Han, W. Gao, N. Yang, and J. M. Jornet, “Molecular absorption effect:
+A double-edged sword of terahertz communications,” IEEE Wireless
+Communications, vol. 30, no. 4, pp. 140–146, 2022.
+[9] Z. Yang, W. Gao, and C. Han, “A universal attenuation model of terahertz wave in space-air-ground channel medium,” IEEE Open Journal
+of the Communications Society, 2024.
+[10] W. Gao, C. Han, and Z. Chen, “Attenuation modeling for atmospheric
+turbulence in terahertz uav channels,” to appear in IEEE PIMRC, 2024.
+[11] S. Nie and I. F. Akyildiz, “Channel modeling and analysis of inter-smallsatellite links in terahertz band space networks,” IEEE Transactions on
+Communications, vol. 69, no. 12, pp. 8585–8599, 2021.
+[12] P. H. Siegel, “Thz for space: The golden age,” in Proc. of IEEE MTT-S
+International Microwave Symposium, 2010, pp. 816–819.
+[13] C. Han, Y. Wu, Z. Chen, Y. Chen, and G. Wang, “Thz isac: A physicallayer perspective of terahertz integrated sensing and communication,”
+IEEE communications magazine, vol. 62, no. 2, pp. 102–108, 2024.
+[14] W. Zhao, C. Han, H. Liu, and T. Yang, “Dynamic hybrid beamforming
+for terahertz multi-user ultra-massive mimo systems with imperfect
+hardware,” in Proc. of IEEE ICC, 2024, pp. 1819–1824.
+[15] F. Fourati and M.-S. Alouini, “Artificial intelligence for satellite communication: A review,” Intelligent and Converged Networks, vol. 2, no. 3,
+pp. 213–243, 2021.
