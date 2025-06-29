@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Set
+from typing import Set, Optional, Tuple
 from entities.document import Document
 
 class DocRecoverer(ABC):
@@ -26,13 +26,14 @@ class DocRecoverer(ABC):
         return "A document recoverer that retrieves documents based on a text query."
 
     @abstractmethod
-    def recover(self, query: str, k: int) -> Set[Document]:
+    def recover(self, query: str, k: int, date_filter: Optional[Tuple[str, str]] = None) -> Set[Document]:
         """
         Search logic to retrieve documents matching the given query.
 
         Args:
             query: A text query.
             k: Number of documents to retrieve
+            date_filter: Optional tuple of start and end dates for filtering documents by publication date.
 
         Returns:
             A set of Document instances matching the query.
