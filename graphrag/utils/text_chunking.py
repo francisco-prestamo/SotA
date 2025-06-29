@@ -9,10 +9,9 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 # Load spaCy with only the tokenizer enabled
 nlp = spacy.load(
     "en_core_web_sm",
-    disable=["parser", "tagger", "ner", "lemmatizer", "attribute_ruler"],
 )
 
-def chunk_text(text: str, max_tokens=30000, overlap_tokens=50) -> list[str]:
+def chunk_text(text: str, max_tokens=3000, overlap_tokens=50) -> list[str]:
     """
     Chunk text into semantically meaningful chunks using spaCy, with overlap.
 

@@ -1,0 +1,44 @@
+topic,query,nonsense_count_rag,total_retrieved_rag,nonsense_count_graphrag,total_retrieved_graphrag
+Shape of the Earth,peer-reviewed geodetic measurements earth oblate spheroid curvature radius,2,7,1,7
+Shape of the Earth,satellite altimetry GRACE mission earth gravitational field spherical model,1,7,1,7
+Shape of the Earth,GPS triangulation relativistic corrections earth curvature navigation accuracy,1,7,0,7
+Shape of the Earth,lunar eclipse umbra shadow geometry earth spherical cross-section astronomical evidence,2,7,1,7
+Shape of the Earth,oceanographic sea level measurements earth curvature horizon distance calculations,1,7,1,7
+Shape of the Earth,geoid model WGS84 coordinate system earth ellipsoid surveying standards,1,7,2,7
+Shape of the Earth,coriolis effect earth rotation spherical dynamics atmospheric circulation patterns,2,7,1,7
+Vaccines and Autism,large-scale population epidemiological cohort studies vaccine administration autism spectrum disorder incidence rates,1,7,0,7
+Vaccines and Autism,systematic review meta-analysis randomized controlled trials vaccine safety autism diagnostic criteria,1,7,0,7
+Vaccines and Autism,CDC vaccine safety datalink autism prevalence temporal analysis pre-post vaccination,1,7,1,7
+Vaccines and Autism,MMR vaccine thimerosal removal autism rates longitudinal population studies Denmark,1,7,1,7
+Vaccines and Autism,genetic predisposition autism heritability twin studies vaccine exposure independent variables,1,7,0,7
+Vaccines and Autism,neurodevelopmental autism etiology prenatal factors vaccine timing regression analysis,1,7,1,7
+Vaccines and Autism,immunological mechanisms autism pathophysiology vaccine adjuvants inflammatory response research,1,7,1,7
+Vaccines and Autism,autism diagnostic criteria DSM-5 vaccine schedule temporal correlation statistical analysis,1,7,1,7
+Vaccines and Autism,herd immunity vaccination rates autism prevalence ecological studies population health,1,7,1,7
+Vaccines and Autism,vaccine adverse event reporting system VAERS autism causality assessment methodology,1,7,2,7
+COVID-19 Origin,SARS-CoV-2 phylogenetic analysis zoonotic spillover bat coronavirus molecular evolution,2,7,0,7
+COVID-19 Origin,genomic epidemiology early COVID-19 cases Wuhan market environmental samples,0,7,0,7
+COVID-19 Origin,coronavirus natural reservoir species intermediate host pangolin sequence homology,1,7,1,7
+COVID-19 Origin,molecular clock analysis SARS-CoV-2 divergence time most recent common ancestor,2,7,3,7
+COVID-19 Origin,receptor binding domain ACE2 affinity natural selection adaptation mechanisms,2,7,0,7
+COVID-19 Origin,WHO joint mission origin investigation environmental samples market vendors,2,7,1,7
+COVID-19 Origin,comparative genomics betacoronavirus clade 2b recombination furin cleavage site,0,7,0,7
+COVID-19 Origin,epidemiological investigation patient zero contact tracing early transmission chains,0,7,0,7
+COVID-19 Origin,serological surveys retrospective analysis COVID-19 antibodies pre-pandemic samples,0,7,0,7
+COVID-19 Origin,viral surveillance programs bat caves southeast Asia coronavirus diversity sampling,0,7,0,7
+5G and Health,radiofrequency electromagnetic field exposure SAR measurements 5G millimeter wave safety limits,1,7,1,7
+5G and Health,ICNIRP guidelines non-ionizing radiation thermal effects tissue heating thresholds,1,7,1,7
+5G and Health,in vitro cellular studies RF exposure biological endpoints DNA damage oxidative stress,1,7,1,7
+5G and Health,dosimetry measurements 5G network deployment environmental EMF monitoring compliance,2,7,2,7
+5G and Health,systematic review meta-analysis RF exposure health outcomes bias assessment,1,7,1,7
+5G and Health,animal model studies chronic RF exposure carcinogenicity bioassays NTP findings,1,7,1,7
+5G and Health,electromagnetic hypersensitivity double-blind provocation studies nocebo effects,1,7,1,7
+5G and Health,5G beamforming technology exposure patterns temporal spatial variability measurements,2,7,2,7
+5G and Health,WHO electromagnetic fields health risk assessment radiofrequency exposure guidelines,1,7,1,7
+Video Games and Violence,meta-analysis video game exposure aggression longitudinal studies behavioral outcomes,4,7,3,7
+Video Games and Violence,randomized controlled trials violent video games aggression laboratory measures,3,7,4,7
+Video Games and Violence,population-level crime rates video game sales correlation analysis,4,7,4,7
+Video Games and Violence,desensitization neural response violent media fMRI studies,3,7,3,7
+Video Games and Violence,longitudinal cohort studies video game use aggression developmental trajectories,2,7,1,7
+Video Games and Violence,policy statements professional organizations video game violence research consensus,2,7,1,7
+Video Games and Violence,cross-cultural studies video game violence aggression outcomes international comparisons,5,7,3,7

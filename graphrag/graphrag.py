@@ -423,21 +423,31 @@ class GraphRag:
             random.shuffle(descriptions)
             summary = "; ".join(descriptions)
             return summary[:5000] + ("..." if len(summary) > 5000 else "")
-        
-    
-    
-    def find_documents(self, query: str, kg: KnowledgeGraph, k: int) -> List[Document]:
+
+    def find_documents(self, query: str, kg: KnowledgeGraph, k: int, n: int = 2) -> List[Document]:
         """
         Find documents relevant to a query using the knowledge graph.
-        Uses cosine similarity between the response embedding and each text unit embedding,
-        then aggregates per document and sorts by average similarity.
+        Uses cosine similarity between the query embedding and each text unit embedding,
+        then for each document, takes the mean of the top n most similar text units.
+        If a document has fewer than n text units, uses all available text units.
+
+        Args:
+            query: The search query
+            kg: Knowledge graph containing documents and text units
+            k: Number of top documents to return
+            n: Number of top text units per document to average (default: 5)
+
+        Returns:
+            List of top k documents sorted by average similarity of their top n text units
         """
         response = query
         response_embedding = self.text_embedder.embed(response)
 
-        # Map: doc_id -> [similarities]
+        # Map: doc_id -> [(similarity, text_unit)]
         doc_similarities = defaultdict(list)
         doc_id_to_doc = {}
+
+        # Calculate similarities for all text units
         for tu in kg.text_units:
             tu_embedding = tu.embedding
             # Cosine similarity
@@ -445,16 +455,27 @@ class GraphRag:
             norm1 = sum(a * a for a in response_embedding.vector) ** 0.5
             norm2 = sum(b * b for b in tu_embedding.vector) ** 0.5
             similarity = dot / (norm1 * norm2 + 1e-8)
-            doc_similarities[tu.document_id].append(similarity)
+            doc_similarities[tu.document_id].append((similarity, tu))
+
+        # Build document lookup
         for doc in kg.documents:
             doc_id_to_doc[doc.id] = doc
-        
+
         doc_avg_sim = []
-        for doc_id, sims in doc_similarities.items():
-            avg_sim = sum((sim)**3 for sim in sims) / len(sims)
+        for doc_id, sim_tu_pairs in doc_similarities.items():
+            # Sort text units by similarity (descending)
+            sim_tu_pairs.sort(key=lambda x: x[0], reverse=True)
+
+            # Take top n text units (or all if fewer than n available)
+            top_n_similarities = [sim for sim, tu in sim_tu_pairs[:n]]
+
+            # Calculate mean of top n similarities
+            avg_sim = sum(top_n_similarities) / len(top_n_similarities)
             doc_avg_sim.append((doc_id, avg_sim))
-        # Sort by similarity descending
+
+        # Sort documents by average similarity (descending)
         doc_avg_sim.sort(key=lambda x: x[1], reverse=True)
+
         # Return top k documents
         top_docs = [doc_id_to_doc[doc_id] for doc_id, _ in doc_avg_sim[:k] if doc_id in doc_id_to_doc]
         return top_docs
@@ -623,13 +644,10 @@ class GraphRag:
         response_parts.append("\n" + "=" * 80)
         
         response = []
-
+        response.append(initial_answer)
         response.append(final_model.executive_summary)
         response.append(final_model.global_insights)
         response.append("\n".join(final_model.local_findings))
-        response.append(final_model.confidence_assessment)
-        response.append("\n".join(final_model.recommendations))
-
         return "\n".join(response)
 
     def _find_relevant_communities(self, query: str, kg: KnowledgeGraph, k: int) -> List[Community]:
@@ -660,7 +678,7 @@ class GraphRag:
             text += " Key relationships: " + ", ".join(
                 f"{rel.source}-{rel.target}" for rel in comm.report.key_relationships[:3]
             )
-            embedding = self.text_embedder.embed(text).vector
+            embedding = comm.report.embedding.vector
             community_embeddings.append(embedding)
 
         # Run optimization
