@@ -60,7 +60,6 @@ class PaperAdder:
         search for relevant documents, and add them to the table.
         """
         # Get expert search reasoning
-        print("Adding papers to SOTA table...")
         expert_names = [expert.name for expert in experts]
         expert_search_reasoning_model = build_expert_search_reasoning_model(expert_names)
         
@@ -82,7 +81,6 @@ class PaperAdder:
         synthesis_prompt = build_search_query_synthesis_prompt(all_queries)
         summary_query_model = self.json_generator.generate_json(synthesis_prompt, StringResponseModel)
         summary_query = summary_query_model.response
-        print(f"Search query: {summary_query}")
         # Recover new documents
         new_docs = self.recoverer_agent.recover_docs(summary_query, self.k)
 
@@ -95,8 +93,8 @@ class PaperAdder:
         original_features = set(self.board.sota_table.features)
         
         for doc in new_docs:
-            print(f"Adding {doc.title} to SOTA table...")
             self._add_paper_to_sota_table(doc, experts)
+            print(sota_table_to_markdown(self.board.sota_table))
             added_titles.append(doc.title)
         
         # Identify new features that were added
@@ -114,22 +112,18 @@ class PaperAdder:
     def _add_paper_to_sota_table(self, doc: Document, experts: List[Expert]) -> None:
         """Add a single paper to the SOTA table by extracting features"""
         # Extract features from the document
-        print(f"Extracting features from {doc.title}...")
         extraction_result = self._extract_paper_features(doc, experts)
          # Update SOTA table features if new ones were found
         new_features_added = []
-        print(f"Adding features to SOTA table...")
-        print(extraction_result.new_features)
 
         for new_feature in extraction_result.new_features:
             if new_feature not in self.board.sota_table.features:
 
                 self.board.sota_table.features.append(new_feature)
                 new_features_added.append(new_feature)
-        print(self.board.sota_table.features)
         # If we added new features, process all existing documents to check for these features
         if new_features_added:
-            pass
+            self._process_existing_documents_for_new_features(new_features_added, experts)
 
         all_features = {}
         
@@ -150,8 +144,6 @@ class PaperAdder:
             domain=self._extract_domain(doc, experts),
             features=all_features
         )
-        print(f"Paper {doc.title}")
-        print("*"*100)
         # Add to SOTA table
         self.board.sota_table.document_features.append((doc, paper_features))
 
@@ -163,8 +155,7 @@ class PaperAdder:
         chunk_features = []
         chunk_new_features = []
         has_existing_features = len(self.board.sota_table.features)>0
-        print(f"Processing {len(chunks)} chunks with multithreading {has_existing_features}")
-        
+
         # Create thread-safe data structures with locks
         chunk_features_lock = Lock()
         chunk_new_features_lock = Lock()
@@ -173,18 +164,14 @@ class PaperAdder:
         def process_chunk(chunk_info):
             chunk_idx, chunk = chunk_info
 
-            print(f"Processing chunk {chunk_idx} {has_existing_features}")
             # We're using only the first expert for now as in the original code
             expert = experts[0]
                 
             # Extract existing features only if any exist in the SOTA table
             if has_existing_features:
-                print("bbbbb")
                 existing_features = self._extract_features_from_chunk(
                     expert, doc, chunk, chunk_idx
                 )
-                print(f"Chunk {chunk_idx} - Existing features:")
-                print(existing_features)
                 with chunk_features_lock:
                     chunk_features.append(existing_features)
 
@@ -192,10 +179,7 @@ class PaperAdder:
             new_features = self._identify_new_features_from_chunk(
                 expert, doc, chunk, chunk_idx
             )
-            print(f"Chunk {chunk_idx} - New features:")
-            print(new_features)
             with chunk_new_features_lock:
-                print(f"Adding new features for chunk {chunk_idx}: {new_features.new_features}")
                 chunk_new_features.append(new_features)
                 
             return True
@@ -214,11 +198,7 @@ class PaperAdder:
         # Consolidate all new features from different chunks
         all_new_features = self._consolidate_new_features(chunk_new_features, doc.title)
 
-        print("_"*120)
-        print("Paper:")
-
         print(json.dumps({"old_features": all_old_features, "new_features": all_new_features}, indent=4, default=str))
-        print(chunk_features)
         return PaperFeatureExtraction(
             document=doc,
             old_features=all_old_features,
@@ -232,7 +212,6 @@ class PaperAdder:
         chunk, 
         chunk_idx: int
     ) -> Dict[str, str]:
-        print(f"Extracting features for chunk {chunk_idx}")
         """Extract existing SOTA table features from a chunk using an expert, expecting a brief description/value for each feature."""
         prompt = build_feature_extraction_prompt(
             expert.expert_model.description,
@@ -274,11 +253,9 @@ class PaperAdder:
             self.board.sota_table.features
         )
         
-        print(f"Extracting new feature names from paper chunk {chunk_idx}:")
         try:
             response_names = self.json_generator.generate_json(prompt, NewFeaturesListModel)
             new_features = response_names.new_features
-            print(f"Found new features: {new_features}")
         except Exception as e:
             logging.warning(f"Failed to identify new feature names for expert {expert.name}, chunk {chunk_idx}: {e}")
             new_features = []
@@ -286,7 +263,6 @@ class PaperAdder:
         # Step 2: For each new feature, extract its value
         feature_values = {}
         if new_features:
-            print(f"Extracting values for {len(new_features)} new features...")
             for feature in new_features:
                 value_prompt = build_feature_value_extraction_prompt(
                     feature,
@@ -297,7 +273,6 @@ class PaperAdder:
                 try:
                     value_response = self.json_generator.generate_json(value_prompt, StringResponseModel)
                     feature_values[feature] = value_response.response
-                    print(f"  {feature}: {value_response.response}")
                 except Exception as e:
                     logging.warning(f"Failed to extract value for new feature '{feature}' for expert {expert.name}, chunk {chunk_idx}: {e}")
                     feature_values[feature] = "Not Available"
@@ -381,8 +356,7 @@ class PaperAdder:
             existing_features = set(self.board.sota_table.features)
             global_new_features = list(set(all_candidate_features) - existing_features)
         
-        print(f"Global new features (not in SOTA table): {global_new_features}")
-        
+
         # If no new features, return empty dict
         if not global_new_features:
             return {}
@@ -448,9 +422,89 @@ class PaperAdder:
                 values = feature_values_map.get(feature_name, [])
                 consolidated[feature_name] = values[0] if values else "Not Available"
         
-        print(f"Consolidated new feature values: {json.dumps(consolidated, indent=2)}")
-        
+
         return consolidated
+
+    def _process_existing_documents_for_new_features(self, new_features: List[str], experts: List[Expert]) -> None:
+        """Process existing documents in the SOTA table to extract values for newly added features"""
+        if not self.board.sota_table.document_features or not new_features:
+            return
+        
+        logging.info(f"Processing {len(self.board.sota_table.document_features)} existing documents for {len(new_features)} new features")
+        
+        # Process each existing document
+        for i, (existing_doc, paper_features) in enumerate(self.board.sota_table.document_features):
+            logging.info(f"Processing document {i+1}/{len(self.board.sota_table.document_features)}: {existing_doc.title}")
+            
+            # Only process if the document doesn't already have these features
+            missing_features = [f for f in new_features if f not in paper_features.features or paper_features.features[f]["value"] == "Not Available"]
+            
+            if not missing_features:
+                logging.info(f"Document already has all new features")
+                continue
+                
+            # Extract new features from document
+            from expert_set.utils.document_chunking import chunk_document
+            chunks = chunk_document(existing_doc, window_size=500)
+            
+            # Extract feature values for each new feature from each chunk
+            feature_values = {feature: [] for feature in missing_features}
+            
+            for chunk_idx, chunk in enumerate(chunks):
+                # We're using only the first expert for now as in the original code
+                expert = experts[0]
+                
+                # Use the same extraction logic as in _extract_features_from_chunk
+                prompt = build_feature_extraction_prompt(
+                    expert.expert_model.description,
+                    self.board.thesis_knowledge.description,
+                    existing_doc.title,
+                    existing_doc.authors,
+                    chunk.chunk,
+                    missing_features  # Only extract the missing features
+                )
+                FeaturesModel = create_features_extraction_model(missing_features)
+                try:
+                    response = self.json_generator.generate_json(prompt, FeaturesModel)
+                    extracted_features = {}
+                    for feature in missing_features:
+                        # Accept string or dict, but prefer string (brief description)
+                        value = getattr(response, feature, "")
+                        if isinstance(value, dict) and 'value' in value:
+                            value = value['value']
+                        extracted_features[feature] = value
+                        
+                        # Add non-empty values to the collection
+                        if value and value != "Not Available":
+                            feature_values[feature].append(value)
+                except Exception as e:
+                    logging.warning(f"Failed to extract features for expert {expert.name}, chunk {chunk_idx} of {existing_doc.title}: {e}")
+            
+            # Consolidate values for each feature
+            for feature in missing_features:
+                values = feature_values.get(feature, [])
+                
+                if values:
+                    # Consolidate using LLM
+                    prompt = build_feature_consolidation_prompt(
+                        feature, existing_doc.title, values
+                    )
+                    try:
+                        consolidated_model = self.json_generator.generate_json(prompt, StringResponseModel)
+                        consolidated_value = consolidated_model.response
+                    except Exception as e:
+                        logging.warning(f"Failed to consolidate feature '{feature}' for {existing_doc.title}: {e}")
+                        consolidated_value = values[0] if values else "Not Available"
+                else:
+                    consolidated_value = "Not Available"
+                
+                # Update document's features
+                if feature not in paper_features.features:
+                    paper_features.features[feature] = {"value": consolidated_value}
+                else:
+                    paper_features.features[feature]["value"] = consolidated_value
+                    
+            logging.info(f"Updated document with {len(missing_features)} new features")
 
     def _extract_year_from_id(self, doc_id: str) -> int:
         """Extract year from document ID"""
