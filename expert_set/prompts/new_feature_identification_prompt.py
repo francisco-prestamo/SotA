@@ -25,11 +25,6 @@ to the ones shown in your target research paper). The objective is to create a s
 has as rows the documents, and as columns, features, with a short description of why they were deemed detected
 in a given research paper
 
-This is a description of your target research paper
-
-### DESCRIPTION ###
-{paper_description}
-### END ###
 
 As such you're specialized in a specific domain which relates with the target research paper, this is your description:
 ### DESCRIPTION ###
@@ -106,10 +101,20 @@ values could change a bit, perhaps more than 'Yes' and 'No' would be necessary t
 given paper, but the conciseness should remain.
 
 **An empty list of new features is a VALID RESPONSE, as a matter of fact it is PREFERRED, you should ONLY 
-identify features that are both CLEARLY MISSING from the currently existing features, relevant to the 
-description of your target research paper and clearly appearing in the document chunk.
+identify features that are both CLEARLY MISSING from the currently existing features, CLEARLY RELEVANT to the 
+description of your target research paper and CLEARLY APPEARING in the document chunk.**
+
+This is a description of your target research paper, maintain extracted features relevant to it, output no features
+if you find no clearly relevant ones
+### DESCRIPTION ###
+{paper_description}
+### END ###
 
 Respond as a JSON object with:
+- "reasoning": a string that could show your reasoning of why you believe that features appearing in the chunk are 
+CLEARLY RELEVANT to your target research paper, and CLEARLY MISSING from the already existing features, 
+conversely, it could show your reasoning as to why the current chunk has no features that are clearly relevant to
+the target research paper and are not redundant with the already existing ones.
 - "new_features": array of new feature names"""
 
 
