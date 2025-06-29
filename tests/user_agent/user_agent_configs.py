@@ -1,9 +1,7 @@
-from pydantic import BaseModel
-
-
-class UserAgentConfig(BaseModel):
-    paper_description: str
-    personality_description: str
+from .models import UserAgentConfig
+from .user_agent_config_data.mouse_embryonic_stem_cell import TEST_MOUSE_EMBRYIONIC_STEM_CELLS
+from .user_agent_config_data.terahertz__aerospace_comms import TEST_TERAHERTZ_AEROSPACE_COMMS
+from .user_agent_config_data.attention_is_all_you_need import TEST_ATTENTION_IS_ALL_YOU_NEED
 
 
 # === DIRECT PERSONALITIES ===
