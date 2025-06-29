@@ -10,6 +10,12 @@ class SQLiteTestCaseRepo(TestCaseRepository):
         self.document_repository = document_repository
         self._create_tables()
 
+    def test_case_exists(self, id: str) -> bool:
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT 1 FROM test_cases WHERE test_case_id = ?", (id,))
+            return cursor.fetchone() is not None
+
     def _create_tables(self):
         """Create all necessary tables for storing test cases and their relationships."""
         with sqlite3.connect(self.db_path) as conn:
