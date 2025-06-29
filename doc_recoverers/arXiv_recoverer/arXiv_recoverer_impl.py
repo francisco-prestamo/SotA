@@ -3,14 +3,13 @@ import time
 import re
 import xml.etree.ElementTree as ET
 from io import BytesIO
-from typing import Set, Dict, Any
+from typing import Set, Dict, Any, Optional, Tuple
 import requests
 from PyPDF2 import PdfReader
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from controller.interfaces.doc_recoverer import DocRecoverer
 from entities.document import Document
 from doc_recoverers.doc_utils.doc_cleaner import DocumentContentCleaner
-
 
 class ArXivRecoverer(DocRecoverer):
     BACKOFF_MIN = 3.0
@@ -28,17 +27,8 @@ class ArXivRecoverer(DocRecoverer):
     def description(self) -> str:
         return "Retrieves documents from arXiv using text queries with inline PDF download and cleaning."
 
-    def recover(self, query: str, k: int) -> Set[Document]:
-        """Retrieve documents from arXiv based on a query.
-
-        Args:
-            query: Search query string
-            k: Number of documents to retrieve
-
-        Returns:
-            Set of recovered Document objects
-        """
-        entries = self._search_arxiv(query, k)
+    def recover(self, query: str, k: int, date_filter: Optional[Tuple[str, str]] = None) -> Set[Document]:
+        entries = self._search_arxiv(query, k, date_filter)
         documents = set()
         futures = []
 
@@ -74,16 +64,14 @@ class ArXivRecoverer(DocRecoverer):
         except Exception:
             return None
 
-    def _search_arxiv(self, query: str, k: int) -> list[Dict[str, Any]]:
-        """Search arXiv for documents matching the query.
+    def _search_arxiv(self, query: str, k: int, date_filter: Optional[Tuple[str, str]]) -> list[Dict[str, Any]]:
+        if date_filter:
+            start_date, end_date = date_filter
+            start_arxiv = start_date.replace('-', '')
+            end_arxiv = end_date.replace('-', '')
+            date_query = f" AND submittedDate:[{start_arxiv} TO {end_arxiv}]"
+            query += date_query
 
-        Args:
-            query: Search query string
-            k: Number of documents to retrieve
-
-        Returns:
-            List of document metadata dictionaries
-        """
         params = {
             "search_query": query,
             "start": 0,
@@ -112,14 +100,6 @@ class ArXivRecoverer(DocRecoverer):
         return []
 
     def _parse_response(self, xml_content: bytes) -> list[Dict[str, Any]]:
-        """Parse arXiv API response XML into document metadata.
-
-        Args:
-            xml_content: Raw XML response from arXiv API
-
-        Returns:
-            List of document metadata dictionaries
-        """
         root = ET.fromstring(xml_content)
         ns = {"atom": "http://www.w3.org/2005/Atom"}
         entries = []
@@ -152,13 +132,5 @@ class ArXivRecoverer(DocRecoverer):
 
     @staticmethod
     def _extract_arxiv_id(url: str) -> str:
-        """Extract arXiv ID from URL.
-
-        Args:
-            url: arXiv document URL
-
-        Returns:
-            Clean arXiv ID string
-        """
         match = re.search(r"abs/([^v]+)", url)
         return match.group(1) if match else url.rstrip("/").split("/")[-1]

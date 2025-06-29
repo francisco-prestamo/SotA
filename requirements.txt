@@ -12,3 +12,8 @@ faiss-cpu==1.11.0
 requests==2.32.3
 pypdf2==3.0.1
 google-genai
+PythonInterfaces~=0.0.2
+pillow~=11.2.1
+beautifulsoup4~=4.13.4
+protobuf~=5.29.4
+pdfplumber~=0.11.7
