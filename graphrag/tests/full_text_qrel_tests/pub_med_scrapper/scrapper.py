@@ -7,8 +7,8 @@ from PyPDF2 import PdfReader
 
 
 from doc_recoverers.doc_utils.doc_cleaner import DocumentContentCleaner
-from scrappers.pub_med_scrapper_2.models.author_spec import AuthorSpec
-from tests.full_text_qrel_tests.nfcorpus_test_generator.interfaces import (
+from .models.author_spec import AuthorSpec
+from ..nfcorpus_test_generator.interfaces import (
     PubMedRecoverer,
     RecovererResponse,
 )

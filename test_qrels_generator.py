@@ -1,14 +1,14 @@
 import os
 from pathlib import Path
 
-from tests.full_text_qrel_tests.persistence.persistence_tests.basic_tc_repo_test import *
-from tests.full_text_qrel_tests.persistence.persistence_tests.basic_doc_repo_test import *
-from tests.full_text_qrel_tests.persistence import (
+from graphrag.tests.full_text_qrel_tests.persistence.persistence_tests.basic_tc_repo_test import *
+from graphrag.tests.full_text_qrel_tests.persistence.persistence_tests.basic_doc_repo_test import *
+from graphrag.tests.full_text_qrel_tests.persistence import (
     SQLiteTestCaseRepo,
     SQLiteDocumentRepository,
 )
-from scrappers.pub_med_scrapper_2 import PubMedScrapper
-from tests.full_text_qrel_tests.nfcorpus_test_generator import TestCaseGenerator
+from graphrag.tests.full_text_qrel_tests.pub_med_scrapper import PubMedScrapper
+from graphrag.tests.full_text_qrel_tests.nfcorpus_test_generator import TestCaseGenerator
 
 
 data_path = ".scrapper_data"
