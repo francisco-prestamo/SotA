@@ -1,7 +1,7 @@
 
 import os
 
-from tests.full_text_qrel_tests.persistence import SQLiteDocumentRepository, SQLiteTestCaseRepo
+from graphrag.tests.full_text_qrel_tests.persistence import SQLiteDocumentRepository, SQLiteTestCaseRepo
 
 data_path = ".test_case_data"
 doc_db_path = os.path.join(data_path, "doc-db")
@@ -23,4 +23,8 @@ print("\n".join([
     f"ID: {tc.id} | Query: {tc.query} | Total Docs: {len(tc.documents)}"
     for tc in tc_repo.get_test_cases()
 ]))
+
+print(len(tc_repo.get_test_cases()))
+
+# print(tc_repo.get_test_cases()[0].documents[0].content)
 

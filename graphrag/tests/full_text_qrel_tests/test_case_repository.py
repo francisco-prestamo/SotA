@@ -10,3 +10,7 @@ class TestCaseRepository(ABC):
     @abstractmethod
     def store_test_case(self, tc: TestCase):
         pass
+
+    @abstractmethod
+    def test_case_exists(self, id: str) -> bool:
+        pass

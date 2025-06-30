@@ -37,12 +37,16 @@ class TestCaseGenerator:
             doc.id: doc for doc in self.document_repository.get_documents()
         }
 
-    def generate_test_cases(self) -> List[TestCase]:
+    def generate_test_cases(self, n: int) -> List[TestCase]:
         dataset = ir_datasets.load("nfcorpus/test")
         all_docs = self._get_all_dataset_docs(dataset)
         all_docs_set = set([id for id in all_docs])
         tcs = []
 
+        if n == None or n <= 0:
+            raise ValueError(f"cannot generate {n} test cases")
+
+        i = 0
         for query_id, test_case in self._get_dataset_test_cases(dataset).items():
 
             relevances = test_case.document_relevances
@@ -79,6 +83,11 @@ class TestCaseGenerator:
             self.test_case_repo.store_test_case(tc)
 
             tcs.append(tc)
+
+            i += 1
+            print(f"[INFO | TEST CASE GENERATOR] Generated test case {i}/{n}")
+            if i > n:
+                break
 
         return tcs
 
@@ -192,7 +201,11 @@ class TestCaseGenerator:
     def _filtered_out(
         self, test_case: DatasetTestCase, relevants: Set[str], kinda_relevants: Set[str]
     ):
-        return not (3 <= len(relevants) <= 10 and len(kinda_relevants) > 0)
+        # return not (3 <= len(relevants) <= 10 and len(kinda_relevants) > 0)
+        not_enough_docs = not (len(relevants) >= 3 and len(kinda_relevants) > 0)
+        already_cached = self.test_case_repo.test_case_exists(test_case.query_id)
+
+        return not_enough_docs or already_cached
 
     def _get_dataset_test_cases(self, dataset) -> Dict[str, DatasetTestCase]:
         test_cases: Dict[str, DatasetTestCase] = {}
