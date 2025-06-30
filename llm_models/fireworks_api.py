@@ -3,13 +3,12 @@ from typing import Optional, Type, TypeVar
 import fireworks.client
 from dotenv import load_dotenv
 from openai import OpenAI
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 import numpy as np
 import time
 
 from entities.embedding import Embedding
 
-import config
 from receptionist_agent.interfaces import JsonGenerator as ReceptionistJsonGen
 from expert_set.interfaces import JsonGenerator as ExpertSetJsonGen
 from recoverer_agent.interfaces import JsonGenerator as RecovererJsonGen
@@ -67,34 +66,34 @@ class FireworksApi(
         self.fireworks_api_key = fireworks_api_key
 
     def generate_json(self, query: str, schema: Type[T]) -> T:
-        if config.inspect_query():
-            print("=" * 60)
-            print(query)
-            input()
-
         client = fireworks.client.Fireworks(api_key=self.fireworks_api_key)
-        response = client.chat.completions.create(
-            model=models[0],
-            response_format={
-                "type": "json_object",
-                "schema": schema.model_json_schema(),
-            },
-            messages=[
-                {"role": "system", "content": query},
-            ],
-            temperature=0.2,
-        )
-        print("Waiting 6 seconds...")
-        time.sleep(6)
-        print("Wait is up")
-        response = response.choices[0].message.content
-        if config.inspect_query():
-            print("-" * 60)
-            print(response)
-            print("=" * 60)
-            input()
-        response = schema.model_validate_json(response)
-        return response
+        backoff = 6
+        max_backoff = 20
+        while True:
+            print("[FireworksApi] Making json generation API request...")
+            try:
+                response = client.chat.completions.create(
+                    model=models[0],
+                    response_format={
+                        "type": "json_object",
+                        "schema": schema.model_json_schema(),
+                    },
+                    messages=[
+                        {"role": "system", "content": query},
+                    ],
+                    temperature=0.2,
+                )
+                response = response.choices[0].message.content
+                validated_response = schema.model_validate_json(response)
+                print(f"[FireworksApi] Response validated, returning...")
+                return validated_response
+            except ValidationError as v:
+                print(f"[FireworksApi] Validation error: {v}")
+                print(f"[FireworksApi] Response: {response}")
+            except Exception as e:
+                print(f"[FireworksApi] Error: {e}. Retrying in {backoff} seconds...")
+                time.sleep(backoff)
+                backoff = min(backoff * 2, max_backoff)
 
     def embed(self, text: str) -> Embedding:
         return self.embed_texts([text])[0]
@@ -111,20 +110,27 @@ class FireworksApi(
             base_url="https://api.fireworks.ai/inference/v1",
             api_key=self.fireworks_api_key,
         )
-
         answ = []
+        backoff = 2
+        max_backoff = 20
         for text in texts:
-            vector = (
-                client.embeddings.create(
-                    model="nomic-ai/nomic-embed-text-v1.5", input=text
-                )
-                .data[0]
-                .embedding
-            )
-            print("Waiting 6 seconds...")
-            time.sleep(6)
-            print("Wait is up")
-            embedding = FireworksEmbedding(np.array(vector))
-            answ += [embedding]
-
+            while True:
+                try:
+                    vector = (
+                        client.embeddings.create(
+                            model="nomic-ai/nomic-embed-text-v1.5", input=text
+                        )
+                        .data[0]
+                        .embedding
+                    )
+                    print("Waiting 6 seconds...")
+                    time.sleep(6)
+                    print("Wait is up")
+                    embedding = FireworksEmbedding(np.array(vector))
+                    answ += [embedding]
+                    break
+                except Exception as e:
+                    print(f"[FireworksApi] Embedding error: {e}. Retrying in {backoff} seconds...")
+                    time.sleep(backoff)
+                    backoff = min(backoff * 2, max_backoff)
         return answ
