@@ -9,7 +9,6 @@ from graphrag.tests.full_text_qrel_tests.test_case import TestCase
 from graphrag.graphrag import GraphRag
 from graphrag.knowledge_graph import KnowledgeGraph
 from llm_models.json_generators.gemini import GeminiJsonGenerator
-from llm_models import FireworksApi
 from llm_models.text_embedders.gemini import GeminiEmbedder
 from entities.document import Document
 
@@ -65,6 +64,8 @@ def main():
         
         # Process each test case
         for i, test_case in enumerate(test_cases):
+            if i<15+6: #<15+6
+                continue
             log(f"Processing test case {i+1}/{len(test_cases)}: {test_case.id}")
             
             # Skip if already processed
@@ -110,6 +111,15 @@ def run_test_case(
     The test_case may be filtered or unfiltered; this function does not care.
     """
     try:
+
+        # Extract ids from the test case
+        relevants_ids = [doc.id for doc in test_case.documents if test_case.relevance.get(doc.id, 0) == 2]
+        medium_relevants_ids = [doc.id for doc in test_case.documents if test_case.relevance.get(doc.id, 0) == 1]
+        non_relevants_ids = [doc.id for doc in test_case.documents if test_case.relevance.get(doc.id, 0) == 0]
+
+        print(len(relevants_ids))
+        print(len(medium_relevants_ids))
+        print(len(non_relevants_ids))
         # Build knowledge graph and measure index time
         log(f"    Building knowledge graph with {len(test_case.documents)} documents")
         start_time = time.time()
@@ -118,7 +128,7 @@ def run_test_case(
         
         # Run RAG method (direct document retrieval) and measure time
         start_time = time.time()
-        retrieved_docs_rag = graph_rag.find_documents(test_case.query, knowledge_graph, k=10)
+        retrieved_docs_rag = graph_rag.find_documents(test_case.query, knowledge_graph, k=len(relevants_ids))
         rag_find_documents_time_ms = (time.time() - start_time) * 1000
         rag_results = categorize_documents_by_relevance(retrieved_docs_rag, test_case.relevance)
         
@@ -129,14 +139,11 @@ def run_test_case(
         
         # Run GraphRAG method (response -> document retrieval) and measure time
         start_time = time.time()
-        retrieved_docs_graphrag = graph_rag.find_documents(graphrag_response, knowledge_graph, k=10)
+        retrieved_docs_graphrag = graph_rag.find_documents(graphrag_response, knowledge_graph, k=len(relevants_ids))
         graphrag_find_documents_time_ms = (time.time() - start_time) * 1000
         graphrag_results = categorize_documents_by_relevance(retrieved_docs_graphrag, test_case.relevance)
         
-        # Extract ids from the test case
-        relevants_ids = [doc.id for doc in test_case.documents if test_case.relevance.get(doc.id, 0) == 2]
-        medium_relevants_ids = [doc.id for doc in test_case.documents if test_case.relevance.get(doc.id, 0) == 1]
-        non_relevants_ids = [doc.id for doc in test_case.documents if test_case.relevance.get(doc.id, 0) == 0]
+
         
         return TestResult(
             rag=rag_results,
@@ -193,13 +200,13 @@ def initialize_graphrag() -> GraphRag:
     """
     try:
         # json_gen = GeminiJsonGenerator()
-        json_gen = FireworksApi()
+        json_gen = GeminiJsonGenerator()
         embedder = GeminiEmbedder(dimensions=128)
         graph_rag = GraphRag(
             text_embedder=embedder, 
             json_generator=json_gen, 
             low_consume=False, 
-            max_tokens=1000
+            max_tokens=3000
         )
         return graph_rag
     except Exception as e:

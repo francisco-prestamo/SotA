@@ -84,7 +84,7 @@ class RecovererAgent(ReceptionistKR, ExpertSetKR):
                             
                             # Search using the query with date filter
                         # Format: ("YYYY-MM-DD", "YYYY-MM-DD") for start and end dates
-                        date_filter = ("2020-01-01", "2025-02-20")  # Adjust time range as needed
+                        date_filter = ("2005-01-01", "2017-05-30")  # Adjust time range as needed
                         searched_docs = [doc for doc in s.recover(query=search_query, k=2, date_filter=date_filter)
                                         if getattr(doc, 'content', None)]
                         all_docs.extend(searched_docs)

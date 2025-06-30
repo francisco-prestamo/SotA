@@ -145,6 +145,7 @@ class PaperAdder:
         
         for doc in new_docs:
             self._add_paper_to_sota_table(doc, experts)
+            print(self.json_generator.get_count())
             print(sota_table_to_markdown(self.board.sota_table))
             added_titles.append(doc.title)
         

@@ -1,0 +1,1493 @@
+{
+  "PLAIN-2600": {
+    "rag": {
+      "relevants_returned": [
+        "MED-4676",
+        "MED-3198",
+        "MED-3197"
+      ],
+      "medium_relevants_returned": [
+        "MED-5330",
+        "MED-5334"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-4676",
+        "MED-3198",
+        "MED-3197"
+      ],
+      "medium_relevants_returned": [
+        "MED-5330",
+        "MED-5328"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "Egg consumption and its impact on arterial function, specifically cardiovascular risk, is a complex issue.  While some studies suggest no significant link, others highlight a possible connection.  A crucial factor is the overall dietary pattern, including the types of fats consumed with eggs and other components.  Whether eggs are part of a balanced diet or contribute to a higher-fat or high-calorie intake is critical.  Further research is needed to establish more definitive conclusions regarding the long-term effect of eggs on arterial health.\nEgg consumption and its impact on arterial function is a complex issue, with some studies suggesting no significant link and others highlighting potential connections. The overall dietary pattern, including the types of fats consumed with eggs, is crucial.  Further research is needed to establish definitive conclusions regarding the long-term effects.\nEgg consumption's effect on arterial health is uncertain; the impact depends on the overall dietary context.\nThe provided text units do not specify the types of fats associated with increased cardiovascular risk when consumed with eggs, only noting the general need for a balanced diet.",
+    "graphrag_index_time_ms": 208721.16208076477,
+    "graphrag_response_time_ms": 7784.141778945923,
+    "rag_find_documents_time_ms": 333.4391117095947,
+    "graphrag_find_documents_time_ms": 395.2789306640625,
+    "relevants_ids": [
+      "MED-4602",
+      "MED-4676",
+      "MED-3198",
+      "MED-3197",
+      "MED-4300"
+    ],
+    "medium_relevants_ids": [
+      "MED-5324",
+      "MED-5322",
+      "MED-5335",
+      "MED-5337",
+      "MED-5328",
+      "MED-5363",
+      "MED-5326",
+      "MED-5334",
+      "MED-5323",
+      "MED-5330"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-2760": {
+    "rag": {
+      "relevants_returned": [
+        "MED-4406"
+      ],
+      "medium_relevants_returned": [
+        "MED-5337",
+        "MED-5328"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [],
+      "medium_relevants_returned": [
+        "MED-5328",
+        "MED-5325",
+        "MED-5337"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "Eating healthy on a budget is possible, focusing on vegetarian or vegan diets, which can be associated with lower costs and reduced risks of certain diseases like diabetes.  Crucial to these diets is a balanced approach, including fruits, vegetables, and whole grains.  Consider planning meals, buying in bulk, and using seasonal produce to save money.  There are also many resources available to assist with creating healthy and affordable meal plans.\nEating healthy on a budget is achievable, with a focus on vegetarian/vegan diets potentially reducing costs and risks.  However, specific cost-effective meal plans aren't detailed in the provided resources.\nEating healthy on a budget is possible, focusing on vegetarian or vegan diets, which can be associated with lower costs and reduced risks of certain diseases like diabetes.  A balanced approach, including fruits, vegetables, and whole grains, is crucial to these diets.  Planning meals, buying in bulk, and using seasonal produce can save money.  Resources are available for healthy and affordable meal plans.\nUnfortunately, the provided text units do not contain information about cost-effective vegetarian or vegan meal plans.\nThe texts discuss the effects of diet on blood pressure and prostate cancer, but not the cost of specific meal plans.",
+    "graphrag_index_time_ms": 159164.8530960083,
+    "graphrag_response_time_ms": 8462.773084640503,
+    "rag_find_documents_time_ms": 350.2931594848633,
+    "graphrag_find_documents_time_ms": 389.13488388061523,
+    "relevants_ids": [
+      "MED-4406",
+      "MED-4712",
+      "MED-4454"
+    ],
+    "medium_relevants_ids": [
+      "MED-5337",
+      "MED-5335",
+      "MED-5325",
+      "MED-5328",
+      "MED-5322",
+      "MED-5330",
+      "MED-5334",
+      "MED-5342",
+      "MED-5363",
+      "MED-5327"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-2820": {
+    "rag": {
+      "relevants_returned": [
+        "MED-4299",
+        "MED-4522",
+        "MED-4107",
+        "MED-4853"
+      ],
+      "medium_relevants_returned": [
+        "MED-5335"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-4522",
+        "MED-4299",
+        "MED-4107"
+      ],
+      "medium_relevants_returned": [
+        "MED-5335",
+        "MED-5328"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "Preventing strokes through diet involves a multifaceted approach, focusing on dietary patterns rich in certain nutrients while limiting others.  Studies suggest that diets emphasizing fruits, vegetables, and whole grains, along with reduced intake of processed foods, saturated fats, and excessive sodium, may play a role in stroke prevention. Specific foods like those rich in antioxidants and polyunsaturated fats might have beneficial effects.  However,  maintaining a balanced diet alongside other lifestyle factors, such as regular exercise and blood pressure management, are crucial in reducing stroke risk.  Individual dietary needs and risk factors should be considered in conjunction with medical advice.\nThis analysis examines the relationship between diet and stroke prevention, focusing on the types of foods that might be beneficial.  Global insights indicate a connection between certain dietary patterns and a reduced risk, but specific recommendations are lacking. Local refinements highlight the need for more precise dietary recommendations concerning fruits, vegetables, and whole grains. Confidence in the current findings is limited due to the lack of specific food recommendations.\nPreventing stroke with diet involves consuming fruits, vegetables, whole grains, and limiting processed foods, saturated fats, and excessive sodium.  Antioxidants and polyunsaturated fats may play a role. A balanced diet is crucial, alongside lifestyle factors like exercise and blood pressure management.\nUnfortunately, the provided text units do not contain specific information about the types of fruits, vegetables, and whole grains most beneficial for stroke prevention.\nThe text mentions antioxidant capacity and its impact on endothelial function, but it does not detail specific food recommendations.",
+    "graphrag_index_time_ms": 181639.9598121643,
+    "graphrag_response_time_ms": 9432.377815246582,
+    "rag_find_documents_time_ms": 370.7160949707031,
+    "graphrag_find_documents_time_ms": 356.5061092376709,
+    "relevants_ids": [
+      "MED-4853",
+      "MED-4522",
+      "MED-4107",
+      "MED-4545",
+      "MED-4299"
+    ],
+    "medium_relevants_ids": [
+      "MED-5327",
+      "MED-5328",
+      "MED-5333",
+      "MED-5322",
+      "MED-5324",
+      "MED-5334",
+      "MED-5323",
+      "MED-5342",
+      "MED-5335",
+      "MED-5326"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-2850": {
+    "rag": {
+      "relevants_returned": [
+        "MED-4433",
+        "MED-4436",
+        "MED-4437",
+        "MED-3694"
+      ],
+      "medium_relevants_returned": [
+        "MED-5328"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-4433",
+        "MED-4437",
+        "MED-4436"
+      ],
+      "medium_relevants_returned": [
+        "MED-2740",
+        "MED-5339"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "The provided text does not contain information regarding antibiotic use in white or dark meat. Therefore, I cannot answer the user query.\nThe query about antibiotic use in white vs. dark meat cannot be answered from the provided information.  Local searches did not uncover specific antibiotic use in chicken production.\nNo information exists regarding antibiotic use in white or dark meat based on the provided text.\nThe provided text units do not contain information about specific antibiotics used in chicken meat production.\nThe texts discuss cancer mortality in poultry workers and bacterial virulence in a mouse model, neither of which relate to antibiotic use in food production.",
+    "graphrag_index_time_ms": 415071.4521408081,
+    "graphrag_response_time_ms": 34830.91974258423,
+    "rag_find_documents_time_ms": 355.9379577636719,
+    "graphrag_find_documents_time_ms": 879.676103591919,
+    "relevants_ids": [
+      "MED-4437",
+      "MED-4433",
+      "MED-3694",
+      "MED-3690",
+      "MED-4436"
+    ],
+    "medium_relevants_ids": [
+      "MED-5332",
+      "MED-5328",
+      "MED-5324",
+      "MED-5339",
+      "MED-5322",
+      "MED-5325",
+      "MED-3787",
+      "MED-5330",
+      "MED-4133",
+      "MED-2740"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-2900": {
+    "rag": {
+      "relevants_returned": [
+        "MED-4313"
+      ],
+      "medium_relevants_returned": [
+        "MED-5337",
+        "MED-5341",
+        "MED-5342",
+        "MED-5339"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-4313",
+        "MED-4810"
+      ],
+      "medium_relevants_returned": [
+        "MED-5342",
+        "MED-5325",
+        "MED-5337"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "Unfortunately, the provided summaries do not contain information on boosting good bacteria in the colon without probiotics.  The documents discuss various topics, including eating patterns and their impact on bowel function, but do not address methods for enhancing gut bacteria populations without using probiotic supplements. \nThe provided information lacks details on boosting good bacteria in the colon without probiotics.  Local searches also lack specific dietary patterns linked to a healthy gut microbiome and probiotic use.\nUnfortunately, the summaries lack specifics on methods to boost beneficial gut bacteria outside the use of probiotics.\nUnfortunately, the provided text snippets do not contain sufficient information to answer the question about dietary patterns associated with a healthy gut microbiome and their relationship to probiotic use. The text fragments refer to studies on lifestyle and nutrient intakes, but lack details on the specific dietary patterns or their connection to probiotics. Therefore, a comprehensive answer cannot be generated.",
+    "graphrag_index_time_ms": 457240.2789592743,
+    "graphrag_response_time_ms": 7958.047151565552,
+    "rag_find_documents_time_ms": 358.02602767944336,
+    "graphrag_find_documents_time_ms": 507.57312774658203,
+    "relevants_ids": [
+      "MED-4768",
+      "MED-4810",
+      "MED-4313",
+      "MED-4443",
+      "MED-4278"
+    ],
+    "medium_relevants_ids": [
+      "MED-5337",
+      "MED-5323",
+      "MED-5328",
+      "MED-5342",
+      "MED-5325",
+      "MED-5330",
+      "MED-5334",
+      "MED-5324",
+      "MED-5341",
+      "MED-5339"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-2920": {
+    "rag": {
+      "relevants_returned": [
+        "MED-4539",
+        "MED-4541"
+      ],
+      "medium_relevants_returned": [
+        "MED-5325",
+        "MED-5363",
+        "MED-5332"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-4634",
+        "MED-4995"
+      ],
+      "medium_relevants_returned": [
+        "MED-5325",
+        "MED-5340",
+        "MED-5330"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "Unfortunately, the provided summaries do not contain information about human neurotransmitters in plants.  The summaries focus on the relationship between vegetarian diets, blood pressure, and a specific research study (Adventist Health Study-2).  There is no mention of neurotransmitters or their presence/absence/interaction in plants.\nThe summaries do not contain information about human neurotransmitters in plants.  No plant compounds affecting animal neurotransmitters were identified.\nThe provided summaries focus solely on vegetarian diets, blood pressure, and a specific research study (Adventist Health Study-2).  No information about neurotransmitters or their presence/absence/interaction in plants was found.\nThe provided text snippets do not contain information about specific plant compounds affecting neurotransmitter systems in animals.\nThe mentioned compounds, linoleic acid and salicylic acid, are discussed in relation to other biological processes, but not their effects on neurotransmitters.",
+    "graphrag_index_time_ms": 332891.3469314575,
+    "graphrag_response_time_ms": 30040.60411453247,
+    "rag_find_documents_time_ms": 355.2439212799072,
+    "graphrag_find_documents_time_ms": 377.4714469909668,
+    "relevants_ids": [
+      "MED-4539",
+      "MED-4541",
+      "MED-4995",
+      "MED-4540",
+      "MED-4634"
+    ],
+    "medium_relevants_ids": [
+      "MED-5332",
+      "MED-5326",
+      "MED-5333",
+      "MED-5330",
+      "MED-5325",
+      "MED-5339",
+      "MED-5363",
+      "MED-5337",
+      "MED-5340",
+      "MED-5323"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-571": {
+    "rag": {
+      "relevants_returned": [
+        "MED-2338",
+        "MED-4742",
+        "MED-2337"
+      ],
+      "medium_relevants_returned": [
+        "MED-2346",
+        "MED-2345"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-2338",
+        "MED-4742"
+      ],
+      "medium_relevants_returned": [
+        "MED-2346",
+        "MED-2345",
+        "MED-2356"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "Anisakis simplex (A. simplex) is a parasitic nematode that can cause allergic reactions and gastrointestinal disease (anisakiasis). It is commonly associated with the consumption of fish, particularly in regions like the Basque Country in Spain. The parasite can sensitize individuals, leading to allergic responses. Research has explored the parasite's allergens and immune responses, with studies involving authors and researchers who have co-authored research on the topic. There are also links to related parasites like Ascaris suum and Toxocara canis through research.\nThe analysis focuses on Anisakis simplex, its association with allergic reactions and gastrointestinal disease (anisakiasis), and its prevalence in fish consumption. Local searches aimed to identify fish types associated with infections and the symptoms and diagnosis of anisakiasis, but returned limited information.\nAnisakis simplex is a parasitic nematode causing anisakiasis, linked to fish consumption and allergic reactions. Research explores its allergens and immune responses. The provided context highlights its presence, especially in regions like the Basque Country.\nThe provided text mentions cooked hake (Merluccius merluccius) is associated with allergic reactions, but does not directly link this to A. simplex infections.\nThe text does not provide information on the symptoms and diagnosis of anisakiasis.",
+    "graphrag_index_time_ms": 165543.20001602173,
+    "graphrag_response_time_ms": 15362.826347351074,
+    "rag_find_documents_time_ms": 397.5522518157959,
+    "graphrag_find_documents_time_ms": 927.4680614471436,
+    "relevants_ids": [
+      "MED-2337",
+      "MED-2355",
+      "MED-4743",
+      "MED-2338",
+      "MED-4742"
+    ],
+    "medium_relevants_ids": [
+      "MED-2345",
+      "MED-2350",
+      "MED-2356",
+      "MED-2346",
+      "MED-2347",
+      "MED-2344",
+      "MED-2348",
+      "MED-2341"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-751": {
+    "rag": {
+      "relevants_returned": [
+        "MED-3123"
+      ],
+      "medium_relevants_returned": [
+        "MED-3129",
+        "MED-3135",
+        "MED-3130",
+        "MED-3139"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-3123"
+      ],
+      "medium_relevants_returned": [
+        "MED-3130",
+        "MED-3129",
+        "MED-3139",
+        "MED-3135"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "BRCA genes are strongly associated with breast cancer. BRCA1 mutations are linked to the disease. Studies have investigated the relationship between BRCA genes, DNA methylation, and breast cancer. Additionally, research explores the impact of phytoestrogens like lignans and soy isoflavones on breast cancer.\nThis analysis explores the relationship between BRCA genes, DNA methylation, and phytoestrogens (lignans and soy isoflavones) in the context of breast cancer. The findings highlight links between BRCA1 mutations and breast cancer, the influence of DNA methylation on BRCA gene expression, and the potential impact of phytoestrogens on breast cancer.\nBRCA genes are strongly associated with breast cancer. BRCA1 mutations, particularly in the context of methylation, are linked to the disease. Phytoestrogens like lignans and soy isoflavones are also being studied in relation to breast cancer.\nBRCA1 mutations are associated with breast cancer, though specific mutation types are not detailed.\nDNA methylation influences BRCA gene expression through epigenetic modulation.\nThe temporal relationship between BRCA mutations and breast cancer development is not explicitly detailed.\nLignans and soy isoflavones may impact breast cancer; soy intake post-diagnosis is linked to survival.\nThe impact of phytoestrogens on breast cancer concerning patient age or menopausal status is not available.",
+    "graphrag_index_time_ms": 85192.51203536987,
+    "graphrag_response_time_ms": 18711.24505996704,
+    "rag_find_documents_time_ms": 357.9602241516113,
+    "graphrag_find_documents_time_ms": 383.1300735473633,
+    "relevants_ids": [
+      "MED-3138",
+      "MED-3137",
+      "MED-3136",
+      "MED-3123",
+      "MED-3141"
+    ],
+    "medium_relevants_ids": [
+      "MED-3135",
+      "MED-3130",
+      "MED-3139",
+      "MED-3129"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-761": {
+    "rag": {
+      "relevants_returned": [
+        "MED-666"
+      ],
+      "medium_relevants_returned": [
+        "MED-3800",
+        "MED-3797",
+        "MED-3799",
+        "MED-3792"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-3794",
+        "MED-3796"
+      ],
+      "medium_relevants_returned": [
+        "MED-3798",
+        "MED-3800",
+        "MED-3792"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "Breast pain, or mastalgia, is a common condition with various potential causes, including hormonal fluctuations, particularly those related to the menstrual cycle. Research suggests a link between cyclical mastalgia and factors like serum prolactin and oestradiol levels. Dietary factors, such as fat intake and the ratio of polyunsaturated to saturated fatty acids (P/S ratio), may also play a role. The Moos Menstrual Distress Questionnaire is used to assess menstrual symptoms, which are associated with conditions like Premenstrual Syndrome (PMS).\nThe analysis focuses on breast pain (mastalgia), exploring its causes and potential influencing factors based on provided text snippets. The primary focus is on hormonal fluctuations, diet, and menstrual cycle influence. \nBreast pain is a common condition with multiple causes including hormonal changes, menstrual cycle, and dietary factors. Hormonal fluctuations, especially those related to the menstrual cycle and factors like prolactin and oestradiol levels play a role. Dietary fat intake and P/S ratio may also be associated.\nHormonal fluctuations beyond the menstrual cycle, such as from medications or medical conditions, can cause breast pain.\nThe relationship between P/S ratio in the diet and breast pain severity is not addressed in the given snippets.",
+    "graphrag_index_time_ms": 87738.08884620667,
+    "graphrag_response_time_ms": 12552.941799163818,
+    "rag_find_documents_time_ms": 444.42081451416016,
+    "graphrag_find_documents_time_ms": 408.0479145050049,
+    "relevants_ids": [
+      "MED-3779",
+      "MED-3778",
+      "MED-666",
+      "MED-3794",
+      "MED-3796"
+    ],
+    "medium_relevants_ids": [
+      "MED-3800",
+      "MED-3798",
+      "MED-3793",
+      "MED-3792",
+      "MED-3797",
+      "MED-3799"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-966": {
+    "rag": {
+      "relevants_returned": [
+        "MED-4103"
+      ],
+      "medium_relevants_returned": [
+        "MED-5335",
+        "MED-5323"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-4103",
+        "MED-4853",
+        "MED-4104"
+      ],
+      "medium_relevants_returned": [],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "Cortisol is a stress hormone and a measurement tool for pain assessment, and it's associated with pain intensity. It is also relevant in the context of Rheumatoid Arthritis, as lower levels are observed in some groups, and it relates to the study of pain and inflammation. The query is connected to Rheumatoid Arthritis, pain, and measurement of pain through the Visual Analog Scale (VAS).\nThe analysis explores the relationship between cortisol, pain, and Rheumatoid Arthritis (RA), highlighting cortisol's role as a stress hormone and its connection to pain intensity and inflammation. Local searches aimed to find specific studies on cortisol and pain in RA patients, but were unsuccessful.\nCortisol is linked to stress, pain assessment, and inflammation, and its levels can be relevant in the context of Rheumatoid Arthritis. The Visual Analog Scale (VAS) is mentioned as a tool for pain measurement.\nThe provided text snippets do not offer specific studies investigating the relationship between cortisol levels and pain intensity in Rheumatoid Arthritis patients.",
+    "graphrag_index_time_ms": 85292.02699661255,
+    "graphrag_response_time_ms": 9810.981750488281,
+    "rag_find_documents_time_ms": 347.86200523376465,
+    "graphrag_find_documents_time_ms": 363.97790908813477,
+    "relevants_ids": [
+      "MED-4853",
+      "MED-4103",
+      "MED-4104"
+    ],
+    "medium_relevants_ids": [
+      "MED-5334",
+      "MED-5335",
+      "MED-5337",
+      "MED-5340",
+      "MED-5328",
+      "MED-5323"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-1066": {
+    "rag": {
+      "relevants_returned": [
+        "MED-4007",
+        "MED-4006",
+        "MED-4004"
+      ],
+      "medium_relevants_returned": [
+        "MED-5337",
+        "MED-5328"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-4006",
+        "MED-4002",
+        "MED-4004",
+        "MED-4001"
+      ],
+      "medium_relevants_returned": [
+        "MED-5337"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "Based on the provided information, Dr. Walter Willett is not directly mentioned in the community summaries or the key entities/relationships. Therefore, no specific information about Dr. Willett can be provided from this data. The summaries focus on research related to lipids, diet, and specific researchers and locations. Key entities and relationships highlight studies on cholesterol, high-fat meals, and the effects of VCO and MCFAs.\nThe analysis did not yield any specific information about Dr. Walter Willett. The primary focus was on research related to lipids, diet, and specific researchers and locations. No information was found regarding other researchers.\nThe global community analysis highlights studies on cholesterol, high-fat meals, and the effects of VCO and MCFAs. The absence of information on Dr. Willett suggests he is not directly involved in the topics covered by this data.\nNo local findings about Dr. Walter Willett were found.\nThe local search confirms the absence of information about researchers beyond those initially identified.",
+    "graphrag_index_time_ms": 174998.56877326965,
+    "graphrag_response_time_ms": 10896.228075027466,
+    "rag_find_documents_time_ms": 365.62204360961914,
+    "graphrag_find_documents_time_ms": 342.76890754699707,
+    "relevants_ids": [
+      "MED-4002",
+      "MED-4006",
+      "MED-4004",
+      "MED-4001",
+      "MED-4007"
+    ],
+    "medium_relevants_ids": [
+      "MED-5334",
+      "MED-5337",
+      "MED-5332",
+      "MED-5324",
+      "MED-5328",
+      "MED-5322",
+      "MED-5363",
+      "MED-5327",
+      "MED-5335",
+      "MED-5326"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-1320": {
+    "rag": {
+      "relevants_returned": [
+        "MED-2760",
+        "MED-2758",
+        "MED-2761",
+        "MED-2762",
+        "MED-2757"
+      ],
+      "medium_relevants_returned": [],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-2758",
+        "MED-2760",
+        "MED-2761",
+        "MED-2757"
+      ],
+      "medium_relevants_returned": [
+        "MED-5325"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "The provided context discusses several studies and findings related to the Physicians' Health Study II (PHS II) and related research. Key aspects include: a meta-analysis by Helen Macpherson, Andrew Pipingas, and Matthew P Pase, affiliated with Swinburne University of Technology, published in the Am J Clin Nutr; studies on multivitamin use and associations with NHANES; and studies concerning the relationship between vegetarian diets and blood pressure.  The PHS II specifically investigated the effects of multivitamins, among other interventions. The context also touches on dietary factors and their relation to multivitamin use. Furthermore, it notes other health aspects, such as cardiovascular disease and cancer prevention, that were investigated.\nThe provided context focuses on the Physicians' Health Study II (PHS II), primarily investigating the effects of multivitamins on cardiovascular disease and cancer prevention. It mentions related studies, including a meta-analysis by Macpherson, Pipingas, and Pase, but does not provide extensive detail on specific interventions beyond multivitamins or the methodology of the meta-analysis.\nThe study and related research touch upon the use of multivitamins and their potential impact on health outcomes. Additional context relates to broader dietary considerations, and studies on other health aspects such as cardiovascular disease and cancer prevention.\nThe PHS II investigated multivitamins for cardiovascular disease and cancer prevention.\nThe context mentions a meta-analysis by Macpherson, Pipingas, and Pase, but details are limited.\nDietary factors and vegetarian diets are also discussed in relation to health outcomes.",
+    "graphrag_index_time_ms": 179223.78587722778,
+    "graphrag_response_time_ms": 14434.67903137207,
+    "rag_find_documents_time_ms": 361.3419532775879,
+    "graphrag_find_documents_time_ms": 336.6563320159912,
+    "relevants_ids": [
+      "MED-2761",
+      "MED-2762",
+      "MED-2760",
+      "MED-2758",
+      "MED-2757"
+    ],
+    "medium_relevants_ids": [
+      "MED-5337",
+      "MED-5323",
+      "MED-5339",
+      "MED-5341",
+      "MED-5327",
+      "MED-5334",
+      "MED-5322",
+      "MED-5335",
+      "MED-5330",
+      "MED-5325"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-1353": {
+    "rag": {
+      "relevants_returned": [
+        "MED-3000"
+      ],
+      "medium_relevants_returned": [
+        "MED-5339"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-3001"
+      ],
+      "medium_relevants_returned": [
+        "MED-5339"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "I am sorry, but the provided context does not contain any information about hernias. Therefore, I am unable to provide a comprehensive answer to your query.\nThe search did not yield any information related to hernias.\nNo global insights were found regarding hernias.\nThe local search did not provide any information on the different types of hernias.",
+    "graphrag_index_time_ms": 91018.23306083679,
+    "graphrag_response_time_ms": 7795.904159545898,
+    "rag_find_documents_time_ms": 391.3290500640869,
+    "graphrag_find_documents_time_ms": 375.17499923706055,
+    "relevants_ids": [
+      "MED-3001",
+      "MED-3000"
+    ],
+    "medium_relevants_ids": [
+      "MED-5325",
+      "MED-5323",
+      "MED-5363",
+      "MED-5332",
+      "MED-5339",
+      "MED-5337",
+      "MED-5328",
+      "MED-5334"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-1429": {
+    "rag": {
+      "relevants_returned": [
+        "MED-2757",
+        "MED-2760",
+        "MED-2761",
+        "MED-2758"
+      ],
+      "medium_relevants_returned": [
+        "MED-5328"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-2760",
+        "MED-2757",
+        "MED-2761",
+        "MED-2758",
+        "MED-2762"
+      ],
+      "medium_relevants_returned": [],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "The Iowa Women's Health Study is an epidemiological study. It has investigated the effects of multivitamins on women's health, including cardiovascular disease, cancer, and mortality. Some studies within the context have examined the relationship between multivitamin use and health outcomes. The study considered dietary supplements, vitamins, and minerals, including calcium and vitamin D. The Women's Health Initiative (WHI) is related to this topic, with similar investigations into supplements and their effects. Researchers like Bolland MJ, Barber PA, Doughty RN, and Ames R have studied calcium supplementation and its impact on vascular events. The study also mentions the manufacturer of the multivitamin used in the study, which is Pfizer.\nThe Iowa Women's Health Study is an epidemiological study investigating the effects of multivitamins on women's health, including cardiovascular disease, cancer, and mortality. The study considered dietary supplements, vitamins, and minerals, including calcium and vitamin D. The manufacturer of the multivitamin used in the study is Pfizer.\nThe study aligns with broader investigations into the effects of supplements on health outcomes, as seen in the Women's Health Initiative (WHI). Research also focuses on calcium supplementation and its impact on vascular events.\nThe Iowa Women's Health Study investigated the effects of multivitamins on women's health.\nThe study considered dietary supplements, vitamins, and minerals, including calcium and vitamin D.\nThe manufacturer of the multivitamin used in the study is Pfizer.",
+    "graphrag_index_time_ms": 170593.7259197235,
+    "graphrag_response_time_ms": 12943.814754486084,
+    "rag_find_documents_time_ms": 361.82403564453125,
+    "graphrag_find_documents_time_ms": 1465.5349254608154,
+    "relevants_ids": [
+      "MED-2761",
+      "MED-2762",
+      "MED-2760",
+      "MED-2758",
+      "MED-2757"
+    ],
+    "medium_relevants_ids": [
+      "MED-5342",
+      "MED-5330",
+      "MED-5332",
+      "MED-3227",
+      "MED-5328",
+      "MED-5334",
+      "MED-3237",
+      "MED-3233",
+      "MED-5326",
+      "MED-3228"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-1547": {
+    "rag": {
+      "relevants_returned": [],
+      "medium_relevants_returned": [
+        "MED-2360",
+        "MED-2361",
+        "MED-2356",
+        "MED-3316",
+        "MED-2368"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-2355"
+      ],
+      "medium_relevants_returned": [
+        "MED-2360",
+        "MED-2361",
+        "MED-2356",
+        "MED-3316"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "Lyme disease is an infectious disease caused by the bacterium Borrelia burgdorferi, transmitted to humans through the bite of infected black-legged ticks (also known as deer ticks) and sometimes other tick species. The disease is often associated with a characteristic rash called Erythema Migrans (EM), which can resemble the rash of Southern Tick-Associated Rash Illness (STARI), also known as Lyme-like illness. The Lone Star tick (Amblyomma americanum) is closely associated with STARI and can cause allergic reactions. Antibiotics, such as Amoxicillin, are used to treat Lyme disease. Other tick species include the dog tick (D. variabilis).\nThe search focuses on Lyme disease, its symptoms, and related conditions. The local search attempts to identify symptoms beyond the characteristic rash but finds no information in the provided snippets.\nLyme disease is caused by Borrelia burgdorferi, transmitted by infected ticks. The disease is often associated with Erythema Migrans (EM) rash. STARI, a Lyme-like illness, is linked to the Lone Star tick. Antibiotics are used for treatment.\nThe local search query asked about symptoms of Lyme disease besides the characteristic rash.\nThe provided text snippets did not contain information about the symptoms of Lyme disease besides the characteristic rash.\nThe text discusses seroconversion for Coxiella burnetii and STARI (Southern Tick-Associated Rash Illness), which is a Lyme-like illness, but does not mention the symptoms of Lyme disease.",
+    "graphrag_index_time_ms": 201915.60196876526,
+    "graphrag_response_time_ms": 12626.534938812256,
+    "rag_find_documents_time_ms": 516.5200233459473,
+    "graphrag_find_documents_time_ms": 959.6521854400635,
+    "relevants_ids": [
+      "MED-2364",
+      "MED-2355",
+      "MED-2369",
+      "MED-2363",
+      "MED-2362"
+    ],
+    "medium_relevants_ids": [
+      "MED-2368",
+      "MED-2357",
+      "MED-2356",
+      "MED-3316",
+      "MED-2352",
+      "MED-2360",
+      "MED-2367",
+      "MED-2353",
+      "MED-2354",
+      "MED-2361"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-1621": {
+    "rag": {
+      "relevants_returned": [
+        "MED-4835"
+      ],
+      "medium_relevants_returned": [
+        "MED-5328",
+        "MED-5335",
+        "MED-5334"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-4832",
+        "MED-4833",
+        "MED-4835"
+      ],
+      "medium_relevants_returned": [
+        "MED-5337"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "The provided information discusses the effects of kiwifruit on cardiovascular health, particularly in hyperlipidemic subjects. Studies have investigated kiwifruit's impact on blood lipid profiles, including total cholesterol, triglycerides, LDL cholesterol, and HDL-C. Additionally, the research explores the role of kiwifruit in relation to antioxidants like vitamin E and vitamin C, and its influence on LDL oxidation. The studies were conducted on hyperlipidemic subjects, with anthropometric measurements also being taken.\nThe research investigates the effects of kiwifruit on cardiovascular health in hyperlipidemic subjects, focusing on its impact on blood lipid profiles and antioxidant activity.\nThe global information provides a broad overview of kiwifruit's potential benefits for cardiovascular health, including its effects on lipid profiles and antioxidant properties.\nThe provided text snippets do not specify the types of kiwifruit used.\nThe text snippets do not contain information on the dosage or duration of kiwifruit consumption.",
+    "graphrag_index_time_ms": 130355.2668094635,
+    "graphrag_response_time_ms": 13319.796085357666,
+    "rag_find_documents_time_ms": 690.8121109008789,
+    "graphrag_find_documents_time_ms": 1123.9519119262695,
+    "relevants_ids": [
+      "MED-4834",
+      "MED-4833",
+      "MED-4832",
+      "MED-4835"
+    ],
+    "medium_relevants_ids": [
+      "MED-5339",
+      "MED-5330",
+      "MED-5335",
+      "MED-5334",
+      "MED-5363",
+      "MED-5333",
+      "MED-5328",
+      "MED-5337"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-1690": {
+    "rag": {
+      "relevants_returned": [
+        "MED-3599"
+      ],
+      "medium_relevants_returned": [
+        "MED-5323",
+        "MED-5342",
+        "MED-5332"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [],
+      "medium_relevants_returned": [
+        "MED-5342",
+        "MED-5363",
+        "MED-5328",
+        "MED-5327"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "The query \"national academy of sciences\" does not directly appear within the provided text. However, the text discusses multiple research studies and their findings regarding dietary components and their impact on health. These studies involve researchers and their affiliations, as well as data sources like the National Health and Nutrition Examination Survey (NHANES). The text also highlights the relationship between different diets (vegetarian and omnivorous) and the intake of essential fatty acids like EPA and DHA. It outlines the involvement of various researchers like Elobeid M, Everett C, Hatch EE, and Lang I in studies using NHANES data. Researchers like Berit Hippe and Jutta Zwielehner are affiliated with the University of Vienna.\nThe provided text discusses research studies related to dietary components and their impact on health, mentioning researchers and data sources like NHANES.  It also briefly touches upon the relationship between vegetarian/omnivorous diets and essential fatty acids.\nThe text highlights the use of research studies focusing on dietary components and their impact on health, the data source being NHANES.  This suggests a global focus on nutrition and its health implications.\nThe text does not provide specific research findings regarding the impact of vegetarian and omnivorous diets on EPA and DHA intake.",
+    "graphrag_index_time_ms": 127081.82501792908,
+    "graphrag_response_time_ms": 11514.05382156372,
+    "rag_find_documents_time_ms": 346.97508811950684,
+    "graphrag_find_documents_time_ms": 383.5587501525879,
+    "relevants_ids": [
+      "MED-3597",
+      "MED-3599",
+      "MED-4804",
+      "MED-3598"
+    ],
+    "medium_relevants_ids": [
+      "MED-5323",
+      "MED-5328",
+      "MED-5333",
+      "MED-5327",
+      "MED-5324",
+      "MED-5342",
+      "MED-5332",
+      "MED-5363"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-1731": {
+    "rag": {
+      "relevants_returned": [
+        "MED-2748"
+      ],
+      "medium_relevants_returned": [],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-2748"
+      ],
+      "medium_relevants_returned": [],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "Norovirus is a significant public health concern, with various research efforts focusing on its persistence, transmission, and control. Studies have investigated factors influencing norovirus persistence, including its behavior in different environments. Researchers have also explored the use of murine norovirus as a surrogate for human norovirus in experiments. Outbreaks of norovirus have been reported in various locations, with investigations into potential sources of contamination. Research teams, often affiliated with institutions like RIVM and Utrecht University, are actively studying norovirus.\nThe analysis focuses on norovirus, highlighting research efforts on persistence, transmission, and control.  The response indicates investigation into outbreak sources and the use of surrogates in experiments. Specific environmental factors influencing persistence are not detailed.\nNorovirus is a subject of significant research, addressing persistence, transmission, and control. Outbreaks and contamination sources are under investigation, often involving institutions like RIVM and Utrecht University. Murine norovirus serves as a research surrogate.\nThe local search was unable to identify specific environmental factors affecting norovirus persistence.\nThe text mentions pesticide application, virus quantification methods (FAM, VIC), and a reference to a publication in Food Analytical Methods.",
+    "graphrag_index_time_ms": 74567.51322746277,
+    "graphrag_response_time_ms": 14327.518939971924,
+    "rag_find_documents_time_ms": 513.0231380462646,
+    "graphrag_find_documents_time_ms": 2682.590961456299,
+    "relevants_ids": [
+      "MED-2748"
+    ],
+    "medium_relevants_ids": [
+      "MED-5334",
+      "MED-5335",
+      "MED-5337",
+      "MED-5324",
+      "MED-5339",
+      "MED-5340"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-1867": {
+    "rag": {
+      "relevants_returned": [
+        "MED-3743"
+      ],
+      "medium_relevants_returned": [
+        "MED-5335",
+        "MED-5327",
+        "MED-5337",
+        "MED-5326"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-3743",
+        "MED-3748",
+        "MED-3746"
+      ],
+      "medium_relevants_returned": [
+        "MED-5326",
+        "MED-5337"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "I am sorry, but the provided context does not contain any information about pineapples. The context focuses on bacteria, butyrate, cancer research, prostate cancer, lifestyle changes, anthocyanin pigments, and bananas. Therefore, I am unable to provide a comprehensive answer regarding pineapples based on the given information.\nThe context focuses on bacteria, butyrate, cancer research, prostate cancer, lifestyle changes, anthocyanin pigments, and bananas. It does not contain information about pineapples.\nThe global community analysis revealed no information regarding pineapples within the provided context. The context emphasizes topics such as bacteria, cancer research, and dietary components like anthocyanins and bananas.\nThe local search did not provide any specific information on pineapples.\nNo specific types of bacteria associated with butyrate production were mentioned in the provided text snippets.",
+    "graphrag_index_time_ms": 164572.88312911987,
+    "graphrag_response_time_ms": 9642.077922821045,
+    "rag_find_documents_time_ms": 423.9010810852051,
+    "graphrag_find_documents_time_ms": 341.68124198913574,
+    "relevants_ids": [
+      "MED-3743",
+      "MED-3748",
+      "MED-3746",
+      "MED-3745",
+      "MED-3742"
+    ],
+    "medium_relevants_ids": [
+      "MED-5323",
+      "MED-5324",
+      "MED-5333",
+      "MED-3546",
+      "MED-5363",
+      "MED-5337",
+      "MED-5335",
+      "MED-5322",
+      "MED-5327",
+      "MED-5326"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-2145": {
+    "rag": {
+      "relevants_returned": [
+        "MED-3920",
+        "MED-3919",
+        "MED-3918"
+      ],
+      "medium_relevants_returned": [
+        "MED-5337",
+        "MED-5342"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-3918",
+        "MED-3919",
+        "MED-3923"
+      ],
+      "medium_relevants_returned": [
+        "MED-5337",
+        "MED-5341"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "I am sorry, but the provided context does not contain any information regarding St. John's Wort. Therefore, I am unable to provide a comprehensive answer about it based on the available data. The context primarily focuses on prostate cancer, lifestyle changes, dietary interventions, and mineral content in herbs. No information on St. John's Wort is available.\nThe provided context focuses on prostate cancer, highlighting the role of lifestyle changes and assessing treatment effects through cell growth evaluation. It does not offer specific details on treatments, dietary guidelines, minerals, or herbal supplements.\nThe global community analysis reveals no specific information about St. John's Wort within the context provided. The context primarily discusses prostate cancer and related aspects.\nLifestyle changes may impact the progression of prostate cancer.\nLNCaP cell growth is used to evaluate treatment effects in prostate cancer.\nThe text does not provide specific dietary guidelines or recommendations for prostate cancer management.\nThe context does not offer specific details on the role of minerals or herbal supplements for prostate cancer.",
+    "graphrag_index_time_ms": 170961.10796928406,
+    "graphrag_response_time_ms": 16205.976009368896,
+    "rag_find_documents_time_ms": 377.4759769439697,
+    "graphrag_find_documents_time_ms": 794.119119644165,
+    "relevants_ids": [
+      "MED-3923",
+      "MED-4372",
+      "MED-3920",
+      "MED-3919",
+      "MED-3918"
+    ],
+    "medium_relevants_ids": [
+      "MED-5340",
+      "MED-5341",
+      "MED-5335",
+      "MED-5323",
+      "MED-5342",
+      "MED-5322",
+      "MED-5337",
+      "MED-5327",
+      "MED-5328",
+      "MED-5325"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-2408": {
+    "rag": {
+      "relevants_returned": [
+        "MED-1360",
+        "MED-1357",
+        "MED-1359"
+      ],
+      "medium_relevants_returned": [
+        "MED-1352",
+        "MED-1355"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-1360",
+        "MED-1359",
+        "MED-1357"
+      ],
+      "medium_relevants_returned": [
+        "MED-1355",
+        "MED-1352"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "The query 'zoloft' is related to studies and treatments for depression, a mood disorder often associated with serotonin levels. Zoloft is a medication commonly prescribed for this psychiatric condition. Research has examined the effects of exercise and other interventions alongside medication. Several studies have been conducted to understand the condition, and guidelines have been set by the National Institute for Clinical Excellence in Great Britain (NICE).\nThe search focused on Zoloft, a medication for depression. The analysis includes global understanding of depression and Zoloft's role, along with an attempt to find local information, which unfortunately did not yield the desired details.\nZoloft is a medication commonly prescribed for depression, a mood disorder often associated with serotonin levels. Exercise and other interventions are sometimes studied alongside medication. Guidelines exist from organizations like NICE.\n",
+    "graphrag_index_time_ms": 183504.48489189148,
+    "graphrag_response_time_ms": 10533.015012741089,
+    "rag_find_documents_time_ms": 362.40410804748535,
+    "graphrag_find_documents_time_ms": 356.57286643981934,
+    "relevants_ids": [
+      "MED-1360",
+      "MED-1358",
+      "MED-1356",
+      "MED-1357",
+      "MED-1359"
+    ],
+    "medium_relevants_ids": [
+      "MED-5339",
+      "MED-1351",
+      "MED-1355",
+      "MED-5334",
+      "MED-1352",
+      "MED-5340",
+      "MED-3545",
+      "MED-5363",
+      "MED-5322",
+      "MED-5332"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-2970": {
+    "rag": {
+      "relevants_returned": [
+        "MED-4388",
+        "MED-4384",
+        "MED-4385",
+        "MED-4554"
+      ],
+      "medium_relevants_returned": [
+        "MED-5335"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-4388",
+        "MED-4385",
+        "MED-4384",
+        "MED-4389"
+      ],
+      "medium_relevants_returned": [
+        "MED-5337"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "While the provided context primarily discusses Age-Related Macular Degeneration (AMD) and related dietary factors, it offers limited direct information on preventing cataracts with diet. However, the information does highlight the importance of a healthy diet for eye health in general. Specifically, the context mentions that antioxidants, omega-3 fatty acids, and vitamins may help with AMD. Also, the context mentions the role of Lutein, which is a carotenoid beneficial to vision and eye health. Although not directly related to cataracts, it can be inferred that a diet rich in antioxidants, omega-3 fatty acids, and vitamins, which can be found in a balanced diet that includes fruits, vegetables, and fish, may have a positive effect on overall eye health and therefore might also be beneficial for cataract prevention. Further research may be needed to confirm this relationship.\nThe context primarily focuses on Age-Related Macular Degeneration (AMD) and its dietary links, offering limited direct information on cataract prevention. It suggests a healthy diet rich in antioxidants, omega-3 fatty acids, and vitamins may benefit overall eye health, potentially extending to cataract prevention.\nA balanced diet including fruits, vegetables, and fish, rich in antioxidants, omega-3 fatty acids, and vitamins, may promote overall eye health and potentially aid in cataract prevention, though this is inferred and requires further research. Lutein, a carotenoid, is also highlighted for its vision benefits.\nThe provided context does not offer specific vitamins or nutrients, beyond those mentioned (antioxidants, omega-3s, vitamins, and Lutein), known to be particularly beneficial for cataract prevention.\nThe primary focus is on AMD, with limited direct information on cataracts.",
+    "graphrag_index_time_ms": 175682.6090812683,
+    "graphrag_response_time_ms": 13173.737049102783,
+    "rag_find_documents_time_ms": 368.1459426879883,
+    "graphrag_find_documents_time_ms": 875.9632110595703,
+    "relevants_ids": [
+      "MED-4388",
+      "MED-4385",
+      "MED-4384",
+      "MED-4554",
+      "MED-4389"
+    ],
+    "medium_relevants_ids": [
+      "MED-5328",
+      "MED-5342",
+      "MED-5339",
+      "MED-5327",
+      "MED-5340",
+      "MED-5333",
+      "MED-5323",
+      "MED-5337",
+      "MED-5335",
+      "MED-5332"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-3292": {
+    "rag": {
+      "relevants_returned": [
+        "MED-4647",
+        "MED-2760"
+      ],
+      "medium_relevants_returned": [
+        "MED-2757",
+        "MED-2758",
+        "MED-2762"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-4647",
+        "MED-2761"
+      ],
+      "medium_relevants_returned": [
+        "MED-2757",
+        "MED-2758",
+        "MED-2762"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "The impact of multivitamins on health is complex and not fully understood. Some studies suggest potential benefits, while others show no clear advantage or even potential risks. Research indicates that multivitamin use is associated with certain medical conditions and dietary factors. However, findings vary, and it's crucial to consider individual health needs and consult with a healthcare professional before taking multivitamins.\nThe impact of multivitamins is complex and not fully understood. While some benefits are suggested, the evidence is inconclusive and individual needs vary.\nMultivitamin use is associated with certain medical conditions and dietary factors, though specifics are not provided in the text. Research findings vary, emphasizing the importance of individual health needs and professional consultation.\nThe provided text does not specify any medical conditions linked to multivitamin use.\nThe provided text does not specify any dietary factors associated with multivitamin use.",
+    "graphrag_index_time_ms": 155837.7799987793,
+    "graphrag_response_time_ms": 10612.664222717285,
+    "rag_find_documents_time_ms": 351.46331787109375,
+    "graphrag_find_documents_time_ms": 337.6302719116211,
+    "relevants_ids": [
+      "MED-2761",
+      "MED-2760",
+      "MED-2759",
+      "MED-4646",
+      "MED-4647"
+    ],
+    "medium_relevants_ids": [
+      "MED-2762",
+      "MED-2757",
+      "MED-2758",
+      "MED-2704",
+      "MED-2755",
+      "MED-5134",
+      "MED-4713",
+      "MED-5130",
+      "MED-4928",
+      "MED-4926"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-2": {
+    "rag": {
+      "relevants_returned": [
+        "MED-2439",
+        "MED-3598",
+        "MED-2438"
+      ],
+      "medium_relevants_returned": [
+        "MED-5337",
+        "MED-5328"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-2439",
+        "MED-3598",
+        "MED-2438",
+        "MED-3599"
+      ],
+      "medium_relevants_returned": [
+        "MED-5337"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "I am sorry, but the provided context does not contain information regarding the relationship between cholesterol statin drugs and breast cancer. The summaries focus on prostate cancer, diet, lifestyle factors, and plant sterols, but do not address the user's specific query. Therefore, I am unable to provide a comprehensive answer.\nThe provided context does not contain information about the relationship between cholesterol statin drugs and breast cancer. The focus is on prostate cancer, diet, lifestyle factors, and plant sterols.\nThe global analysis is unable to provide an answer due to the lack of relevant information in the context.\nThere is no information regarding the impact of statin drugs on the development or progression of breast cancer.\nThe context discusses plant sterols and STAT3 signaling but does not mention statins or breast cancer.",
+    "graphrag_index_time_ms": 191461.8821144104,
+    "graphrag_response_time_ms": 9119.925022125244,
+    "rag_find_documents_time_ms": 368.5157299041748,
+    "graphrag_find_documents_time_ms": 386.00683212280273,
+    "relevants_ids": [
+      "MED-3598",
+      "MED-3599",
+      "MED-3597",
+      "MED-2438",
+      "MED-2439"
+    ],
+    "medium_relevants_ids": [
+      "MED-5324",
+      "MED-5340",
+      "MED-5322",
+      "MED-5342",
+      "MED-5334",
+      "MED-5323",
+      "MED-5363",
+      "MED-5328",
+      "MED-5335",
+      "MED-5337"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-44": {
+    "rag": {
+      "relevants_returned": [],
+      "medium_relevants_returned": [
+        "MED-2815",
+        "MED-2818",
+        "MED-2786",
+        "MED-2781",
+        "MED-2783"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [],
+      "medium_relevants_returned": [
+        "MED-2815",
+        "MED-2781",
+        "MED-2818",
+        "MED-2783",
+        "MED-2786"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "Based on the community summaries, individuals who should be cautious about curcumin or consult with a healthcare professional include those:\n\n*   With pre-existing health conditions, particularly those related to the liver or gall bladder, as curcumin's effects on these organs have been studied.\n*   Taking medications, as curcumin can interact with certain drugs, potentially affecting their efficacy or causing adverse effects.\n*   Pregnant or breastfeeding women, as the safety of curcumin in these populations may not be fully established.\n*   Individuals with a history of allergic reactions to turmeric or curcumin.\n\nIt is also important to note that: Curcumin has been studied for its potential in treating various conditions, including cancer, inflammatory bowel disease, and skin conditions, it is important to consult with a healthcare professional before using curcumin for any health-related purpose.  It is also important to note that some studies have investigated the potential of curcumin to induce DNA damage, and the long-term safety is still being studied.\nIndividuals with pre-existing health conditions, those taking medications, pregnant or breastfeeding women, and individuals with a history of allergic reactions to turmeric or curcumin should be cautious about curcumin.\nCurcumin may interact with medications, and its effects on the liver, gallbladder, and during pregnancy/breastfeeding require consideration. It has potential benefits for various conditions but also potential risks regarding DNA damage. Consultation with a healthcare professional is recommended.\nThe provided text does not specify any particular medications that interact with curcumin.",
+    "graphrag_index_time_ms": 151653.85603904724,
+    "graphrag_response_time_ms": 9856.794118881226,
+    "rag_find_documents_time_ms": 340.90113639831543,
+    "graphrag_find_documents_time_ms": 369.7538375854492,
+    "relevants_ids": [
+      "MED-3233",
+      "MED-5333",
+      "MED-5341",
+      "MED-5324",
+      "MED-5334"
+    ],
+    "medium_relevants_ids": [
+      "MED-2786",
+      "MED-2818",
+      "MED-2815",
+      "MED-2782",
+      "MED-2783",
+      "MED-2781",
+      "MED-2785"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-68": {
+    "rag": {
+      "relevants_returned": [
+        "MED-3887"
+      ],
+      "medium_relevants_returned": [
+        "MED-5341",
+        "MED-5328",
+        "MED-5326",
+        "MED-5339"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [],
+      "medium_relevants_returned": [
+        "MED-5341",
+        "MED-5328",
+        "MED-5326",
+        "MED-5337",
+        "MED-5339"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "I am sorry, but the provided context does not contain information about the ingredients of chicken nuggets. The context focuses on various research topics including breast and prostate cancer, the impact of diet and exercise, gut microbiota, and food safety related to bacterial infections. Therefore, I am unable to answer your question.\nThe provided context primarily focuses on research related to breast and prostate cancer, the influence of diet and exercise, gut microbiota, and food safety, but does not contain information about the ingredients of chicken nuggets or the impact of cooking methods on bacterial infections.\nThe global community analysis reveals a focus on health and nutrition research, with specific attention to cancer, lifestyle factors, and food safety, but no information on chicken nuggets.\nNo specific information on chicken nugget ingredients was found.\nNo information regarding the impact of different cooking methods on food safety related to bacterial infections was found.",
+    "graphrag_index_time_ms": 183254.638671875,
+    "graphrag_response_time_ms": 7492.090702056885,
+    "rag_find_documents_time_ms": 369.124174118042,
+    "graphrag_find_documents_time_ms": 364.34221267700195,
+    "relevants_ids": [
+      "MED-4133",
+      "MED-4804",
+      "MED-3887",
+      "MED-4129",
+      "MED-3888"
+    ],
+    "medium_relevants_ids": [
+      "MED-5339",
+      "MED-5335",
+      "MED-5323",
+      "MED-5324",
+      "MED-5332",
+      "MED-5326",
+      "MED-5341",
+      "MED-5328",
+      "MED-5337",
+      "MED-5325"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-291": {
+    "rag": {
+      "relevants_returned": [
+        "MED-4642",
+        "MED-4643"
+      ],
+      "medium_relevants_returned": [
+        "MED-2107",
+        "MED-2106"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-4643",
+        "MED-4642"
+      ],
+      "medium_relevants_returned": [
+        "MED-2107",
+        "MED-2103"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "The query about stool size and breast cancer risk is not directly addressed in the provided context. However, the context provides information on related factors. The studies focus on the relationship between diet, dietary habits, and breast cancer risk, particularly in postmenopausal women. Factors like high-fat animal product consumption and the impact of diet on estrogen levels are key areas of investigation. Plasma deoxycholic acid (DCA) is studied as a factor in breast cancer. While not explicitly mentioning stool size, the context explores how diet, which can influence stool characteristics, relates to breast cancer risk through hormone metabolism and other mechanisms. The Seventh-day Adventist population is used as a study group, with a focus on their vegetarian lifestyle.\nThe provided context explores the relationship between diet, dietary habits, and breast cancer risk, focusing on postmenopausal women. It investigates factors like high-fat animal product consumption and the impact of diet on estrogen levels, without directly addressing stool size.\nThe study group includes Seventh-day Adventists, examining the role of vegetarian diets and their impact on breast cancer risk factors, such as hormone metabolism, with plasma deoxycholic acid (DCA) being a key focus.\nThe context does not provide any specific information regarding stool size and its relationship with breast cancer risk.\nThe studies primarily focus on the impact of diet and dietary habits on breast cancer risk.\nThe research investigates the connection between high-fat animal product consumption and estrogen levels, among other factors.",
+    "graphrag_index_time_ms": 131612.27083206177,
+    "graphrag_response_time_ms": 22211.72785758972,
+    "rag_find_documents_time_ms": 332.3099613189697,
+    "graphrag_find_documents_time_ms": 1021.8160152435303,
+    "relevants_ids": [
+      "MED-4522",
+      "MED-4516",
+      "MED-4642",
+      "MED-4643"
+    ],
+    "medium_relevants_ids": [
+      "MED-2102",
+      "MED-2107",
+      "MED-2105",
+      "MED-2099",
+      "MED-2103",
+      "MED-2101",
+      "MED-2529",
+      "MED-2106"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-344": {
+    "rag": {
+      "relevants_returned": [
+        "MED-5323"
+      ],
+      "medium_relevants_returned": [
+        "MED-2405",
+        "MED-2407",
+        "MED-2411",
+        "MED-2410"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-5323"
+      ],
+      "medium_relevants_returned": [
+        "MED-2405",
+        "MED-2407",
+        "MED-2411",
+        "MED-2410"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "Dioxins, a type of persistent organic pollutant (POP), are environmental contaminants. Exposure to dioxins, particularly through events like the spraying of Agent Orange by the US Air Force in Vietnam, has been linked to an increased risk of type 2 diabetes. Studies suggest that dioxins can be stored in body fat and may contribute to metabolic disorders. Several studies compare risk estimates and associate dioxin exposure with increased diabetes risk.\nExposure to dioxins, persistent organic pollutants stored in body fat, is linked to an increased risk of type 2 diabetes. The information provided does not specify which types of dioxins are most strongly associated with this risk nor the mechanisms of action.\nDioxins are environmental contaminants that have been linked to an increased risk of type 2 diabetes. Exposure, particularly from events like Agent Orange spraying, is associated with this risk. The contaminants can be stored in body fat, potentially contributing to metabolic disorders.\nThe documents do not specify particular types of dioxins associated with increased risk.\nThe documents do not explain the mechanisms by which dioxins contribute to type 2 diabetes.",
+    "graphrag_index_time_ms": 106628.26108932495,
+    "graphrag_response_time_ms": 11485.960960388184,
+    "rag_find_documents_time_ms": 368.29400062561035,
+    "graphrag_find_documents_time_ms": 385.58316230773926,
+    "relevants_ids": [
+      "MED-5327",
+      "MED-5332",
+      "MED-5330",
+      "MED-5335",
+      "MED-5323"
+    ],
+    "medium_relevants_ids": [
+      "MED-2411",
+      "MED-2410",
+      "MED-2405",
+      "MED-2407"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-488": {
+    "rag": {
+      "relevants_returned": [
+        "MED-1798",
+        "MED-1810",
+        "MED-4767"
+      ],
+      "medium_relevants_returned": [
+        "MED-5334",
+        "MED-5330"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-1798",
+        "MED-1810",
+        "MED-4767",
+        "MED-1797"
+      ],
+      "medium_relevants_returned": [
+        "MED-5324"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "Adenovirus-36 (Ad-36) is a virus associated with obesity and altered lipid metabolism. Studies, including those using chicken models, have shown that infection with Ad-36 can lead to increased fat deposition, including visceral and total body fat.  Research indicates that Ad-36 infection is associated with elevated levels of triglycerides, total cholesterol, and changes in other metabolic factors.  Ad-36 has been studied in various animal models, including non-human primates. Research suggests a connection between Ad-36 and metabolic pathways and cellular processes, but the exact mechanism remains under investigation. Antibodies related to Ad-36 are more common among people of African and Asian descent. \nAdenovirus-36 (Ad-36) is linked to obesity and altered lipid metabolism. Infection can lead to increased fat deposition and changes in metabolic factors like triglycerides and cholesterol. The exact mechanisms are still under investigation. Antibodies are more common in people of African and Asian descent.  Local searches indicate Ad-36 may affect leptin RNA expression, but specific treatments are not mentioned.\nAd-36 is associated with obesity and changes in lipid metabolism. Infection can lead to increased fat deposition. Antibodies related to Ad-36 are more common among people of African and Asian descent.\nAd-36 infection suppresses leptin RNA expression.\nThe text does not detail other specific metabolic pathways affected by Ad-36.\nThe provided text snippets do not offer a specific mechanism by which Ad-36 leads to increased fat deposition.\nThe text does not specify any treatments or interventions to mitigate the effects of an AD-36 infection.\nThe provided snippets do not contain information about the prevalence of Ad-36 antibodies in different populations globally.",
+    "graphrag_index_time_ms": 126294.66199874878,
+    "graphrag_response_time_ms": 16615.556001663208,
+    "rag_find_documents_time_ms": 350.86989402770996,
+    "graphrag_find_documents_time_ms": 437.82591819763184,
+    "relevants_ids": [
+      "MED-1810",
+      "MED-1802",
+      "MED-1798",
+      "MED-1797",
+      "MED-4767"
+    ],
+    "medium_relevants_ids": [
+      "MED-5327",
+      "MED-5324",
+      "MED-5332",
+      "MED-5340",
+      "MED-5323",
+      "MED-5330",
+      "MED-5335",
+      "MED-5333",
+      "MED-5334",
+      "MED-5339"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-499": {
+    "rag": {
+      "relevants_returned": [
+        "MED-1115",
+        "MED-2213",
+        "MED-4384"
+      ],
+      "medium_relevants_returned": [
+        "MED-5328",
+        "MED-5324"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-2213",
+        "MED-1115",
+        "MED-4384"
+      ],
+      "medium_relevants_returned": [
+        "MED-5328",
+        "MED-5341"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "The query focuses on African Americans and their connection to dementia and related studies. Multiple communities provided insights, highlighting the 'Indianapolis-Ibadan Dementia Project,' which compares dementia incidence rates between African Americans in Indianapolis, Indiana, and the Yoruba population in Ibadan, Nigeria. The studies are often published in JAMA (Journal of the American Medical Association). Key figures like Hugh C. Hendrie are associated with these studies through affiliations with institutions like Indiana University. The studies investigate the incidence of Alzheimer's Disease (AD) and other forms of dementia within these populations.\nThe research focuses on dementia, particularly Alzheimer's Disease, within the African-American community, primarily through the 'Indianapolis-Ibadan Dementia Project.' The project compares dementia incidence between African Americans in Indianapolis and the Yoruba population in Ibadan, Nigeria. Local searches sought methodologies used in this project but were unsuccessful.\nThe 'Indianapolis-Ibadan Dementia Project' is a significant study comparing dementia rates between African Americans and the Yoruba population. Studies are published in journals like JAMA. Key figures such as Hugh C. Hendrie are associated with the research.\nThe provided text snippets do not detail the specific methodologies used in the 'Indianapolis-Ibadan Dementia Project' for data collection and analysis.",
+    "graphrag_index_time_ms": 158011.50012016296,
+    "graphrag_response_time_ms": 11809.913873672485,
+    "rag_find_documents_time_ms": 341.39299392700195,
+    "graphrag_find_documents_time_ms": 332.4270248413086,
+    "relevants_ids": [
+      "MED-4384",
+      "MED-2213",
+      "MED-1115",
+      "MED-3877",
+      "MED-1108"
+    ],
+    "medium_relevants_ids": [
+      "MED-5334",
+      "MED-5324",
+      "MED-5341",
+      "MED-5328",
+      "MED-5363",
+      "MED-5330",
+      "MED-5339",
+      "MED-5326",
+      "MED-5340",
+      "MED-5337"
+    ],
+    "non_relevants_ids": []
+  },
+  "PLAIN-531": {
+    "rag": {
+      "relevants_returned": [
+        "MED-4372",
+        "MED-4193"
+      ],
+      "medium_relevants_returned": [
+        "MED-5335",
+        "MED-5341",
+        "MED-5342"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag": {
+      "relevants_returned": [
+        "MED-4372",
+        "MED-3778"
+      ],
+      "medium_relevants_returned": [
+        "MED-5341",
+        "MED-5335",
+        "MED-5363"
+      ],
+      "non_relevants_returned": []
+    },
+    "graphrag_response": "Alternative medicine encompasses a wide range of practices and treatments that are not typically considered part of conventional Western medicine. The provided community summaries touch upon several aspects related to this topic, including dietary interventions, exercise programs, and the use of complementary therapies. Specific examples include low-fat, high-fiber diets and exercise programs investigated for their effects on breast cancer. Other summaries explore the practices and advice offered by health food stores, and surveys conducted on alternative health practices. Furthermore, the context also discusses alternative approaches like vegan diets in relation to neurodegenerative diseases like Parkinson's disease. The overall topic is broad and there are studies in both in-vivo and in-vitro settings.\nThe analysis explores alternative medicine, focusing on dietary interventions, exercise, and complementary therapies. It examines their relation to health outcomes, including breast cancer and Parkinson's disease.\nAlternative medicine encompasses a broad range of practices beyond conventional Western medicine. The summaries mention dietary interventions such as low-fat, high-fiber, and vegan diets, and exercise programs.\nThe summaries don't specify complementary therapies.\nNo information is provided about the relationship between specific dietary interventions and health outcomes.",
+    "graphrag_index_time_ms": 124204.70404624939,
+    "graphrag_response_time_ms": 13262.64500617981,
+    "rag_find_documents_time_ms": 333.5380554199219,
+    "graphrag_find_documents_time_ms": 376.1780261993408,
+    "relevants_ids": [
+      "MED-3793",
+      "MED-4193",
+      "MED-4372",
+      "MED-3778",
+      "MED-3867"
+    ],
+    "medium_relevants_ids": [
+      "MED-5363",
+      "MED-5327",
+      "MED-5339",
+      "MED-5324",
+      "MED-5341",
+      "MED-5330",
+      "MED-5332",
+      "MED-5342",
+      "MED-5333",
+      "MED-5335"
+    ],
+    "non_relevants_ids": []
+  }
+}
