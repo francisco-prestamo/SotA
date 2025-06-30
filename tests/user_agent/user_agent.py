@@ -24,7 +24,7 @@ class UserAgent(UserAPI, UserQuerier):
         self.personality_description = personality_description
         self.json_generator = json_generator
 
-        self.receptionist_conversation_summary: str | None
+        self.receptionist_conversation_summary: str | None = None
 
     def receptionist_query_user(self, query: str) -> str:
         self._add_receptionist_intervention_to_chat(query)

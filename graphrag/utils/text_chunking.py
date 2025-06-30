@@ -97,7 +97,7 @@ def chunk_document(text_embedder: TextEmbedder, document: Document, max_tokens=3
         )
 
     text_units = []
-    with ThreadPoolExecutor(max_workers=5) as executor:
+    with ThreadPoolExecutor(max_workers=20) as executor:
         futures = {executor.submit(create_text_unit, (i, chunk)): i for i, chunk in enumerate(text_chunks)}
         for future in as_completed(futures):
             text_unit = future.result()
