@@ -95,7 +95,7 @@ class GraphRag:
                     textunit_entities[tu_union.unit_id] = entities
                     tu_union = None
         else:
-            with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
                 future_to_tu = {
                     executor.submit(self.extract_entities_and_relationships_from_textunit, tu): tu
                     for tu in kg.text_units
@@ -163,7 +163,7 @@ class GraphRag:
             kg.add_community(comm)
         #==============================================================================================================================
         # # Phase 4: Community Summarization
-        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
             future_to_comm = {
                 executor.submit(self.summarize_community, comm, kg): comm
                 for comm in kg.communities
@@ -217,7 +217,7 @@ class GraphRag:
                     tu_union = None
         else:
             print("Updating Entities and Relationships...")
-            with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
                 future_to_tu = {
                     executor.submit(self.extract_entities_and_relationships_from_textunit, tu): tu
                     for tu in new_text_units
@@ -273,7 +273,7 @@ class GraphRag:
             kg.add_community(comm)
         
         from tqdm import tqdm
-        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
             future_to_comm = {
                 executor.submit(self.summarize_community, comm, kg): comm
                 for comm in kg.communities
