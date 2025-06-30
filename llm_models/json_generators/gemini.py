@@ -23,11 +23,10 @@ class GeminiJsonGenerator(
     ReceptJsonGen,
     UserAgentJsonGen,
 ):
-    def __init__(self, model: str = "gemini-2.0-flash-lite"):
+    def __init__(self, model: str = "gemini-1.5-flash-8b"):
         # List of API keys, can be loaded from env or passed directly
-        
-        self.api_keys = []
-        self.api_keys = [os.getenv("GEMINI_API_KEY_1"), os.getenv("GEMINI_API_KEY_2"), os.getenv("GEMINI_API_KEY_3")]
+
+        self.api_keys = self._get_api_keys()
         self.model = model
         self.key_index = 0
         self.client = genai.Client(api_key=self.api_keys[self.key_index])
@@ -44,6 +43,7 @@ class GeminiJsonGenerator(
         """
         max_schema_retries = 3
         schema_retries = 0
+        other_retries = 0
         while True:
             try:
                 response = self.client.models.generate_content(
@@ -59,18 +59,43 @@ class GeminiJsonGenerator(
                 return schema.model_validate_json(response.text)
             except ValidationError as ve:
                 schema_retries += 1
-                print(f"Schema validation error, retrying ({schema_retries}/{max_schema_retries})...")
+                print(
+                    f"Schema validation error, retrying ({schema_retries}/{max_schema_retries})..."
+                )
                 if schema_retries >= max_schema_retries:
-                    print("Schema validation failed after 5 attempts, returning empty JSON.")
-                    prompt = "Generate an empty JSON response for each field in the schema."
+                    print(
+                        "Schema validation failed after 5 attempts, returning empty JSON."
+                    )
+                    prompt = (
+                        "Generate an empty JSON response for each field in the schema."
+                    )
                 time.sleep(0.5)
                 continue
             except Exception as e:
-                # print("Rotating key...", e)
+                print("Rotating key...", e)
+                print(e)
                 self.rotate_key()
-                time.sleep(10)
-       
+                other_retries += 1
+                t = (other_retries // 5 + 1) * 10
+                print(f"Waiting {t} seconds...")
+                time.sleep(t)
 
+    def _get_api_keys(self) -> list[str]:
+        i = 1
+        answ = []
+        while True:
+            key = os.getenv(f"GEMINI_API_KEY_{i}")
+            if key != None:
+                answ.append(key)
+            else:
+                break
+
+            i += 1
+
+        if len(answ) == 0:
+            raise Exception("No api keys found for gemini json generator")
+
+        return answ
 
 def example_usage():
     class GreetingModel(BaseModel):
