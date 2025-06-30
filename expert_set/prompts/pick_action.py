@@ -35,7 +35,6 @@ class ExpertIntervention(BaseModel):
         use_enum_values = True
 
 
-
 def create_answers_model(experts: Dict[str, ExpertDescription]) -> Type[BaseModel]:
     """
     Dynamically create a Pydantic model with one field per expert.
@@ -53,11 +52,37 @@ def create_answers_model(experts: Dict[str, ExpertDescription]) -> Type[BaseMode
     return InterventionsModel
 
 
+def is_sota_table_empty(sota_table_md: str) -> bool:
+    """
+    Check if the state of the art table is empty or contains only headers/structure.
+    """
+    if not sota_table_md or not sota_table_md.strip():
+        return True
+
+    # Remove common markdown table elements and whitespace
+    content = sota_table_md.strip()
+    lines = [line.strip() for line in content.split('\n') if line.strip()]
+
+    # Filter out common table structure elements
+    content_lines = []
+    for line in lines:
+        # Skip table separators (lines with only |, -, and spaces)
+        if not line.replace('|', '').replace('-', '').replace(' ', '').replace(':', ''):
+            continue
+        # Skip empty table cells (lines with only | and spaces)
+        if not line.replace('|', '').replace(' ', ''):
+            continue
+        content_lines.append(line)
+
+    # If no content lines remain, table is empty
+    return len(content_lines) == 0
+
+
 def pick_action_prompt(
-    presentations: Dict[str, ExpertPresentation],
-    sota_table_md: str,
-    thesis_desc: str,
-    thesis_thoughts: str,
+        presentations: Dict[str, ExpertPresentation],
+        sota_table_md: str,
+        thesis_desc: str,
+        thesis_thoughts: str,
 ) -> str:
     expert_presentation_model_str = json.dumps(
         [{"expert_id": ExpertPresentation.model_json_schema()}], indent=2
@@ -66,6 +91,33 @@ def pick_action_prompt(
     expert_strs = json.dumps(
         {id: pres.model_dump() for id, pres in presentations.items()}, indent=2
     )
+
+    # Check if SOTA table is empty
+    table_is_empty = is_sota_table_empty(sota_table_md)
+
+    # Build available actions description
+    available_actions = []
+
+    available_actions.append(
+        f"{RoundAction.AddDocument.value}: Add a new document to the state of the art table, this choice is to be made when there are important parts of the research paper such that none of the recovered papers document the state of the art in those specific fields.")
+
+    if not table_is_empty:
+        available_actions.append(
+            f"{RoundAction.RemoveDocument.value}: Remove a document from the state of the art table, this choice is to be made when some document is redundant or not relevant given the provided description.")
+
+    available_actions.append(
+        f"{RoundAction.AskUser.value}: Ask the user, this choice is to be made when clarification is needed for some part of the description of the paper, the user commanded this entire operation, and it is they who help build the description of the paper.")
+
+    if not table_is_empty:
+        available_actions.append(
+            f"{RoundAction.AcceptSota.value}: Accept SOTA (State of the Art), this choice is to be made when the experts are completely sure there are no relevant topics explored in the research paper that aren't covered in the existing state of the art table.")
+
+    actions_text = "\n\n".join(available_actions)
+
+    # Add constraint message if table is empty
+    constraint_message = ""
+    if table_is_empty:
+        constraint_message = "\n\nIMPORTANT CONSTRAINT: The state of the art table is currently empty. Therefore, the options to 'Remove Document' and 'Accept SOTA' are not available. You must either add documents to build the table or ask for user clarification if needed."
 
     return f"""
 A set of experts gather to build a state of the art table for a given research paper, such a table is a summary of
@@ -85,27 +137,18 @@ This is a description of the experts taking part in the investigation, in the fo
 notice the expert ids, they will be used later:
 {expert_strs}
 
-The decision to be made is to either:
+The available decisions are:
 
-{RoundAction.AddDocument.value}: Add a new document to the state of the art table, this choice is to be made when there are important parts of the 
-research paper such that none of the recovered papers document the state of the art in those specific fields.
-
-{RoundAction.RemoveDocument.value}: Remove a document from the state of the art table, this choice is to be made when some document is redundant or
-not relevant given the provided description
-
-{RoundAction.AskUser.value}: Ask the user, this choice is to be made when clarification is needed for some part of the description of the paper,
-the user commanded this entire operation, and it is they who help build the description of the paper
-
-{RoundAction.AcceptSota.value}: Accept Sota (State of the Art), this choice is to be made when the experts are
-completely sure there are no relevant topics explored in the research paper that aren't covered in the existing
-state of the art table
+{actions_text}{constraint_message}
 
 Given this information, each expert will now intervene in the process of making a decision, following a similar schema
 as when they were described, their answers will be of the following form, consider that the expert ids must match with the id in their descriptions above
 """
 
+
 class SummaryAnswerModel(BaseModel):
     summary: str
+
 
 def pick_action_summary_prompt(pick_action_prompt: str, answer: BaseModel, chosen_action: RoundAction) -> str:
     print("answer")
@@ -135,14 +178,3 @@ The process of decision making is as follows
 After a count of the votes, the following action was chosen: {chosen_action}
 
     """
-
-
-
-
-
-
-
-
-
-
-

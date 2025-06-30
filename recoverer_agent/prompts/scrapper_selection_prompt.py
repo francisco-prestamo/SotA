@@ -1,17 +1,44 @@
 def scrapper_selection_prompt(research_description: str, scraper_infos: list, result_schema) -> str:
     """
-    Build prompt for selecting appropriate scrapers and generating search queries based on research description.
+    Build prompt for selecting the best scrapers and generating optimal search queries based on research description.
     Args:
         research_description: Detailed description of what research topic/information is needed
         scraper_infos: List of available scrapers with their descriptions and previous searches
         result_schema: Pydantic schema for the expected response format
     """
+    # Generate schema information for the model
+    schema_info = """
+    The JSON response should follow this structure:
+    {
+        "reasoning": "Overall reasoning for your selections",
+        "selections": [
+            {
+                "source_name": "Name of the scraper",
+                "selected": true/false,
+                "queries": [
+                    {
+                        "query": "specific search query 1",
+                        "reasoning": "why this query is valuable"
+                    },
+                    {
+                        "query": "specific search query 2",
+                        "reasoning": "why this query is valuable"
+                    },
+                    ...up to 3 queries per source
+                ],
+                "source_reasoning": "Why this source is relevant or not relevant"
+            },
+            ...one object per available source
+        ]
+    }
+    """
+    
     scraper_descriptions = "\n".join([
         f"• {info['name']}: {info['description']}\n  Previous searches: {', '.join(info.get('previous_searches', ['None']))}"
         for info in scraper_infos
     ])
     
-    return f"""You are a research query specialist. Your task is to select ALL relevant document sources and craft comprehensive search queries that will retrieve the most complete academic content coverage on the subject.
+    return f"""You are a research query specialist. Your task is to identify the most relevant sources and craft precise search queries for finding academic papers directly relevant to the research description.
 
 RESEARCH OBJECTIVE:
 {research_description}
@@ -19,58 +46,85 @@ RESEARCH OBJECTIVE:
 AVAILABLE SOURCES WITH PREVIOUS SEARCHES:
 {scraper_descriptions}
 
-YOUR ENHANCED MISSION:
-1. Select ALL sources that could contribute to a complete understanding of the research topic
-2. Generate comprehensive search queries that cover the entire scope of the research intent
-3. Consider complementary angles and related subtopics to ensure complete coverage
-4. Take into account previous searches to avoid duplication and expand knowledge
+YOUR FLEXIBLE MISSION:
+1. Determine the MOST RELEVANT sources for the current research objective (1-3 sources)
+2. For each selected source, generate UP TO 3 OPTIMAL search queries tailored to its strengths
+3. Ensure all queries directly address different aspects of the research description
+4. Take into account previous searches to avoid duplication
 
-SELECTION STRATEGY (COMPREHENSIVE APPROACH):
-• Select ALL sources with ANY relevance to the research domain
-• Utilize BOTH specialized databases AND general sources for maximum coverage
-• Ensure NO relevant information source is excluded
-• When in doubt about a source's relevance, INCLUDE it rather than exclude
+MULTI-QUERY STRATEGY:
+• Identify multiple aspects or angles of the research objective that should be explored
+• For each selected source, create up to 3 complementary queries that address different aspects
+• Ensure each query focuses on distinct methodologies, applications, or theoretical frameworks
+• Make each query specialized and non-overlapping with others to maximize coverage
+• Balance between depth (specific techniques) and breadth (different approaches) in your query set
 
-COMPREHENSIVE QUERY CRAFTING PRINCIPLES:
-• Use natural language search terms without operators (no quotes, AND, OR, NOT, etc.)
-• Craft BRIEF queries using 4-8 terms per query
-• Keep queries concise and focused - avoid long phrases or sentences
-• Combine core research terms with adjacent concepts in brief plain text format
-• Ensure queries cover an specific research area about the research topic
-• Create targeted queries that will find papers published from different perspectives
-• Use straightforward, concise language that search engines can interpret naturally
-• Consider how the topic might be discussed in different academic disciplines
-• Avoid complex search operators and lengthy descriptions - rely on brief natural keyword matching
+QUERY CRAFTING PRINCIPLES FOR SCIENTIFIC DATABASES:
+• Use precise technical terminology that academic researchers would use in papers
+• Include specific methodologies, algorithms, metrics, or frameworks in each query
+• Target recent advances and state-of-the-art approaches where appropriate
+• Use 3-6 highly specific technical terms in each query rather than general descriptions
+• Match terminology to the indexing patterns of each selected scientific database
+
+TAILORING QUERIES TO SOURCE STRENGTHS:
+• For arXiv: Focus on recent technical papers with specific algorithm/method names
+• For PubMed: Use precise medical/biological terminology and include methodology terms
+• For academic databases: Include specific metrics, evaluation approaches, or frameworks
+• For Semantic Scholar: Balance technical precision with broader conceptual terms
+
+EXAMPLES OF MULTI-QUERY STRATEGY:
+
+Example 1: Research description about "deep learning for medical image analysis"
+Source: arXiv
+Query 1: "convolutional neural networks segmentation medical imaging"
+Query 2: "self-supervised learning anatomical structure detection"
+Query 3: "uncertainty estimation diagnostic accuracy medical images"
+Reasoning: These queries cover different technical approaches (CNNs, self-supervised learning) and challenges (segmentation, detection, uncertainty estimation) in medical imaging.
+
+Example 2: Research description about "recommendation systems addressing cold start problem"
+Source: Semantic Scholar
+Query 1: "hybrid recommendation systems cold start problem"
+Query 2: "knowledge graph embeddings user preferences new items"
+Query 3: "few-shot learning recommendation systems evaluation metrics"
+Reasoning: These queries address the main challenge (cold start) with different approaches (hybrid systems, knowledge graphs, few-shot learning).
+
+Example 3: Research description about "reinforcement learning for robotic manipulation"
+Source 1: arXiv
+Query 1: "reinforcement learning sample efficiency robotic grasping"
+Query 2: "sim2real transfer robotic manipulation dexterous hands"
+Source 2: Semantic Scholar
+Query 1: "hierarchical reinforcement learning complex manipulation tasks"
+Reasoning: These queries cover both technical challenges (sample efficiency, sim2real) across multiple relevant sources.
+
+DETECTING MULTIPLE IMPORTANT ASPECTS TO SEARCH:
+• Identify several technically significant components in the research objective
+• For each component, focus on specialized methodologies that address different needs or challenges
+• Consider various performance bottlenecks that would be addressed in recent literature
+• Target different evaluation methodologies or metrics for assessing solutions
+• Ensure your queries together provide comprehensive coverage of the research topic
 
 BUILDING ON PREVIOUS SEARCHES:
-• Review previous search queries for each source and build upon them
-• If previous searches were narrow, add broader perspective queries
-• If previous searches were broad, add more specific targeted queries
-• Create queries that explore different aspects not covered in previous searches
-• Consider how to expand or refine previous searches to get complementary results
+• Analyze previous queries to avoid duplication and ensure progress
+• If previous searches used general terms, create more technically specific queries
+• If previous searches focused on methods, consider targeting applications or evaluations
+• Formulate queries that address limitations or challenges identified in previously found papers
+• Create a complementary set of queries that explore different angles of the research topic
 
-QUERY EXAMPLES FOR COMPREHENSIVE COVERAGE (BRIEF, NO OPERATORS):
-• Technical research: "artificial intelligence machine learning neural networks", "AI algorithms deep learning applications", "machine learning survey recent advances", "AI challenges ethical considerations"
-• Social sciences: "social media mental health adolescents", "social media cultural differences behavior", "social media longitudinal studies outcomes", "social media policy regulation effects"
-• Medical research: "diabetes treatment insulin therapy", "diabetes systematic review meta analysis", "diabetes clinical trials patient outcomes", "diabetes prevention lifestyle interventions"
-• Interdisciplinary topics: Use 4-8 terms from relevant fields as separate focused queries
+OUTPUT REASONING:
+For each source and its associated queries, provide:
+1. Why this source is relevant for the current research objective
+2. Why each specific query is valuable at this moment in the research process
+3. How each query complements the others to provide comprehensive coverage
+4. How the crafted queries use specific technical terminology suited to that source's indexing
+5. How these queries relate to or improve upon previous searches on this source
 
 SEARCH QUERY FORMAT REQUIREMENTS:
-• Use only natural language keywords and phrases
-• Keep queries BRIEF - 4-8 key terms per query
-• No quotation marks, Boolean operators, or special characters
-• Separate concepts with spaces, not operators
-• Keep queries focused and conversational
-• Avoid lengthy phrases or complete sentences
-• Balance specificity with breadth in term selection
-• Example: "climate change ocean acidification marine ecosystems" instead of overly long descriptions
+• Use only the most precise technical terminology relevant to the current research need
+• Keep each query concise (3-6 key technical terms)
+• No quotes, Boolean operators or special characters
+• Focus on technical precision rather than natural language phrasing
+• Prioritize terms that would appear in academic paper titles and abstracts
+• Ensure each query for a source explores a different aspect of the research topic
 
-COMPREHENSIVE COVERAGE STRATEGY:
-Each query should aim to capture a different slice of the research landscape using brief, natural language search terms. Together, your queries should leave no stone unturned, ensuring all relevant papers are discovered regardless of the exact terminology they use.
-
-For each selected source, provide:
-- Clear explanation of how this source contributes to comprehensive understanding
-- A brief natural language search query (4-8 terms, no operators) that captures aspects of the topic this source is best positioned to provide
-- How this query complements or extends previous searches on this source
-
-PRIORITY: The goal is COMPLETE COVERAGE using brief, simple search terms. It's better to retrieve some extra papers than to miss important relevant ones. When in doubt, be more inclusive in your source selection and query formulation."""
+OUTPUT FORMAT:
+{schema_info}"""

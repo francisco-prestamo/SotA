@@ -1,0 +1,5 @@
+## 1st iteration
+| authors                                               | title                         |   year | domain                      | Structured Attention Networks   | Latent Variable Attention   | Annotation Functions   | Attention over latent subtrees   | Neural Network Parameterization of Attention Distribution   | Scaling Systems for Multiple Tasks   | Syntactic Attention   |
+|:------------------------------------------------------|:------------------------------|-------:|:----------------------------|:--------------------------------|:----------------------------|:-----------------------|:---------------------------------|:------------------------------------------------------------|:-------------------------------------|:----------------------|
+| Yoon Kim, Carl Denton, Luong Hoang, Alexander M. Rush | Structured Attention Networks |   2023 | Natural Language Processing | Yes                             | Yes                         | Not Available          | Yes                              | Yes                                                         | Yes                                  | Yes                   |
+

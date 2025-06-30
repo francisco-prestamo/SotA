@@ -47,7 +47,7 @@ class PaperAdder:
         json_generator: JsonGenerator,
         board: Board,
         recoverer_agent: RecovererAgent,
-        k: int = 3
+        k: int = 1
     ):
         self.json_generator = json_generator
         self.recoverer_agent = recoverer_agent
@@ -76,11 +76,62 @@ class PaperAdder:
         prompt = build_expert_search_reasoning_prompt(sota_md, thesis_desc, thesis_thoughts, expert_context)
         expert_searches = self.json_generator.generate_json(prompt, expert_search_reasoning_model)
         
-        # Synthesize search queries
-        all_queries = [getattr(expert_searches, name).what_to_search for name in expert_names]
+        # Prepare detailed expert reasoning and hierarchical queries
+        expert_reasoning_data = []
+        all_foundational_queries = []
+        all_established_queries = []
+        all_specialized_queries = []
+        
+        for name in expert_names:
+            expert_data = getattr(expert_searches, name)
+            all_foundational_queries.append(expert_data.foundational_search)
+            all_established_queries.append(expert_data.established_methods_search)
+            all_specialized_queries.append(expert_data.specialized_search)
+            
+            expert_reasoning_data.append({
+                "expert": name,
+                "gap_analysis": expert_data.gap_analysis,
+                "reasoning": expert_data.reasoning,
+                "foundational_search": expert_data.foundational_search,
+                "established_methods_search": expert_data.established_methods_search,
+                "specialized_search": expert_data.specialized_search,
+                "expected_impact": expert_data.expected_impact
+            })
+            
+        # Consolidate all queries from different depths for synthesis
+        all_queries = all_foundational_queries + all_established_queries + all_specialized_queries
+            
+        # Log detailed reasoning from each expert
+        print(f"\n==== Expert Search Reasoning Summary ====")
+        for data in expert_reasoning_data:
+            print(f"\nExpert: {data['expert']}")
+            print(f"Gap Analysis: {data['gap_analysis']}")
+            print(f"Foundational Search: {data['foundational_search']}")
+            print(f"Established Methods Search: {data['established_methods_search']}")
+            print(f"Specialized Search: {data['specialized_search']}")
+        print("\n=========================================\n")
+        
+        # Synthesize search queries with hierarchical approach
         synthesis_prompt = build_search_query_synthesis_prompt(all_queries)
         summary_query_model = self.json_generator.generate_json(synthesis_prompt, StringResponseModel)
         summary_query = summary_query_model.response
+        
+        print(f"\n==== Hierarchical Research Strategy ====")
+        print("FOUNDATIONAL KNOWLEDGE:")
+        for query in all_foundational_queries:
+            print(f"- {query}")
+        
+        print("\nESTABLISHED METHODS:")
+        for query in all_established_queries:
+            print(f"- {query}")
+        
+        print("\nSPECIALIZED TECHNIQUES:")
+        for query in all_specialized_queries:
+            print(f"- {query}")
+        
+        print("\nSYNTHESIZED RESEARCH TARGET:")
+        print(summary_query)
+        print("=======================================\n")
         # Recover new documents
         new_docs = self.recoverer_agent.recover_docs(summary_query, self.k)
 
