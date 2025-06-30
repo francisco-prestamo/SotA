@@ -400,7 +400,9 @@ class GraphRag:
             summary = f"Entities: {entity_descs}. Relationships: {rel_descs}"
             summary = summary[:8000] + ("..." if len(summary) > 8000 else "")
 
-        return CommunityReport(summary=summary, key_entities=key_entities, key_relationships=key_relationships)
+        embedding = self.text_embedder.embed(summary)
+
+        return CommunityReport(summary=summary, key_entities=key_entities, key_relationships=key_relationships,embedding=embedding)
 
     def summary_descriptions(self, descriptions: List[str]) -> str:
         """
