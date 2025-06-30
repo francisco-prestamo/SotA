@@ -62,7 +62,7 @@ class GraphRag:
 
         from tqdm import tqdm
         all_text_units = []
-        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
             future_to_doc = {executor.submit(process_document, doc): doc for doc in documents}
             for future in tqdm(concurrent.futures.as_completed(future_to_doc), total=len(documents), desc="Processing documents"):
                 text_units = future.result()
