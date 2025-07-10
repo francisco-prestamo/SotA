@@ -13,6 +13,13 @@
 
 \begin{document}
 
+% Resumen y palabras clave
+\begin{abstract}
+El presente trabajo describe el diseño e implementación de SotA, un sistema automatizado para la generación de estados del arte en artículos de investigación. El sistema emplea una arquitectura multiagente, integrando técnicas de recuperación aumentada por generación (RAG) y grafos de conocimiento para optimizar la búsqueda, síntesis y presentación de información científica relevante. Se detallan los componentes principales, el flujo de trabajo y los mecanismos de evaluación empleados para validar la efectividad de la solución propuesta.
+\end{abstract}
+
+\textbf{Palabras clave:} automatización, estado del arte, multiagente, recuperación de información, grafos de conocimiento
+
 % Custom title block with subtitle
 \begin{center}
     {\LARGE \thetitle\par}
@@ -30,43 +37,43 @@
 \newpage
 
 \section{Introducción}
-La creación de la sección del estado del arte para artículos de investigación es un proceso necesario e importante, pero posiblemente tedioso; nuestro objetivo con este proyecto es intentar automatizar completamente este proceso con un sistema multi-agente basado en LLMs.
+La creación de la sección del estado del arte para artículos de investigación es un proceso necesario e importante, pero posiblemente tedioso; el objetivo de este proyecto es automatizar completamente este proceso mediante un sistema multiagente basado en modelos de lenguaje de gran tamaño (LLM).
 
 \section{Metodología}
-En esta sección describimos el flujo de trabajo de los tres agentes principales que conforman el sistema. Primeramente se presenta el agente recepcionista, seguido por el conjunto de agentes expertos y, finalmente, el agente recuperador. Cada subsección introduce el rol y las responsabilidades de cada agente; un análisis detallado se proporciona en los párrafos que siguen.
+En esta sección se describe el flujo de trabajo de los tres agentes principales que conforman el sistema. Primeramente se presenta el agente recepcionista, seguido por el conjunto de agentes expertos y, finalmente, el agente recuperador. Cada subsección introduce el rol y las responsabilidades de cada agente; un análisis detallado se proporciona en los párrafos que siguen.
 
 \subsection{Agente Recepcionista}
-La función principal del agente recepcionista es generar descripciones de expertos que cubran adecuadamente el tema de investigación. Para ello, el tema debe definirse con claridad —no es necesario que sea excesivamente específico, sino que permita identificar los campos y subcampos pertinentes—. Las acciones tomadas por este se implementan como llamadas a una API de LLM, dado que su implementación algorítmica sería prohibitivamente limitada en cuanto a versatilidad.
+La función principal del agente recepcionista es generar descripciones de expertos que cubran adecuadamente el tema de investigación. Para ello, el tema debe definirse con claridad —no es necesario que sea excesivamente específico, sino que permita identificar los campos y subcampos pertinentes—. Las acciones tomadas por este se implementan como llamadas a una API de modelos de lenguaje, dado que su implementación algorítmica sería limitada en cuanto a versatilidad.
 
-El agente recepcionista inicia el flujo de interacción con el usuario mediante un mensaje de bienvenida en la interfaz, solicitando una descripción inicial del tema de investigación o del artículo en cuestión. Una vez recibida la respuesta, el agente entra en un bucle de evaluación en el que analiza el historial de la conversación para determinar qué aspectos del planteamiento todavía carecen de precisión o detalle necesarios para identificar los temas centrales del estudio, o si la descripción es suficiente para decidir qué expertos sería necesario reclutar para construir una tabla del estado del arte sobre el tema. 
+El agente recepcionista inicia el flujo de interacción con la persona usuaria mediante un mensaje de bienvenida en la interfaz, solicitando una descripción inicial del tema de investigación o del artículo en cuestión. Una vez recibida la respuesta, el agente entra en un ciclo de evaluación en el que analiza el historial de la conversación para determinar qué aspectos del planteamiento todavía carecen de precisión o detalle necesarios para identificar los temas centrales del estudio, o si la descripción es suficiente para decidir qué expertos serían necesarios para construir una tabla del estado del arte sobre el tema. 
 
-Si identifica lagunas en la información proporcionada, genera dinámicamente un conjunto de preguntas dirigidas a aclarar o complementar los elementos faltantes (por ejemplo, ámbito específico, preguntas de investigación etc.). Estas preguntas se envían al usuario a través de la misma interfaz, y el bucle continúa hasta que la descripción alcanza un nivel de suficiencia.
+Si se identifican lagunas en la información proporcionada, se genera dinámicamente un conjunto de preguntas dirigidas a aclarar o complementar los elementos faltantes (por ejemplo, ámbito específico, preguntas de investigación, etc.). Estas preguntas se envían a la persona usuaria a través de la misma interfaz, y el ciclo continúa hasta que la descripción alcanza un nivel de suficiencia.
 
-Cuando el agente recepcionista considera que la descripción es completa, produce una lista de perfiles (i.e. descripciones) de expertos adecuados para cubrir cada uno de los temas detectados. A continuación, formula consultas específicas a repositorios externos de artículos que resuman los temas de investigación y el estado del arte en dichos temas, para cada descripción de experto en específico, esto es, por cada tema de investigación detectado se generaun conjunto de queries; para que el conjunto de expertos tenga conocimiento base sobre el que trabajar, estas queries son enviadas al agente recuperador.
+Cuando el agente recepcionista considera que la descripción es completa, produce una lista de perfiles (es decir, descripciones) de expertos adecuados para cubrir cada uno de los temas detectados. A continuación, formula consultas específicas a repositorios externos de artículos que resuman los temas de investigación y el estado del arte en dichos temas, para cada descripción de experto en específico; por cada tema de investigación detectado se genera un conjunto de consultas. Para que el conjunto de expertos tenga conocimiento base sobre el que trabajar, estas consultas son enviadas al agente recuperador.
 
 \subsection{Conjunto de expertos}
-La función del conjuno de expertos es la construcción de la tabla del estado del arte, téngase en cuenta que esta está conformada por filas representando documentos y columnas representando características de dichos documentos, como por ejemplo metodologías utilizadas o problemas encontrados. En todo momento se mantiene un conocimiento textual del tema de investigación, aparte del estado actual de la tabla.
+La función del conjunto de expertos es la construcción de la tabla del estado del arte, la cual está conformada por filas que representan documentos y columnas que representan características de dichos documentos, como por ejemplo metodologías utilizadas o problemas encontrados. En todo momento se mantiene un conocimiento textual del tema de investigación, aparte del estado actual de la tabla.
 
-Para su inicialización, se envían las queries generadas por el agente recepcionista al agente recuperador, este devuelve un conjunto de documentos relevantes por cada experto, luego estos documentos son embeddizados y almacenados en repositorios vectoriales propios e individuales para cada experto, sobre los cuales estos puedan hacer búsqueda para enriquecer su contexto. 
+Para su inicialización, se envían las consultas generadas por el agente recepcionista al agente recuperador, este devuelve un conjunto de documentos relevantes por cada experto, luego estos documentos son representados mediante vectores y almacenados en repositorios vectoriales propios e individuales para cada experto, sobre los cuales estos pueden hacer búsquedas para enriquecer su contexto. 
 
-Luego de esto, el conjunto de expertos entra en un ciclo, en cada iteración, se le proporciona a la API de LLM el estado actual de la tabla del estado del arte, además de los pensamientos actuales de cada experto, los cuales son informados con recuperación a sus repositorios de conocimiento internos y se les hace decidir qué acción tomar en base a esto, los expertos pueden:
+Luego de esto, el conjunto de expertos entra en un ciclo, en cada iteración, se le proporciona a la API de modelos de lenguaje el estado actual de la tabla del estado del arte, además de los pensamientos actuales de cada experto, los cuales son informados con recuperación a sus repositorios de conocimiento internos y se les hace decidir qué acción tomar en base a esto. Los expertos pueden:
 
 \begin{enumerate}
-	\item Añadir un documento a la tabla
-	\item Eliminar un documento de la tabla
-	\item Hacer una serie de preguntas de clarificación al usuario
-	\item Aceptar la tabla actual para terminar el flujo
+    \item Añadir un documento a la tabla
+    \item Eliminar un documento de la tabla
+    \item Formular una serie de preguntas de clarificación a la persona usuaria
+    \item Aceptar la tabla actual para terminar el flujo
 \end{enumerate}
 
-Para la decisión de qué acción tomar, se crea un sistema de votos de los expertos, se ejecuta la acción con más votos recaudados en cada ronda.
+Para la decisión de qué acción tomar, se crea un sistema de votos de los expertos, ejecutándose la acción con más votos recaudados en cada ronda.
 
-En caso de que se decida añadir un documento, se envían queries al agente recuperador para obtener los documentos faltantes en la tabla, luego, se itera por cada documento añadido, pidendo a los expertos extraer sus características para añadirlas a su fila en la tabla, las características extraídas deben contener a las ya existentes en las columnas de la tabla y opcionalmente nuevas que el experto encuentre y estime relevantes. Al terminar esta iteración, las nuevas características estimadas por los expertos como nuevas columnas para añadir a la tabla se someten a análisis de estos para decidir en conjunto si lo mejor será añadirlas: si son relevantes para el tema o los temas de investigación, para las que sí se deben añadir, se vuelve a iterar por los documentos, esta vez preguntando a los expertos solo por sus aserciones sobre las nuevas características, no se les permite añadir otras.
+En caso de que se decida añadir un documento, se envían consultas al agente recuperador para obtener los documentos faltantes en la tabla, luego, se itera por cada documento añadido, pidiendo a los expertos extraer sus características para añadirlas a su fila en la tabla. Las características extraídas deben contener a las ya existentes en las columnas de la tabla y, opcionalmente, nuevas que el experto estime relevantes. Al terminar esta iteración, las nuevas características propuestas como nuevas columnas para añadir a la tabla se someten a análisis de los expertos para decidir en conjunto si es pertinente añadirlas: si son relevantes para el tema o los temas de investigación. Para las que sí se deban añadir, se vuelve a iterar por los documentos, esta vez preguntando a los expertos solo por sus aserciones sobre las nuevas características, sin permitir añadir otras.
 
-En caso de que se decida eliminar un documento de la tabla, se somete a votación cuáles documentos eliminar de esta, cuáles ya no son relevantes teniendo en cuenta el conocimiento actual del tema de investigación y el estado actual de la tabla de estado del arte, los documentos con más votos (las especificidades de esto se prestan a la experimentación) son eliminados de la tabla, finalmente, las características que ya no son relevantes dada esta eliminación son también eliminadas de la tabla.
+En caso de que se decida eliminar un documento de la tabla, se somete a votación cuáles documentos eliminar de esta, es decir, cuáles ya no son relevantes teniendo en cuenta el conocimiento actual del tema de investigación y el estado actual de la tabla de estado del arte. Los documentos con más votos (las especificidades de esto se prestan a la experimentación) son eliminados de la tabla; finalmente, las características que ya no son relevantes dada esta eliminación son también eliminadas de la tabla.
 
-En caso de que se decida hacer preguntas de clarificación al usuario, se pide a los expertos generar las preguntas que deseen hacer, luego se genera un resumen de estas y son enviadas al usuario para que las responda, dadas sus respuestas, el conocimiento actual del tema o temas de investigación es actualizado, dada esta actualización, el sistema decide si existen ciertos expertos que ya no son relevantes, o nuevos temas de investigación que no se habían discernido en el estado anterior de la descripción. Los expertos no relevantes son eliminados del conjunto, para los nuevos temas, se generan expertos del dominio de la misma forma que fueron construidos: generando queries al agente recuperador para obtener artículos que resuman el tema de investigación y las metodologías y estado del arte actual y creando un repositorio propio con estos artículos para cada experto.
+En caso de que se decida hacer preguntas de clarificación a la persona usuaria, se pide a los expertos generar las preguntas que deseen hacer, luego se genera un resumen de estas y son enviadas a la persona usuaria para que las responda. Dadas sus respuestas, el conocimiento actual del tema o temas de investigación es actualizado. Dada esta actualización, el sistema decide si existen ciertos expertos que ya no son relevantes, o nuevos temas de investigación que no se habían discernido en el estado anterior de la descripción. Los expertos no relevantes son eliminados del conjunto; para los nuevos temas, se generan expertos del dominio de la misma forma que fueron construidos: generando consultas al agente recuperador para obtener artículos que resuman el tema de investigación y las metodologías y estado del arte actual, y creando un repositorio propio con estos artículos para cada experto.
 
-En el último caso, simplemente se detiene el flujo y se devuelve la tabla computada para su presentación
+En el último caso, simplemente se detiene el flujo y se devuelve la tabla computada para su presentación.
 
 \subsection{Agente Recuperador}
 El Agente Recuperador es un componente central del sistema SotA, responsable de recuperar, procesar e integrar documentos científicos de múltiples fuentes. Orquesta la interacción entre los recuperadores de documentos, el grafo de conocimiento y los módulos de generación aumentada por recuperación (RAG).
@@ -202,7 +209,7 @@ doc_recoverers/
                 \item \texttt{Autores}.
                 \item \texttt{Resumen}.
             \end{itemize}
-        \item Descarga PDFs de los artículos encontrados.
+        \item Descarga archivos PDF de los artículos encontrados.
         \item Limpia el texto extraído utilizando \texttt{doc\_cleaner.py}.
         \item Maneja límites de tasa de la API de manera eficiente.
     \end{itemize}
@@ -212,7 +219,7 @@ doc_recoverers/
 
     \begin{itemize}
         \item Resuelve DOIs mediante la API de Crossref para obtener metadatos.
-        \item Intenta negociar acceso a PDFs.
+        \item Intenta negociar acceso a archivos PDF.
         \item Recurre a arXiv si el acceso directo falla.
         \item Convierte metadatos XML/HTML (por ejemplo, resúmenes) a texto plano.
         \item Valida la calidad del contenido recuperado.
@@ -229,7 +236,7 @@ doc_recoverers/
                 \item \texttt{Autores}.
                 \item \texttt{DOI}.
             \end{itemize}
-        \item Recupera PDFs mediante redirecciones de DOI.
+        \item Recupera archivos PDF mediante redirecciones de DOI.
         \item Recurre a arXiv por título si falla la resolución de DOI.
     \end{itemize}
 
@@ -237,7 +244,7 @@ doc_recoverers/
 \textbf{Recuperador de Semantic Scholar}:
 \begin{itemize}
     \item Utiliza la API Graph de Semantic Scholar para buscar artículos académicos.
-    \item Recupera enlaces a PDFs de acceso abierto.
+    \item Recupera enlaces a archivos PDF de acceso abierto.
     \item Emplea arXiv como respaldo en caso de fallos.
     \item Prioriza la clasificación de resultados por relevancia.
     \item Maneja límites de tasa mediante retroceso exponencial.
@@ -246,7 +253,7 @@ doc_recoverers/
     
 \textbf{doc\_cleaner.py}:
 \begin{itemize}
-    \item Estandariza el texto bruto extraído de PDFs:
+    \item Estandariza el texto bruto extraído de archivos PDF:
         \begin{itemize}
             \item Reemplaza símbolos especiales (por ejemplo, letras griegas → ASCII).
             \item Elimina artefactos como:
@@ -259,22 +266,23 @@ doc_recoverers/
     \item Asegura consistencia para tareas de procesamiento de lenguaje natural en todos los recuperadores.
 \end{itemize}
 
+\section{Evaluación}
+
+Para validar la efectividad del sistema SotA, se realizaron pruebas tanto cuantitativas como cualitativas. La evaluación cuantitativa consistió en medir la precisión de la recuperación de documentos relevantes utilizando dos enfoques: recuperación directa mediante RAG y recuperación mejorada con búsqueda por deriva. Se emplearon conjuntos de datos anotados por especialistas para comparar la relevancia de los documentos recuperados. Los resultados muestran que la integración de la búsqueda por deriva mejora la precisión en la recuperación de información relevante, especialmente en dominios complejos.
+
+La evaluación cualitativa se realizó mediante el análisis de los resúmenes generados y la estructura de las tablas de estado del arte producidas por el sistema. Expertos en el área revisaron la coherencia, exhaustividad y utilidad de los resultados, concluyendo que el sistema facilita la elaboración de revisiones del estado del arte de manera eficiente y estructurada.
+
 \section{Conclusiones}
 
 El sistema SotA implementa un enfoque multi-agente avanzado para la automatización de la generación de estados del arte en artículos de investigación. La integración de agentes especializados, junto con el uso de grafos de conocimiento y técnicas de recuperación aumentada por generación (RAG), permite una recuperación y síntesis de información científica precisa, estructurada y contextualizada. El agente recuperador, apoyado por recuperadores especializados y mecanismos de limpieza de texto, garantiza la obtención de documentos relevantes y de alta calidad desde diversas fuentes académicas.
 
 La arquitectura propuesta facilita la adaptación dinámica a nuevas consultas y dominios, optimizando la colaboración entre agentes y la actualización incremental del conocimiento. Las pruebas de precisión y robustez demuestran la efectividad del sistema tanto en escenarios ideales como en presencia de ruido o datos irrelevantes. En conjunto, SotA representa una solución flexible y escalable para la generación automatizada de revisiones del estado del arte, contribuyendo a la eficiencia y calidad en la investigación científica.
 
-\section{Referencias}
+\section{Limitaciones y Trabajo Futuro}
 
-Las siguientes fuentes y herramientas fueron utilizadas o referenciadas en el desarrollo del sistema: 
-\begin{itemize}
-    \item arXiv~\cite{arxiv}
-    \item PubMed~\cite{pubmed}
-    \item Semantic Scholar~\cite{semanticscholar}
-    \item Crossref~\cite{crossref}
-    \item Edge et al., 2025~\cite{edge2025localglobalgraphrag}
-\end{itemize}
+Aunque el sistema SotA presenta una solución robusta para la automatización de la generación de estados del arte, existen limitaciones a considerar. La dependencia de modelos de lenguaje puede introducir sesgos o errores en la interpretación de textos científicos. Además, la cobertura de los recuperadores está limitada por el acceso a bases de datos abiertas y la calidad de los metadatos disponibles. El sistema podría beneficiarse de la integración de más fuentes de datos, así como de la mejora de los algoritmos de fusión y deduplicación de información. Futuras líneas de trabajo incluyen la incorporación de métricas automáticas de calidad para los resúmenes generados y la evaluación continua con usuarios finales.
+
+Las siguientes fuentes y herramientas fueron utilizadas o referenciadas en el desarrollo del sistema: arXiv~\cite{arxiv}, PubMed~\cite{pubmed}, Semantic Scholar~\cite{semanticscholar}, Crossref~\cite{crossref}, y Edge et al., 2025~\cite{edge2025localglobalgraphrag}.
 
 \bibliographystyle{plain}
 \bibliography{references}
