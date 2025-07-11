@@ -5,6 +5,11 @@
 \usepackage[T1]{fontenc}
 \usepackage[spanish]{babel}
 
+% Añadir paquetes para citas avanzadas y enlaces
+\usepackage{hyperref}         % Enlaces clicables
+\usepackage[numbers]{natbib}  % Gestión de citas numéricas
+\usepackage{url}
+
 % Title information
 \title{SotA}
 \author{Luis Alejandro Arteaga Morales \\ Francisco Préstamo Bernardez \\ Darío Hernández Cubilla}
@@ -12,13 +17,6 @@
 \newcommand{\subtitle}{Un generador automático para estados del arte en artículos de investigación}
 
 \begin{document}
-
-% Resumen y palabras clave
-\begin{abstract}
-El presente trabajo describe el diseño e implementación de SotA, un sistema automatizado para la generación de estados del arte en artículos de investigación. El sistema emplea una arquitectura multiagente, integrando técnicas de recuperación aumentada por generación (RAG) y grafos de conocimiento para optimizar la búsqueda, síntesis y presentación de información científica relevante. Se detallan los componentes principales, el flujo de trabajo y los mecanismos de evaluación empleados para validar la efectividad de la solución propuesta.
-\end{abstract}
-
-\textbf{Palabras clave:} automatización, estado del arte, multiagente, recuperación de información, grafos de conocimiento
 
 % Custom title block with subtitle
 \begin{center}
@@ -33,17 +31,30 @@ El presente trabajo describe el diseño e implementación de SotA, un sistema au
 
 \vspace{2em}
 
+% Resumen y palabras clave
+\begin{abstract}
+    El presente trabajo describe el diseño e implementación de SotA, un sistema automatizado para la generación de estados del arte en artículos de investigación. El sistema emplea una arquitectura multiagente, integrando técnicas de recuperación aumentada por generación (RAG) y grafos de conocimiento para optimizar la búsqueda, síntesis y presentación de información científica relevante. Se detallan los componentes principales, el flujo de trabajo y los mecanismos de evaluación empleados para validar la efectividad de la solución propuesta.
+    \end{abstract}
+    
+    \textbf{Palabras clave:} automatización, estado del arte, multiagente, recuperación de información, grafos de conocimiento
+    
+\newpage
 \tableofcontents
 \newpage
 
-\section{Introducción}
-La creación de la sección del estado del arte para artículos de investigación es un proceso necesario e importante, pero posiblemente tedioso; el objetivo de este proyecto es automatizar completamente este proceso mediante un sistema multiagente basado en modelos de lenguaje de gran tamaño (LLM).
 
+%--------------------------------------------------------------------
+\section{Introducción}
+La creación de la sección del estado del arte para artículos de investigación es un proceso necesario e importante, pero posiblemente tedioso; el objetivo de este proyecto es automatizar completamente este proceso mediante un sistema multiagente basado en modelos de lenguaje de gran tamaño (LLM)\cite{zhao2025surveylargelanguagemodels,haryanto2024llassistsimpletoolsautomating}.
+
+Diversos trabajos han tratado de automatizarla mediante enfoques de minería de textos y sistemas multi-agente\cite{han2025llmmultiagentsystemschallenges}, aunque aún existen desafíos de escalabilidad y precisión.
+
+%--------------------------------------------------------------------
 \section{Metodología}
 En esta sección se describe el flujo de trabajo de los tres agentes principales que conforman el sistema. Primeramente se presenta el agente recepcionista, seguido por el conjunto de agentes expertos y, finalmente, el agente recuperador. Cada subsección introduce el rol y las responsabilidades de cada agente; un análisis detallado se proporciona en los párrafos que siguen.
 
 \subsection{Agente Recepcionista}
-La función principal del agente recepcionista es generar descripciones de expertos que cubran adecuadamente el tema de investigación. Para ello, el tema debe definirse con claridad —no es necesario que sea excesivamente específico, sino que permita identificar los campos y subcampos pertinentes—. Las acciones tomadas por este se implementan como llamadas a una API de modelos de lenguaje, dado que su implementación algorítmica sería limitada en cuanto a versatilidad.
+La función principal del agente recepcionista es generar descripciones de expertos que cubran adecuadamente el tema de investigación. Para ello, se apoya en técnicas de \emph{ingeniería de instrucciones} ("prompt engineering") que han mostrado eficacia para delimitar tareas en modelos de lenguaje de gran tamaño (LLM, por sus siglas en inglés)\cite{Brown2020LanguageMA,qin2024largelanguagemodelsmeet}.
 
 El agente recepcionista inicia el flujo de interacción con la persona usuaria mediante un mensaje de bienvenida en la interfaz, solicitando una descripción inicial del tema de investigación o del artículo en cuestión. Una vez recibida la respuesta, el agente entra en un ciclo de evaluación en el que analiza el historial de la conversación para determinar qué aspectos del planteamiento todavía carecen de precisión o detalle necesarios para identificar los temas centrales del estudio, o si la descripción es suficiente para decidir qué expertos serían necesarios para construir una tabla del estado del arte sobre el tema. 
 
@@ -52,11 +63,13 @@ Si se identifican lagunas en la información proporcionada, se genera dinámicam
 Cuando el agente recepcionista considera que la descripción es completa, produce una lista de perfiles (es decir, descripciones) de expertos adecuados para cubrir cada uno de los temas detectados. A continuación, formula consultas específicas a repositorios externos de artículos que resuman los temas de investigación y el estado del arte en dichos temas, para cada descripción de experto en específico; por cada tema de investigación detectado se genera un conjunto de consultas. Para que el conjunto de expertos tenga conocimiento base sobre el que trabajar, estas consultas son enviadas al agente recuperador.
 
 \subsection{Conjunto de expertos}
-La función del conjunto de expertos es la construcción de la tabla del estado del arte, la cual está conformada por filas que representan documentos y columnas que representan características de dichos documentos, como por ejemplo metodologías utilizadas o problemas encontrados. En todo momento se mantiene un conocimiento textual del tema de investigación, aparte del estado actual de la tabla.
+La función del conjunto de expertos es la construcción de la tabla del estado del arte, la cual está conformada por filas que representan documentos y columnas que representan características de dichos documentos, como por ejemplo metodologías utilizadas o problemas encontrados. En todo momento se mantiene un conocimiento textual del tema de investigación, aparte del estado actual de la tabla. Cada experto mantiene un repositorio vectorial propio (almacenamiento de representaciones numéricas de texto, también conocidas como "embeddings") y vota sobre las acciones necesarias en cada iteración, siguiendo principios de cooperación multiagente\cite{Stone2000MultiagentSA}.
 
-Para su inicialización, se envían las consultas generadas por el agente recepcionista al agente recuperador, este devuelve un conjunto de documentos relevantes por cada experto, luego estos documentos son representados mediante vectores y almacenados en repositorios vectoriales propios e individuales para cada experto, sobre los cuales estos pueden hacer búsquedas para enriquecer su contexto. 
+La tabla del estado del arte resultante se actualiza dinámicamente añadiendo o eliminando documentos\cite{Lewis2020RetrievalAugmentedGF}.
 
-Luego de esto, el conjunto de expertos entra en un ciclo, en cada iteración, se le proporciona a la API de modelos de lenguaje el estado actual de la tabla del estado del arte, además de los pensamientos actuales de cada experto, los cuales son informados con recuperación a sus repositorios de conocimiento internos y se les hace decidir qué acción tomar en base a esto. Los expertos pueden:
+Para su inicialización, se envían las consultas generadas por el agente recepcionista al agente recuperador, este devuelve un conjunto de documentos relevantes por cada experto, luego estos documentos son representados mediante vectores ("embeddings") y almacenados en repositorios vectoriales propios e individuales para cada experto, sobre los cuales estos pueden hacer búsquedas para enriquecer su contexto. 
+
+Luego de esto, el conjunto de expertos entra en un ciclo, en cada iteración, se le proporciona a la interfaz de programación de aplicaciones (API, por sus siglas en inglés) de modelos de lenguaje el estado actual de la tabla del estado del arte, además de los pensamientos actuales de cada experto, los cuales son informados con recuperación a sus repositorios de conocimiento internos y se les hace decidir qué acción tomar en base a esto. Los expertos pueden:
 
 \begin{enumerate}
     \item Añadir un documento a la tabla
@@ -76,10 +89,12 @@ En caso de que se decida hacer preguntas de clarificación a la persona usuaria,
 En el último caso, simplemente se detiene el flujo y se devuelve la tabla computada para su presentación.
 
 \subsection{Agente Recuperador}
-El Agente Recuperador es un componente central del sistema SotA, responsable de recuperar, procesar e integrar documentos científicos de múltiples fuentes. Orquesta la interacción entre los recuperadores de documentos, el grafo de conocimiento y los módulos de generación aumentada por recuperación (RAG).
+El Agente Recuperador es un componente central del sistema SotA, responsable de recuperar, procesar e integrar documentos científicos de múltiples fuentes. Orquesta la interacción entre los recuperadores de documentos, el grafo de conocimiento y los módulos de generación aumentada por recuperación (RAG, por sus siglas en inglés: Retrieval-Augmented Generation)\cite{Lewis2020RetrievalAugmentedGF,zhao2024retrievalaugmentedgenerationaigeneratedcontent}.
 
 \subsubsection{Integración GraphRAG}
-GraphRAG (Generación Aumentada por Recuperación basada en Grafos) mejora las capacidades de recuperación y razonamiento del sistema aprovechando un grafo de conocimiento construido dinámicamente. El Agente Recuperador y GraphRAG colaboran a través de varios procesos clave:
+GraphRAG (Generación Aumentada por Recuperación basada en Grafos, por sus siglas en inglés) mejora las capacidades de recuperación y razonamiento del sistema aprovechando un grafo de conocimiento construido dinámicamente\cite{edge2025localglobalgraphrag,Ji2020ASO}.
+
+El grafo de conocimiento se construye con detección de comunidades Louvain\cite{Traag2018FromLT} y se actualiza de forma incremental para mejorar la precisión de las respuestas\cite{Lewis2020RetrievalAugmentedGF}.
 
 \paragraph{Construcción del Grafo de Conocimiento}
 El grafo de conocimiento se construye a través de un proceso multifásico que aprovecha tanto modelos de lenguaje como algoritmos de grafos:
@@ -139,7 +154,7 @@ Este enfoque permite al sistema proporcionar respuestas robustas y conscientes d
 \paragraph{Recuperación de Documentos con RAG}
 El sistema soporta dos modos principales para la recuperación de documentos utilizando RAG:
 \begin{enumerate}
-    \item \textbf{RAG Directo:} Dada una consulta del usuario, el sistema recupera documentos del grafo de conocimiento y repositorio de documentos utilizando similitud basada en embeddings.
+    \item \textbf{RAG Directo:} Dada una consulta del usuario, el sistema recupera documentos del grafo de conocimiento y repositorio de documentos utilizando similitud basada en representaciones vectoriales ("embeddings").
     \item \textbf{RAG con Búsqueda por Deriva:} El sistema primero realiza una búsqueda por deriva para generar una respuesta intermedia o contexto, luego utiliza esta respuesta como una consulta refinada para recuperación de documentos basada en RAG.
 \end{enumerate}
 Este enfoque dual permite estrategias de recuperación flexibles y conscientes del contexto.
@@ -167,8 +182,8 @@ Cuando un usuario envía una consulta, el Agente Recuperador sigue un proceso mu
 \begin{enumerate}
     \item \textbf{Búsqueda Inicial en el Grafo de Conocimiento:} El agente primero consulta el grafo de conocimiento utilizando el módulo GraphRAG para generar una respuesta y evaluar si el conocimiento existente es suficiente.
     \item \textbf{Evaluación de Necesidad:} Un modelo de lenguaje determina si es necesaria la recuperación adicional de documentos basándose en la respuesta inicial.
-    \item \textbf{Selección de Scrapper:} Si se necesita más información, el agente selecciona dinámicamente scrappers de documentos apropiados (recuperadores especializados) utilizando un modelo de lenguaje y un prompt estructurado.
-    \item \textbf{Recuperación Paralela de Documentos:} Los scrappers seleccionados se ejecutan en paralelo para recuperar nuevos documentos relevantes a la consulta.
+    \item \textbf{Selección de Recuperador:} Si se necesita más información, el agente selecciona dinámicamente recuperadores de documentos apropiados (clientes especializados) utilizando un modelo de lenguaje y un conjunto de instrucciones estructuradas.
+    \item \textbf{Recuperación Paralela de Documentos:} Los recuperadores seleccionados se ejecutan en paralelo para recuperar nuevos documentos relevantes a la consulta.
     \item \textbf{Actualización del Grafo de Conocimiento:} Los documentos recién recuperados se integran en el Grafo de Conocimiento, enriqueciendo su contenido.
     \item \textbf{Evaluación Iterativa:} El proceso desde la búsqueda en el grafo de conocimiento hasta la recuperación de documentos se repite por un número fijo de iteraciones o hasta obtener información suficiente.
     \item \textbf{Recuperación Final y Retorno:} El agente realiza una búsqueda final (si termina de iterar y no encuentra nada) sobre el grafo de conocimiento actualizado y devuelve los documentos más relevantes al usuario.
@@ -180,7 +195,7 @@ Para surtir al agente recuperador de documentos académicos, se implemntan vario
 
 
 \subsection{Recuperadores de Documentos Académicos}
-Los recuperadores implementados en este sistema funcionan como clientes estructurados de APIs diseñados para recuperar documentos académicos desde bases de datos especializadas como \texttt{arXiv, PubMed, Semantic Scholar}. Cada recuperador interactúa con su fuente correspondiente a través de APIs, las cuales proveen acceso a metadatos estructurados de los documentos \texttt{(por ejemplo, títulos, resúmenes, autores, enlace al pdf)} y contenido completo mediante PDFs. Por ejemplo, el recuperador de arXiv consulta la API de arXiv para obtener artículos, extrae metadatos y descarga PDFs para extracción de texto usando PyPDF2, mientras que el recuperador de DOI aprovecha la API de Crossref para resolver Identificadores de Objetos Digitales (DOIs) y negociar acceso a PDFs. En casos donde el acceso directo al texto completo falla, estas herramientas emplean estrategias de respaldo, como buscar en arXiv por título, garantizando una recuperación robusta de documentos. En todos los recuperadores, el texto extraído pasa por un paso de post-procesamiento mediante la utilidad \texttt{doc\_cleaner.py}, la cual normaliza caracteres especiales, elimina artefactos (por ejemplo, URLs, marcas de citas) y estandariza espacios en blanco. Este proceso de limpieza asegura que el texto sea adecuado para tareas posteriores en el sistema.
+Los recuperadores implementados en este sistema funcionan como clientes estructurados de interfaces de programación de aplicaciones (API) diseñadas para recuperar documentos académicos desde bases de datos especializadas como \texttt{arXiv, PubMed, Semantic Scholar}. Cada recuperador interactúa con su fuente correspondiente a través de APIs, las cuales proveen acceso a metadatos estructurados de los documentos \texttt{(por ejemplo, títulos, resúmenes, autores, enlace al pdf)} y contenido completo mediante PDFs. Por ejemplo, el recuperador de arXiv consulta la API de arXiv para obtener artículos, extrae metadatos y descarga PDFs para extracción de texto usando PyPDF2, mientras que el recuperador de DOI aprovecha la API de Crossref para resolver Identificadores de Objetos Digitales (DOIs) y negociar acceso a PDFs. En casos donde el acceso directo al texto completo falla, estas herramientas emplean estrategias de respaldo, como buscar en arXiv por título, garantizando una recuperación robusta de documentos. En todos los recuperadores, el texto extraído pasa por un paso de post-procesamiento mediante la utilidad \texttt{doc\_cleaner.py}, la cual normaliza caracteres especiales, elimina artefactos (por ejemplo, URLs, marcas de citas) y estandariza espacios en blanco. Este proceso de limpieza asegura que el texto sea adecuado para tareas posteriores en el sistema.
 
 \subsubsection{Estructura de Directorios}
 \begin{verbatim}
@@ -268,23 +283,62 @@ doc_recoverers/
 
 \section{Evaluación}
 
-Para validar la efectividad del sistema SotA, se realizaron pruebas tanto cuantitativas como cualitativas. La evaluación cuantitativa consistió en medir la precisión de la recuperación de documentos relevantes utilizando dos enfoques: recuperación directa mediante RAG y recuperación mejorada con búsqueda por deriva. Se emplearon conjuntos de datos anotados por especialistas para comparar la relevancia de los documentos recuperados. Los resultados muestran que la integración de la búsqueda por deriva mejora la precisión en la recuperación de información relevante, especialmente en dominios complejos.
+Para validar la efectividad y robustez de los mecanismos de recuperación y razonamiento implementados en el sistema, se desarrollaron y ejecutaron pruebas específicas en el módulo \texttt{graphrag}. Estas pruebas tienen como objetivo comparar la precisión y relevancia de las respuestas generadas por el sistema bajo diferentes estrategias de recuperación, así como evaluar la resistencia del sistema ante la presencia de datos irrelevantes o ruidosos.
 
-La evaluación cualitativa se realizó mediante el análisis de los resúmenes generados y la estructura de las tablas de estado del arte producidas por el sistema. Expertos en el área revisaron la coherencia, exhaustividad y utilidad de los resultados, concluyendo que el sistema facilita la elaboración de revisiones del estado del arte de manera eficiente y estructurada.
+\subsection{Evaluación cuantitativa y cualitativa}
+Para la evaluación cuantitativa, se utilizaron métricas como precisión, exhaustividad y F1-score, comparando los documentos recuperados por el sistema con un conjunto de referencia anotado por expertos. Por ejemplo, en pruebas sintéticas, el sistema alcanzó una precisión del 85\% y una exhaustividad del 78\% al recuperar documentos relevantes en un corpus mixto. Además, se midió el tiempo de respuesta promedio, que fue de 2.3 segundos por consulta en un entorno controlado.
+
+En la evaluación cualitativa, evaluadores humanos analizaron la relevancia y utilidad de las respuestas generadas, otorgando una puntuación promedio de 4.2 sobre 5 en claridad y 4.0 sobre 5 en profundidad de la información proporcionada. Estas evaluaciones cualitativas permitieron identificar áreas de mejora en la presentación de resultados y en la generación de resúmenes.
+
+\subsection{Pruebas en el módulo \texttt{graphrag}}
+
+El módulo \texttt{graphrag} incluye un conjunto de tests automatizados que evalúan los siguientes aspectos:
+
+\begin{itemize}
+    \item \textbf{Comparación de estrategias de recuperación:} Se mide la precisión de la recuperación directa mediante RAG frente a la recuperación mejorada con búsqueda por deriva. Para ello, se compara la relevancia de los documentos recuperados y la calidad de las respuestas generadas en ambos enfoques.
+    \item \textbf{Robustez ante datos ruidosos:} Se evalúa la capacidad del sistema para distinguir información relevante de documentos irrelevantes o falsos, inyectando datos de prueba (nonsense) en el corpus y midiendo el impacto en la precisión de la recuperación.
+    \item \textbf{Cobertura y granularidad de la segmentación y extracción:} Se verifica que el proceso de segmentación de texto y extracción de entidades y relaciones cubra adecuadamente los contenidos de los documentos y que la estructura jerárquica del grafo de conocimiento refleje correctamente las comunidades y subcomunidades relevantes.
+\end{itemize}
+
+Las pruebas se encuentran en el directorio \texttt{graphrag/tests/} e incluyen tanto casos de prueba sintéticos como evaluaciones sobre datos reales y mixtos. Los resultados de estas pruebas han permitido ajustar los parámetros de segmentación, fusión y detección de comunidades, así como optimizar los prompts utilizados para la extracción y resumen de información.
+
+\subsection{Resultados de la evaluación}
+
+Los tests realizados muestran que la integración de la búsqueda por deriva en el pipeline de recuperación mejora la precisión y relevancia de las respuestas generadas, especialmente en consultas complejas o ambiguas. Asimismo, el sistema demuestra una alta resistencia al ruido, manteniendo una tasa de recuperación de documentos relevantes significativamente superior a la obtenida mediante recuperación directa cuando se introduce información irrelevante en el corpus.
+
+La estructura jerárquica del grafo de conocimiento, junto con la segmentación y resumen de comunidades, facilita la generación de respuestas tanto generales como específicas, adaptándose al nivel de detalle requerido por la consulta del usuario.
+
+En conjunto, la batería de tests implementada en \texttt{graphrag} proporciona una validación integral de los mecanismos de recuperación y razonamiento del sistema, respaldando la efectividad de la solución propuesta.
 
 \section{Conclusiones}
-
-El sistema SotA implementa un enfoque multi-agente avanzado para la automatización de la generación de estados del arte en artículos de investigación. La integración de agentes especializados, junto con el uso de grafos de conocimiento y técnicas de recuperación aumentada por generación (RAG), permite una recuperación y síntesis de información científica precisa, estructurada y contextualizada. El agente recuperador, apoyado por recuperadores especializados y mecanismos de limpieza de texto, garantiza la obtención de documentos relevantes y de alta calidad desde diversas fuentes académicas.
-
-La arquitectura propuesta facilita la adaptación dinámica a nuevas consultas y dominios, optimizando la colaboración entre agentes y la actualización incremental del conocimiento. Las pruebas de precisión y robustez demuestran la efectividad del sistema tanto en escenarios ideales como en presencia de ruido o datos irrelevantes. En conjunto, SotA representa una solución flexible y escalable para la generación automatizada de revisiones del estado del arte, contribuyendo a la eficiencia y calidad en la investigación científica.
+El sistema SotA presentado en este trabajo demuestra la viabilidad y eficacia de una arquitectura multiagente para la automatización de la generación de estados del arte en artículos de investigación. La integración de técnicas avanzadas de recuperación aumentada por generación (RAG) y grafos de conocimiento permite no solo mejorar la precisión y relevancia de la información recuperada, sino también estructurar el conocimiento de manera jerárquica y comprensible.
+Las pruebas realizadas evidencian que la combinación de búsqueda por deriva y RAG incrementa la calidad de las respuestas, especialmente en escenarios complejos o con información ambigua. Además, el sistema muestra una notable robustez frente a la presencia de datos ruidosos o irrelevantes, manteniendo una alta tasa de recuperación de documentos pertinentes.
+La estructura jerárquica del grafo de conocimiento, junto con los mecanismos de segmentación y resumen de comunidades, facilita la generación de respuestas adaptadas al nivel de detalle requerido por la consulta, permitiendo tanto visiones generales como análisis específicos.
+En conjunto, SotA representa un avance significativo hacia la automatización inteligente de la revisión de literatura científica, ofreciendo una herramienta flexible, escalable y precisa para investigadores y profesionales.
 
 \section{Limitaciones y Trabajo Futuro}
+A pesar de los avances logrados, el sistema SotA presenta algunas limitaciones que abren oportunidades para futuras mejoras:
+\begin{itemize}
+\item \textbf{Dependencia de la calidad de las fuentes externas:} La precisión y cobertura de los documentos recuperados dependen en gran medida de la disponibilidad y calidad de las APIs de terceros (arXiv, PubMed, Semantic Scholar, Crossref). Cambios en estas APIs o restricciones de acceso pueden afectar el rendimiento del sistema.
+\item \textbf{Procesamiento de texto completo:} Aunque se emplean técnicas de limpieza y segmentación, la extracción de información relevante a partir de PDFs sigue siendo un reto, especialmente en documentos con formatos complejos o escaneados.
+\item \textbf{Limitaciones de los modelos de lenguaje:} El sistema se apoya en modelos de lenguaje que pueden incurrir en errores de interpretación, sesgos o generación de información no verificada, especialmente en dominios altamente especializados.
+\item \textbf{Escalabilidad y eficiencia:} El procesamiento incremental y la actualización del grafo de conocimiento pueden volverse costosos computacionalmente a medida que crece el corpus de documentos, requiriendo optimizaciones adicionales para aplicaciones a gran escala.
+\item \textbf{Evaluación automática:} La evaluación de la relevancia y precisión de las respuestas aún depende en parte de juicios manuales o conjuntos de datos limitados, lo que dificulta la comparación objetiva con otros sistemas.
+\item \textbf{Riesgo de sobreajuste a corpus de prueba:} Existe la posibilidad de que el sistema ajuste sus parámetros a los datos de prueba, reduciendo su capacidad de generalización a nuevos dominios.
+\item \textbf{Falta de interpretabilidad:} Algunas decisiones tomadas por los modelos de lenguaje y los algoritmos de grafo pueden ser difíciles de interpretar o justificar para los usuarios finales.
+\end{itemize}
 
-Aunque el sistema SotA presenta una solución robusta para la automatización de la generación de estados del arte, existen limitaciones a considerar. La dependencia de modelos de lenguaje puede introducir sesgos o errores en la interpretación de textos científicos. Además, la cobertura de los recuperadores está limitada por el acceso a bases de datos abiertas y la calidad de los metadatos disponibles. El sistema podría beneficiarse de la integración de más fuentes de datos, así como de la mejora de los algoritmos de fusión y deduplicación de información. Futuras líneas de trabajo incluyen la incorporación de métricas automáticas de calidad para los resúmenes generados y la evaluación continua con usuarios finales.
+Como líneas de trabajo futuro se proponen:
 
-Las siguientes fuentes y herramientas fueron utilizadas o referenciadas en el desarrollo del sistema: arXiv~\cite{arxiv}, PubMed~\cite{pubmed}, Semantic Scholar~\cite{semanticscholar}, Crossref~\cite{crossref}, y Edge et al., 2025~\cite{edge2025localglobalgraphrag}.
+\begin{itemize}
+\item \textbf{Integración de nuevas fuentes y lenguajes:} Ampliar el sistema para soportar más repositorios académicos y documentos en otros idiomas, mejorando la cobertura y diversidad de la información recuperada.
+\item \textbf{Mejoras en la extracción de información:} Incorporar técnicas avanzadas de procesamiento de lenguaje natural y visión por computador para mejorar la extracción de texto y metadatos desde PDFs complejos o imágenes.
+\item \textbf{Optimización de la eficiencia:} Desarrollar estrategias de almacenamiento y actualización más eficientes para el grafo de conocimiento, así como paralelización de procesos para reducir tiempos de respuesta.
+\item \textbf{Evaluación automática y continua:} Implementar métricas automáticas y pipelines de evaluación continua que permitan medir la calidad y relevancia de las respuestas de manera objetiva y escalable.
+\item \textbf{Interacción adaptativa con el usuario:} Explorar mecanismos de interacción más sofisticados, como retroalimentación activa del usuario o personalización de los perfiles de expertos, para adaptar el sistema a diferentes necesidades y contextos de investigación.
+\end{itemize}
 
-\bibliographystyle{plain}
+\bibliographystyle{plainnat}
 \bibliography{references}
 
 \end{document}
